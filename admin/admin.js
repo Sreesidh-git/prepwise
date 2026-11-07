@@ -137,7 +137,7 @@
 
   document.getElementById('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!configured()) return setStatus(loginStatus, 'Admin configuration is not installed. Copy admin/config.example.js to admin/config.js and add the Supabase URL and anon key.');
+    if (!configured()) return setStatus(loginStatus, 'Owner configuration is not installed. Copy admin/config.example.js to admin/config.js and add the Supabase URL and publishable key.');
     setStatus(loginStatus, 'Signing in…', false);
     try {
       const session = await supabaseAuth('token?grant_type=password', { email: document.getElementById('email').value, password: document.getElementById('password').value });

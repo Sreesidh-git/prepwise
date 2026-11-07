@@ -54,7 +54,7 @@ Cloudflare Pages can deploy the repository root as the static output and automat
 1. Replace `YOUR-DOMAIN.example` in [`robots.txt`](./robots.txt) and [`sitemap.xml`](./sitemap.xml) with the verified site domain.
 2. Configure the encrypted server variables listed in [`functions/README.md`](./functions/README.md).
 3. Configure the browser-safe values in [`js/public-config.js`](./js/public-config.js).
-4. Apply the Supabase migrations and run the importer only after a real Supabase project and service-role secret are available.
+4. Apply the Supabase migrations and run the importer only after a real Supabase project and server-only secret key are available.
 
 ## Work on data
 

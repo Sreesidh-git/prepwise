@@ -1,8 +1,8 @@
 """Import the existing PrepWise JSON datasets into Supabase PostgREST.
 
 This script intentionally uses only the Python standard library so it can run
-without adding a dependency to the static frontend. It requires a Supabase
-service-role key and must only be run in a trusted environment.
+without adding a dependency to the static frontend. It requires the Supabase
+secret key and must only be run in a trusted environment.
 """
 
 from __future__ import annotations
@@ -410,7 +410,7 @@ def main() -> int:
     report = ImportReport()
     try:
         run_import(SupabaseRestClient(project_url, service_key), args.batch_size, report)
-    except SupabaseImportError as error:
+    except (SupabaseImportError, KeyError, TypeError, ValueError) as error:
         report.failed.append(str(error))
         report.print_summary()
         print(f"Import failed: {error}", file=sys.stderr)

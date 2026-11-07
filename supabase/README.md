@@ -11,7 +11,7 @@ Create a Supabase project and copy these values into a local `.env` file or Clou
 - `SUPABASE_SECRET_KEY` for server-only migration/import jobs
 - `SUPABASE_OWNER_USER_ID` for the one authorized owner identity used by Pages Functions
 
-The publishable/anon key may be used by public browser reads. The service-role key must only be used by trusted migration tooling or server-side functions.
+The publishable key may be used by public browser reads. The secret key must only be used by trusted migration tooling or server-side functions.
 
 ## Apply migrations
 
@@ -37,7 +37,7 @@ python .\scripts\import_json_to_supabase.py
 
 The importer reads the existing JSON files, upserts normalized categories/countries/companies/questions/news, creates one published full-test quiz per company, and links each quiz to its questions. It does not modify or delete the local JSON files.
 
-The importer has not been run in this checkout because no Supabase project URL or service-role key is available.
+The importer has not been run in this checkout because no Supabase project URL or secret key is available.
 
 ## Initial owner setup
 

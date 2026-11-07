@@ -1,5 +1,5 @@
 // Public browser configuration. Replace these empty values in a deployment
-// with the Supabase project URL and publishable/anon key.
+// with the Supabase project URL and publishable key.
 window.PREPWISE_CONFIG = {
   supabaseUrl: '',
   supabasePublishableKey: ''
