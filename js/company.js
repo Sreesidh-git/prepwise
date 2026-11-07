@@ -191,21 +191,6 @@
         </button>
       </div>
 
-      <div class="sidebar-card" style="padding: var(--space-md); text-align: center;">
-        <span class="ad-badge">Sidebar Ad (300×250 / 300×600)</span>
-        <div class="ad-slot ad-slot-sidebar" style="background:#fff;border-color:var(--color-border);margin-top:8px;">
-          <span style="font-size:2rem;margin-bottom:8px;">💡</span>
-          <div style="font-weight:700;font-size:0.9rem;color:var(--color-text);margin-bottom:4px;">
-            Top 50 ${company.shortName} Coding Questions
-          </div>
-          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-bottom:12px;">
-            Download curated cheatsheet & solutions PDF.
-          </p>
-          <a href="https://www.placementcrack.com/" target="_blank" rel="noopener" style="background:var(--color-primary);color:white;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:700;">
-            Free Download ↗
-          </a>
-        </div>
-      </div>
     `;
   }
 
@@ -409,7 +394,6 @@
     `;
 
     rolesGrid.innerHTML += internshipCard;
-    rolesGrid.innerHTML += stealthRoleSponsor;
   }
 
   // ---------- Render Test Pattern ----------

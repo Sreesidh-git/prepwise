@@ -41,6 +41,12 @@ There is currently no build command, test runner, lint configuration, or depende
 
 The `functions/` directory contains Cloudflare Pages Functions and is not executed by the Python server. See [`functions/README.md`](./functions/README.md) for deployment-side API behavior.
 
+## Configure public analytics
+
+The browser-safe placeholders live in [`js/public-config.js`](./js/public-config.js). Keep the values empty for a local static-only run. For a deployed site, set the Supabase project URL, publishable/anon key, and optional GA4 Measurement ID there through the deployment process. Never put the Supabase service-role key or Google Search Console credentials in this file.
+
+The former demo advertising runtime is disabled and is not loaded by any public page.
+
 ## Work on data
 
 The browser reads JSON directly:

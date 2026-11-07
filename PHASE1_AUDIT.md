@@ -16,7 +16,7 @@ PrepWise has no build system or server runtime. The browser loads four HTML docu
 | Company behavior | `js/company.js` |
 | Quiz behavior | `js/quiz.js` |
 | News behavior | `js/news.js` |
-| Advertising behavior | `js/ads.js` (currently demo UI; migration requirement says disable/remove fake ads) |
+| Advertising behavior | Disabled during migration; the former demo ad runtime was removed |
 | Company data | `data/companies.json` |
 | Country data | `data/countries.json` |
 | Hiring news | `data/news.json` |
@@ -31,7 +31,7 @@ PrepWise has no build system or server runtime. The browser loads four HTML docu
 - `/quiz.html?company=<id>&category=<category>&level=<level>&role=<role>` loads the company record and question file, then filters questions in the browser.
 - `/about.html` is a static informational page.
 - `news.js` loads `data/news.json` and also contains a simulated alert pool. This must be replaced with published database content and clearly labelled runtime behavior.
-- `ads.js` creates wallpaper, anchor, floating-video, and sponsored UI. The production specification explicitly requires advertising preparation only, so this module must be disabled and later replaced by configurable, inactive placement definitions.
+- The former demo ad runtime created wallpaper, anchor, floating-video, and sponsored UI. It has been removed because the production specification explicitly requires advertising preparation only.
 
 ## Repository inventory
 
@@ -99,4 +99,3 @@ Add `/admin` as a separate owner-authenticated surface. It must not be included 
 ## Phase 1 checkpoint
 
 The current worktree includes the earlier documentation, link, content, and quiz-answer fixes. This audit records that state before database/backend work begins. The checkpoint commit is intentionally separate from later Supabase implementation commits.
-

@@ -52,11 +52,12 @@ prepwise/
 ├── css/
 │   └── style.css              # Yellow/black logo, news ticker, fresher CTC box, level glow
 ├── js/
-│   ├── app.js                 # 50-country strict filtering, stealth in-feed sponsor cards
+│   ├── app.js                 # 50-country strict filtering and dynamic search
 │   ├── news.js                # Auto-updating MNC hiring news ticker & live news feed
 │   ├── company.js             # Detailed fresher JDs, CTC calculator, roles & level practice
 │   ├── quiz.js                # Quiz logic, 4 difficulty levels, role preparation, step solutions
-│   └── ads.js                 # Wallpaper takeover, sticky anchor, floating video, ad control pill
+│   ├── public-config.js       # Safe browser configuration placeholders
+│   └── analytics.js           # GA4 and anonymous first-party analytics hooks
 └── data/
     ├── news.json              # Live MNC campus drive announcements & eligibility updates
     ├── countries.json         # Top 50 countries, flags, tech hubs, top employers

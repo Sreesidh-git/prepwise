@@ -88,12 +88,6 @@
     companies.forEach((company, index) => {
       cardsHtml += createCompanyCard(company);
 
-      // Stealth In-Feed Native Sponsored Card inserted after 3rd and 7th card
-      if (index === 2) {
-        cardsHtml += createStealthSponsorCard1();
-      } else if (index === 6) {
-        cardsHtml += createStealthSponsorCard2();
-      }
     });
 
     companiesGrid.innerHTML = cardsHtml;

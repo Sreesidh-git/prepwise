@@ -6,6 +6,7 @@ These functions are server-side entry points for a Cloudflare Pages deployment. 
 
 - `GET /api/health` — deployment health check; contains no secrets.
 - `POST /api/feedback` — validates and stores anonymous public feedback.
+- `POST /api/analytics` — validates anonymous first-party events and stores them server-side.
 - `GET|POST|PATCH|DELETE /api/admin/<resource>` — owner-authenticated content operations.
 
 Admin requests must include:

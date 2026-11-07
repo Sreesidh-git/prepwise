@@ -227,27 +227,6 @@
     // Format explanation
     const formattedExplanation = formatExplanation(q.explanation || 'No step-by-step explanation provided.');
 
-    // In-content native question ad banner (rotates every 2 questions for high density)
-    const showNativeAd = (index % 2 === 1);
-    const nativeAdHtml = showNativeAd ? `
-      <div class="ad-slot ad-slot-inline" style="margin-top: var(--space-md); text-align: left; background: #fff; border: 1.5px solid var(--color-border);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-          <span class="ad-badge">Sponsored Placement</span>
-          <span style="font-size:0.65rem; color:var(--color-text-muted);">AdChoices ↗</span>
-        </div>
-        <div class="ad-creative-mock" style="justify-content: flex-start; padding: 10px;">
-          <span style="font-size:1.6rem; margin-right: 8px;">💼</span>
-          <div>
-            <div style="font-weight:700; font-size:0.875rem; color:var(--color-text);">Direct Campus Placement Referral Network</div>
-            <div style="font-size:0.75rem; color:var(--color-text-secondary);">Get referred directly to hiring managers at top tech firms with a pre-screened resume.</div>
-          </div>
-          <a href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener" style="margin-left:auto; background:var(--color-primary); color:white; padding:6px 14px; border-radius:6px; font-size:0.75rem; font-weight:700; white-space:nowrap;">
-            Apply Free ↗
-          </a>
-        </div>
-      </div>
-    ` : '';
-
     questionArea.innerHTML = `
       <div class="question-card">
         <div class="question-meta" style="align-items:center; justify-content:space-between;">
@@ -275,15 +254,9 @@
             <h4>Detailed Step-by-Step Solution:</h4>
             <div>${formattedExplanation}</div>
             
-            <!-- Stealth Sponsored Study Unit -->
-            <div style="margin-top:14px; padding:8px 12px; background:rgba(37,99,235,0.05); border:1px dashed var(--color-primary); border-radius:var(--radius-md); font-size:0.75rem; display:flex; align-items:center; justify-content:space-between; gap:8px;">
-              <span>💡 <strong>Sponsored Preparation Tool:</strong> Practice live 1-on-1 mock interviews for this question with ex-FAANG engineers.</span>
-              <a href="https://www.pramp.com/" target="_blank" rel="noopener" style="font-weight:700; color:var(--color-primary); white-space:nowrap;">Claim Free Session ↗</a>
-            </div>
           </div>
         </div>
       </div>
-      ${nativeAdHtml}
     `;
 
     // Bind option click listeners if not answered yet
@@ -398,6 +371,15 @@
     }
 
     const percentage = Math.round((correct / total) * 100);
+    if (window.prepwiseTrack) {
+      window.prepwiseTrack('quiz_complete', {
+        questionCount: total,
+        answeredCount: total - skipped,
+        score: correct,
+        category: categoryParam,
+        level: levelParam || 'all'
+      });
+    }
 
     let feedbackTitle = 'Great Effort!';
     let feedbackDesc = 'Review your mistakes and take on the next difficulty tier to level up your placement score.';
@@ -437,21 +419,6 @@
         <a href="company.html?id=${companyData.id}" class="quiz-btn quiz-btn-primary">
           💼 View All Roles & Salaries for ${companyData.shortName}
         </a>
-      </div>
-
-      <!-- High-eCPM Results Banner Ad -->
-      <div class="ad-slot ad-slot-inline" style="margin-top: var(--space-xl); background: #fff; border: 1.5px solid var(--color-border); text-align: left;">
-        <span class="ad-badge">Results Banner Ad (728×90 / Responsive)</span>
-        <div class="ad-creative-mock" style="padding: 12px;">
-          <span style="font-size:2rem; margin-right: 12px;">🏆</span>
-          <div>
-            <div style="font-weight:700; font-size:0.95rem; color:var(--color-text);">Full-Stack Engineering Career Accelerator</div>
-            <div style="font-size:0.8rem; color:var(--color-text-secondary);">Guaranteed placement assistance + 1-on-1 mock interviews with senior FAANG engineers.</div>
-          </div>
-          <a href="https://www.coursera.org/" target="_blank" rel="noopener" style="margin-left:auto; background:var(--color-secondary); color:white; padding:8px 18px; border-radius:6px; font-weight:700; font-size:0.8rem; white-space:nowrap;">
-            Claim 40% Off ↗
-          </a>
-        </div>
       </div>
 
       <!-- Next Steps & Retention Engine -->

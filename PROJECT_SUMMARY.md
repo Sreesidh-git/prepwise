@@ -44,7 +44,8 @@ HTML pages
         ├── company.js  -> companies.json, questions/<company>.json
         ├── quiz.js     -> companies.json, questions/<company>.json
         ├── news.js     -> news.json
-        └── ads.js      -> browser localStorage for ad preferences
+        ├── public-config.js -> safe browser configuration placeholders
+        └── analytics.js -> GA4 and anonymous first-party analytics hooks
 
 Python data scripts
   └── generate or enrich files in data/
@@ -60,7 +61,7 @@ The scripts are loaded at the bottom of each page, so the DOM exists before the 
 - A company question file normally contains 50 questions in four categories.
 - Questions can have both `difficulty` and `level`; the quiz accepts either field.
 - News is loaded from `data/news.json`. The news module rotates items and adds simulated breaking alerts during refreshes; it is not connected to a live news API.
-- Ads are demo UI components. Their settings can be persisted in `localStorage` under `prepwise_ad_config`.
+- Advertising is intentionally disabled for the production migration. Future placement configuration must not display fake ads or simulated earnings.
 - The website does not currently have authentication, server-side storage, automated API fetching, or a submission system.
 
 ## Content scale
@@ -90,4 +91,3 @@ At the time this guide was written, the repository contains:
 - The Python scripts contain an absolute Windows path from an older workspace. Update `base_dir` before running them on another computer; see [`DATA_AND_CONTENT.md`](./DATA_AND_CONTENT.md).
 - JSON is the runtime source of truth. If a Python generator changes a JSON file, inspect the diff before serving the site.
 - Salary, hiring, and news values are content in this repository. They should be checked against official sources before being presented as current facts.
-
