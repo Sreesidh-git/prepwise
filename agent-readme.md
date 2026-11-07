@@ -221,5 +221,14 @@ hash if created, blockers, and the next action. Never remove prior entries.
   table/API probes cannot be trusted; migrations remain unapplied.
 - Browser secret audit found no `SUPABASE_SECRET_KEY` or owner ID references;
   server-side references are limited to the expected functions/importer.
+- Read-only link verification succeeded for project `jwkllwqabixzmtfiuncd`
+  (`Prepwise`, production). Remote migration history is empty for local
+  migrations `0001`, `0002`, and `0003`.
+- `npx supabase db push --remote --dry-run` succeeded and previewed exactly:
+  `0001_initial_schema.sql`, `0002_analytics_events.sql`, and
+  `0003_owner_only_policies.sql`. No seeds or roles were included.
+- The dry run confirms pending migration history but does not prove that no
+  manually-created remote objects conflict with these names. No production SQL
+  was executed; a remote schema diff would be a separate read-only review.
 - Next action is to wait for the user to fill `.env` and explicitly approve
   migration execution.
