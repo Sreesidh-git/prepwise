@@ -14,6 +14,8 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +26,26 @@ DEFAULT_BATCH_SIZE = 100
 
 class SupabaseImportError(RuntimeError):
     """Raised when a Supabase import request fails."""
+
+
+@dataclass
+class ImportReport:
+    imported: Counter[str] = field(default_factory=Counter)
+    skipped: Counter[str] = field(default_factory=Counter)
+    failed: list[str] = field(default_factory=list)
+
+    def add_imported(self, table: str, count: int) -> None:
+        self.imported[table] += count
+
+    def add_skipped(self, reason: str, count: int = 1) -> None:
+        self.skipped[reason] += count
+
+    def print_summary(self) -> None:
+        imported = ", ".join(f"{key}={value}" for key, value in self.imported.items()) or "none"
+        skipped = ", ".join(f"{key}={value}" for key, value in self.skipped.items()) or "none"
+        print(f"Import report: imported [{imported}], skipped [{skipped}], failed [{len(self.failed)}]")
+        for failure in self.failed:
+            print(f"Failed: {failure}", file=sys.stderr)
 
 
 class SupabaseRestClient:
@@ -258,6 +280,7 @@ def create_quizzes(
     company_ids: dict[str, str],
     question_category_ids: dict[str, str],
     batch_size: int,
+    report: ImportReport,
 ) -> None:
     quiz_rows = [
         {
@@ -270,6 +293,7 @@ def create_quizzes(
         for company in companies
     ]
     quizzes = client.upsert("quizzes", quiz_rows, "slug", batch_size)
+    report.add_imported("quizzes", len(quiz_rows))
     quiz_ids = {quiz["slug"]: quiz["id"] for quiz in quizzes}
 
     links: list[dict[str, Any]] = []
@@ -289,9 +313,10 @@ def create_quizzes(
             for position, row in enumerate(questions)
         )
     client.upsert("quiz_questions", links, "quiz_id,question_id", batch_size)
+    report.add_imported("quiz_questions", len(links))
 
 
-def run_import(client: SupabaseRestClient, batch_size: int) -> None:
+def run_import(client: SupabaseRestClient, batch_size: int, report: ImportReport) -> None:
     companies = load_json("data/companies.json")
     countries = load_json("data/countries.json")
     news = load_json("data/news.json")
@@ -299,52 +324,67 @@ def run_import(client: SupabaseRestClient, batch_size: int) -> None:
     company_categories = client.upsert(
         "company_categories", company_category_rows(companies), "slug", batch_size
     )
+    report.add_imported("company_categories", len(company_categories))
     question_categories = client.upsert(
         "question_categories", question_category_rows(), "slug", batch_size
     )
-    client.upsert("countries", country_rows(countries), "legacy_code", batch_size)
+    report.add_imported("question_categories", len(question_categories))
+    country_payload = country_rows(countries)
+    client.upsert("countries", country_payload, "legacy_code", batch_size)
+    report.add_imported("countries", len(country_payload))
 
     company_category_ids = {row["name"]: row["id"] for row in company_categories}
     question_category_ids = {row["name"]: row["id"] for row in question_categories}
     company_result = client.upsert(
         "companies", company_rows(companies, company_category_ids), "legacy_id", batch_size
     )
+    report.add_imported("companies", len(company_result))
     company_ids = {row["legacy_id"]: row["id"] for row in company_result}
 
     country_result = client.request("GET", "countries", query="?select=id,name")
     country_ids = {row["name"]: row["id"] for row in country_result}
-    operations = [
-        {"company_id": company_ids[company["id"]], "country_id": country_ids[country]}
+    operation_candidates = [
+        (company, country)
         for company in companies
         for country in company.get("countries", [])
+    ]
+    operations = [
+        {"company_id": company_ids[company["id"]], "country_id": country_ids[country]}
+        for company, country in operation_candidates
         if country in country_ids
     ]
+    report.add_skipped(
+        "unknown_company_country",
+        len(operation_candidates) - len(operations),
+    )
     client.upsert(
         "company_country_operations",
         operations,
         "company_id,country_id",
         batch_size,
     )
+    report.add_imported("company_country_operations", len(operations))
 
     for company in companies:
         rows = question_rows(company, company_ids[company["id"]], question_category_ids)
         client.upsert("interview_questions", rows, "company_id,legacy_id", batch_size)
+        report.add_imported("interview_questions", len(rows))
 
-    client.upsert("hiring_news", news_rows(news, {
+    news_payload = news_rows(news, {
         name.lower(): company_ids[company["id"]]
         for company in companies
         for name in (company["name"], company["shortName"], company["id"])
-    }), "legacy_id", batch_size)
-    create_quizzes(client, companies, company_ids, question_category_ids, batch_size)
+    })
+    client.upsert("hiring_news", news_payload, "legacy_id", batch_size)
+    report.add_imported("hiring_news", len(news_payload))
+    create_quizzes(client, companies, company_ids, question_category_ids, batch_size, report)
 
     total_questions = sum(
         len(load_json(f"data/questions/{company['id']}.json").get("questions", []))
         for company in companies
     )
-    print(
-        f"Imported {len(companies)} companies, {len(countries)} countries, "
-        f"{total_questions} questions, {len(news)} news records."
-    )
+    print(f"Loaded source data: {len(companies)} companies, {len(countries)} countries, "
+          f"{total_questions} questions, {len(news)} news records.")
 
 
 def parse_args() -> argparse.Namespace:
@@ -367,11 +407,15 @@ def main() -> int:
             file=sys.stderr,
         )
         return 2
+    report = ImportReport()
     try:
-        run_import(SupabaseRestClient(project_url, service_key), args.batch_size)
+        run_import(SupabaseRestClient(project_url, service_key), args.batch_size, report)
     except SupabaseImportError as error:
+        report.failed.append(str(error))
+        report.print_summary()
         print(f"Import failed: {error}", file=sys.stderr)
         return 1
+    report.print_summary()
     return 0
 
 

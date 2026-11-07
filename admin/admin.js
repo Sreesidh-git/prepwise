@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const config = window.PREPWISE_CONFIG;
+  const config = window.PREPWISE_CONFIG || {};
   const loginView = document.getElementById('loginView');
   const dashboardView = document.getElementById('dashboardView');
   const loginStatus = document.getElementById('loginStatus');
@@ -181,8 +181,23 @@
     renderTable(document.getElementById('resourceTable'), state.records.filter((record) => JSON.stringify(record).toLowerCase().includes(query)));
   });
 
-  let savedSession = null;
-  try { savedSession = JSON.parse(localStorage.getItem('prepwise_admin_session') || 'null'); } catch { savedSession = null; }
-  if (savedSession?.access_token && configured()) showDashboard(savedSession);
-  else showLogin();
+  async function loadRuntimeConfig() {
+    try {
+      const response = await fetch('/api/config', { headers: { Accept: 'application/json' } });
+      if (!response.ok) return;
+      const runtimeConfig = await response.json();
+      Object.assign(config, runtimeConfig);
+      config.supabaseAnonKey = config.supabasePublishableKey;
+    } catch (error) {
+      // Static local hosting intentionally has no runtime configuration endpoint.
+    }
+  }
+
+  (async () => {
+    await loadRuntimeConfig();
+    let savedSession = null;
+    try { savedSession = JSON.parse(localStorage.getItem('prepwise_admin_session') || 'null'); } catch { savedSession = null; }
+    if (savedSession?.access_token && configured()) showDashboard(savedSession);
+    else showLogin();
+  })();
 })();

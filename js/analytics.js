@@ -53,7 +53,7 @@
       properties: { ...properties, deviceCategory: deviceCategory() }
     };
     ga(eventName, properties);
-    if (config.supabaseUrl && config.supabaseAnonKey) {
+    if (config.supabaseUrl && config.supabasePublishableKey) {
       fetch('/api/analytics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,7 +78,20 @@
     window.gtag('config', config.ga4MeasurementId, { send_page_view: false });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  async function loadRuntimeConfig() {
+    try {
+      const response = await fetch('/api/config', { headers: { Accept: 'application/json' } });
+      if (!response.ok) return;
+      const runtimeConfig = await response.json();
+      Object.assign(config, runtimeConfig);
+      config.supabaseAnonKey = config.supabasePublishableKey;
+    } catch (error) {
+      // Static local hosting intentionally has no runtime configuration endpoint.
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadRuntimeConfig();
     initializeGa4();
     track('page_view');
 
