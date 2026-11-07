@@ -1,0 +1,6 @@
+# Cloudflare Pages local development bindings.
+# Copy to .dev.vars and fill only in your local ignored file.
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
+SUPABASE_OWNER_USER_ID=

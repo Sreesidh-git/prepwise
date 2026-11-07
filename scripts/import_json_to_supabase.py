@@ -231,7 +231,7 @@ def news_rows(news: list[dict[str, Any]], company_ids: dict[str, str]) -> list[d
         rows.append(
             {
                 "legacy_id": item.get("id"),
-                "company_id": company_ids.get(item.get("company", "")),
+                "company_id": company_ids.get(item.get("company", "").lower()),
                 "company_name": item["company"],
                 "logo": item.get("logo"),
                 "badge": item.get("badge"),
@@ -331,7 +331,9 @@ def run_import(client: SupabaseRestClient, batch_size: int) -> None:
         client.upsert("interview_questions", rows, "company_id,legacy_id", batch_size)
 
     client.upsert("hiring_news", news_rows(news, {
-        company["shortName"]: company_ids[company["id"]] for company in companies
+        name.lower(): company_ids[company["id"]]
+        for company in companies
+        for name in (company["name"], company["shortName"], company["id"])
     }), "legacy_id", batch_size)
     create_quizzes(client, companies, company_ids, question_category_ids, batch_size)
 
@@ -356,12 +358,12 @@ def main() -> int:
     if args.batch_size < 1:
         print("--batch-size must be positive", file=sys.stderr)
         return 2
-    project_url = os.environ.get("PUBLIC_SUPABASE_URL")
-    service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    project_url = os.environ.get("SUPABASE_URL")
+    service_key = os.environ.get("SUPABASE_SECRET_KEY")
     if not project_url or not service_key:
         print(
-            "Set PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in the environment. "
-            "The service-role key is server-only and must never be committed.",
+            "Set SUPABASE_URL and SUPABASE_SECRET_KEY in the environment. "
+            "The secret key is server-only and must never be committed.",
             file=sys.stderr,
         )
         return 2

@@ -43,7 +43,7 @@ The `functions/` directory contains Cloudflare Pages Functions and is not execut
 
 ## Configure public analytics
 
-The browser-safe placeholders live in [`js/public-config.js`](./js/public-config.js). Keep the values empty for a local static-only run. For a deployed site, set the Supabase project URL, publishable/anon key, and optional GA4 Measurement ID there through the deployment process. Never put the Supabase service-role key or Google Search Console credentials in this file.
+The browser-safe placeholders live in [`js/public-config.js`](./js/public-config.js) and [`admin/config.js`](./admin/config.js). Keep the values empty for a local static-only run. For a deployed site, set the Supabase project URL, publishable key, and optional GA4 Measurement ID there through the deployment process. Never put `SUPABASE_SECRET_KEY`, `SUPABASE_OWNER_USER_ID`, or Google Search Console credentials in browser files.
 
 The former demo advertising runtime is disabled and is not loaded by any public page.
 

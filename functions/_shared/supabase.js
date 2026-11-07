@@ -19,7 +19,7 @@ export function envValue(env, name) {
 }
 
 function supabaseHeaders(env, accessToken) {
-  const serviceRoleKey = envValue(env, 'SUPABASE_SERVICE_ROLE_KEY');
+  const serviceRoleKey = envValue(env, 'SUPABASE_SECRET_KEY');
   return {
     apikey: serviceRoleKey,
     Authorization: `Bearer ${accessToken || serviceRoleKey}`,
@@ -28,7 +28,7 @@ function supabaseHeaders(env, accessToken) {
 }
 
 export async function supabaseRequest(env, path, options = {}) {
-  const baseUrl = envValue(env, 'PUBLIC_SUPABASE_URL').replace(/\/$/, '');
+  const baseUrl = envValue(env, 'SUPABASE_URL').replace(/\/$/, '');
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
@@ -55,7 +55,7 @@ export async function supabaseRequest(env, path, options = {}) {
 }
 
 export async function supabaseCount(env, path, accessToken) {
-  const baseUrl = envValue(env, 'PUBLIC_SUPABASE_URL').replace(/\/$/, '');
+  const baseUrl = envValue(env, 'SUPABASE_URL').replace(/\/$/, '');
   const response = await fetch(`${baseUrl}${path}`, {
     headers: {
       ...supabaseHeaders(env, accessToken),
@@ -85,10 +85,10 @@ export async function requireAdmin(request, env) {
     return { response: json({ error: 'Authentication required' }, 401) };
   }
 
-  const supabaseUrl = envValue(env, 'PUBLIC_SUPABASE_URL').replace(/\/$/, '');
+  const supabaseUrl = envValue(env, 'SUPABASE_URL').replace(/\/$/, '');
   const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
     headers: {
-      apikey: envValue(env, 'PUBLIC_SUPABASE_ANON_KEY'),
+      apikey: envValue(env, 'SUPABASE_PUBLISHABLE_KEY'),
       Authorization: `Bearer ${token}`
     }
   });
@@ -100,6 +100,9 @@ export async function requireAdmin(request, env) {
   const userId = user?.id;
   if (!userId) {
     return { response: json({ error: 'Invalid authentication subject' }, 401) };
+  }
+  if (userId !== envValue(env, 'SUPABASE_OWNER_USER_ID')) {
+    return { response: json({ error: 'Owner access required' }, 403) };
   }
 
   const encodedUserId = encodeURIComponent(userId);

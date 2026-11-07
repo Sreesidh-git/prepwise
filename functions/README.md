@@ -21,8 +21,11 @@ The function validates that token with Supabase Auth and checks the active `admi
 
 Configure these as encrypted server-side variables:
 
-- `PUBLIC_SUPABASE_URL`
-- `PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY`
+- `SUPABASE_OWNER_USER_ID`
 
 The local Python HTTP server cannot execute these functions. Use `wrangler pages dev` or a deployed Cloudflare Pages project after installing and authenticating the Wrangler CLI.
+
+For local Pages Functions testing, create an ignored `.dev.vars` file with the same names. The browser only receives the URL and publishable key through the static public configuration files; the secret key and owner ID must never be placed there.
