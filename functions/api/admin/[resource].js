@@ -14,6 +14,17 @@ const RESOURCES = new Set([
   'quizzes',
   'hiring_news',
   'website_settings',
+  'feedback',
+  'admin_activity_logs'
+]);
+const MUTABLE_RESOURCES = new Set([
+  'company_categories',
+  'companies',
+  'question_categories',
+  'interview_questions',
+  'quizzes',
+  'hiring_news',
+  'website_settings',
   'feedback'
 ]);
 
@@ -35,15 +46,16 @@ async function handle(request, context) {
 
   try {
     if (request.method === 'GET') {
+      const orderColumn = resource === 'admin_activity_logs' ? 'created_at' : 'updated_at';
       const payload = await supabaseRequest(
         context.env,
-        `/rest/v1/${resource}?select=*&order=updated_at.desc&limit=100`,
+        `/rest/v1/${resource}?select=*&order=${orderColumn}.desc&limit=100`,
         { accessToken: auth.token }
       );
       return json({ data: payload });
     }
 
-    if (!['POST', 'PATCH', 'DELETE'].includes(request.method)) {
+    if (!['POST', 'PATCH', 'DELETE'].includes(request.method) || !MUTABLE_RESOURCES.has(resource)) {
       return json({ error: 'Method not allowed' }, 405);
     }
 
