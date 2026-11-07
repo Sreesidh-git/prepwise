@@ -48,9 +48,11 @@ commit only completed work, and leave the exact next action under "Next action".
 - **Public access:** no registration or login required.
 - **Private access:** `/admin/` requires Supabase Auth and the configured owner.
 - **Advertising:** demo advertising runtime and sponsored placements are disabled.
-- **Supabase credentials:** `.env` exists but all canonical values are empty;
-  no credentials have been used.
-- **Supabase CLI:** not installed or available on PATH.
+- **Supabase credentials:** URL, publishable key, and secret key are set in
+  `.env`; owner ID and optional public values are still empty. No secret value
+  is recorded here.
+- **Supabase CLI:** available through `npx supabase` version `3.0.0`; no global
+  installation was performed.
 - **Supabase project ref:** `jwkllwqabixzmtfiuncd` (provided by user; no
   project connection has been attempted).
 - **Production migrations/import:** intentionally not executed.
@@ -212,5 +214,12 @@ hash if created, blockers, and the next action. Never remove prior entries.
 - User provided the project URL
   `https://jwkllwqabixzmtfiuncd.supabase.co/rest/v1/`; the usable project ref
   is `jwkllwqabixzmtfiuncd`.
+- Read-only connectivity checks found that `.env` currently stores the project
+  URL with the `/rest/v1/` suffix. It must be the base URL
+  `https://jwkllwqabixzmtfiuncd.supabase.co`; no credential file was edited.
+- With the suffixed URL, the publishable key reaches the project endpoint but
+  table/API probes cannot be trusted; migrations remain unapplied.
+- Browser secret audit found no `SUPABASE_SECRET_KEY` or owner ID references;
+  server-side references are limited to the expected functions/importer.
 - Next action is to wait for the user to fill `.env` and explicitly approve
   migration execution.
