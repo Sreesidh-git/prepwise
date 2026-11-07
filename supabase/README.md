@@ -52,6 +52,6 @@ The schema intentionally does not create an owner automatically because doing so
 
 ## Admin dashboard
 
-The private dashboard is at `/admin/`. Copy [`admin/config.example.js`](../admin/config.example.js) to `admin/config.js` for local connected testing and add the public Supabase URL and anon/publishable key. The owner still must authenticate through Supabase Auth and have an active row in `admin_profiles`; the browser key does not grant administrator access.
+The private dashboard is at `/admin/`. Copy [`admin/config.example.js`](../admin/config.example.js) to `admin/config.js` for local connected testing and add the public Supabase URL and publishable key. The owner must authenticate through Supabase Auth, have an active `role = 'owner'` row in `admin_profiles`, and match `SUPABASE_OWNER_USER_ID`; the browser key does not grant owner access.
 
 Cloudflare Pages must receive `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, and `SUPABASE_OWNER_USER_ID` as encrypted environment variables for the Pages Functions under [`functions/`](../functions/) to serve owner operations.

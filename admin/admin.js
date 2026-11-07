@@ -2,6 +2,9 @@
   'use strict';
 
   const config = window.PREPWISE_CONFIG || {};
+  if (!config.supabaseAnonKey) {
+    config.supabaseAnonKey = config.supabasePublishableKey || '';
+  }
   const loginView = document.getElementById('loginView');
   const dashboardView = document.getElementById('dashboardView');
   const loginStatus = document.getElementById('loginStatus');
@@ -14,12 +17,14 @@
   }
 
   function configured() {
-    return config && config.supabaseUrl && config.supabaseAnonKey &&
+    const publishableKey = config?.supabasePublishableKey || config?.supabaseAnonKey;
+    return config && config.supabaseUrl && publishableKey &&
       !config.supabaseUrl.includes('your-project-ref') &&
-      !config.supabaseAnonKey.includes('your-supabase');
+      !publishableKey.includes('your-supabase');
   }
 
   async function supabaseAuth(path, body, token) {
+    const publishableKey = config.supabasePublishableKey || config.supabaseAnonKey;
     const response = await fetch(`${config.supabaseUrl.replace(/\/$/, '')}/auth/v1/${path}`, {
       method: 'POST',
       headers: { apikey: config.supabaseAnonKey, Authorization: `Bearer ${token || config.supabaseAnonKey}`, 'Content-Type': 'application/json' },
