@@ -39,6 +39,8 @@ http://localhost:3456/quiz.html?company=tcs&level=Beginner
 
 There is currently no build command, test runner, lint configuration, or dependency manifest in the repository. Manual browser testing is the available validation path.
 
+The `functions/` directory contains Cloudflare Pages Functions and is not executed by the Python server. See [`functions/README.md`](./functions/README.md) for deployment-side API behavior.
+
 ## Work on data
 
 The browser reads JSON directly:
@@ -83,4 +85,3 @@ Press `Ctrl+C` in the terminal running `python -m http.server`.
 - Inspect the browser console for errors.
 - Review JSON and code changes with `git diff`.
 - Verify that links to company ids and question files still match.
-
