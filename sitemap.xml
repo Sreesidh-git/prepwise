@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Replace YOUR-DOMAIN.example before deploying. Dynamic company and quiz URLs are generated from the JSON dataset during deployment preparation. -->
+  <url>
+    <loc>https://YOUR-DOMAIN.example/</loc>
+  </url>
+  <url>
+    <loc>https://YOUR-DOMAIN.example/about.html</loc>
+  </url>
+</urlset>

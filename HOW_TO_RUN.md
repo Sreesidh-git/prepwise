@@ -47,6 +47,15 @@ The browser-safe placeholders live in [`js/public-config.js`](./js/public-config
 
 The former demo advertising runtime is disabled and is not loaded by any public page.
 
+## Deployment preparation
+
+Cloudflare Pages can deploy the repository root as the static output and automatically discover the `functions/` directory. Before production deployment:
+
+1. Replace `YOUR-DOMAIN.example` in [`robots.txt`](./robots.txt) and [`sitemap.xml`](./sitemap.xml) with the verified site domain.
+2. Configure the encrypted server variables listed in [`functions/README.md`](./functions/README.md).
+3. Configure the browser-safe values in [`js/public-config.js`](./js/public-config.js).
+4. Apply the Supabase migrations and run the importer only after a real Supabase project and service-role secret are available.
+
 ## Work on data
 
 The browser reads JSON directly:

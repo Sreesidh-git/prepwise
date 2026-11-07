@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /functions/
+
+# Replace YOUR-DOMAIN.example before deploying.
+Sitemap: https://YOUR-DOMAIN.example/sitemap.xml
