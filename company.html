@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Complete company profile, interview test pattern, and practice aptitude MCQs with step-by-step solutions.">
+  <title>Company Profile — PrepWise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" role="navigation">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo-icon">P</span>
+        Prep<span class="logo-text-wise">Wise</span>
+      </a>
+      <div class="navbar-nav" id="navMenu">
+        <a href="index.html">Companies</a>
+        <a href="index.html#mncNewsSection">📰 MNC News</a>
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="about.html">About</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ========== LIVE MNC NEWS TICKER ========== -->
+  <div class="news-ticker-bar">
+    <div class="container" style="display:flex; align-items:center; gap:12px; width:100%;">
+      <span class="ticker-label"><span class="live-dot"></span> MNC RECRUITMENT WIRE</span>
+      <div class="ticker-content" id="newsTickerText">
+        Connecting to live campus recruitment updates...
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOP BILLBOARD AD ========== -->
+  <div class="container ad-billboard-top">
+    <div class="ad-slot ad-slot-inline" style="margin-top: var(--space-md); margin-bottom: 0;">
+      <span class="ad-badge">Leaderboard 728×90 / 970×250</span>
+      <div class="ad-creative-mock">
+        <span style="font-size:1.5rem;">🎯</span>
+        <div style="text-align:left;">
+          <strong>Exclusive Campus Placement Test Series 2026</strong> — Mock Tests with All-India Ranks
+          <div style="font-size:0.75rem;color:var(--color-text-muted);">Sponsored by PlacementCrack</div>
+        </div>
+        <button style="margin-left:auto;background:var(--color-secondary);color:white;padding:6px 16px;border-radius:6px;font-weight:700;font-size:0.8rem;">Explore ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BREADCRUMB ========== -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="separator">›</span>
+      <span id="breadcrumbCompany">Company</span>
+    </div>
+  </div>
+
+  <!-- ========== COMPANY HEADER ========== -->
+  <section class="container">
+    <div class="company-header" id="companyHeader">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading company details...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TABS ========== -->
+  <section class="container">
+    <div class="tabs-container" id="tabsContainer" style="display:none;">
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="overview">📋 Overview</button>
+        <button class="tab-btn" data-tab="roles">💼 Roles & Salaries</button>
+        <button class="tab-btn" data-tab="test-pattern">📝 Test Pattern</button>
+        <button class="tab-btn" data-tab="practice">🎯 Practice Questions</button>
+      </nav>
+
+      <!-- Tab: Overview -->
+      <div class="tab-panel active" id="tab-overview">
+        <div class="info-grid">
+          <div class="info-main" id="overviewContent">
+            <!-- Populated by JS -->
+          </div>
+          <aside class="info-sidebar" id="overviewSidebar">
+            <!-- Populated by JS -->
+          </aside>
+        </div>
+      </div>
+
+      <!-- Tab: Roles & Salaries -->
+      <div class="tab-panel" id="tab-roles">
+        <div id="rolesContent">
+          <h2 style="font-size:1.35rem;font-weight:800;margin-bottom:var(--space-xs);">Hiring Job Roles & Salary Benchmarks</h2>
+          <p class="text-muted mb-lg">Select a specific job role below to review required skills, compensation ranges, interview rounds, and launch targeted preparation.</p>
+          <div class="role-cards-grid" id="rolesGrid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Test Pattern -->
+      <div class="tab-panel" id="tab-test-pattern">
+        <div id="testPatternContent">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Tab: Practice Questions -->
+      <div class="tab-panel" id="tab-practice">
+        <!-- Level Selector for Practice -->
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-lg);margin-bottom:var(--space-xl);">
+          <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:var(--space-xs);">Select Preparation Difficulty (Beginner to Legend)</h3>
+          <p class="text-xs text-muted mb-md">Choose your current readiness level to calibrate question complexity:</p>
+          <div class="level-selector-bar" id="practiceLevelSelector">
+            <button class="level-pill active" data-practice-level="">All 4 Levels</button>
+            <button class="level-pill" data-practice-level="Beginner">🌱 Beginner (Foundational)</button>
+            <button class="level-pill" data-practice-level="Intermediate">⚡ Intermediate (Placement Standard)</button>
+            <button class="level-pill" data-practice-level="Advanced">⚔️ Advanced (Complex DSA / Design)</button>
+            <button class="level-pill pill-legend" data-practice-level="Legend">👑 Legend (FAANG Extreme)</button>
+          </div>
+        </div>
+
+        <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:var(--space-md);">Choose a Category</h2>
+        <p class="text-muted mb-lg">Select a question category below, or take the full test with all 50 questions.</p>
+        <div class="category-grid" id="categoryGrid">
+          <!-- Populated by JS -->
+        </div>
+        <div class="text-center">
+          <a href="#" class="start-all-btn" id="startAllBtn">
+            🚀 Start Full Test (50 Questions)
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== AD SLOT ========== -->
+  <section class="container" style="margin-bottom: var(--space-xl);">
+    <div class="ad-slot ad-slot-inline">
+      📢 Ad Space — Display ad placement (e.g., Google AdSense responsive unit)
+    </div>
+  </section>
+
+  <!-- ========== NEXT STEPS ========== -->
+  <section class="container" style="padding-bottom: var(--space-2xl);">
+    <div class="next-steps" id="nextSteps" style="display:none;">
+      <h3>🔥 Prepare for More Companies</h3>
+      <div class="next-steps-grid" id="relatedCompanies">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>PrepWise</h3>
+          <p>Free, instant-access interview preparation for engineering and science graduates worldwide.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Companies</h4>
+          <a href="company.html?id=tcs">TCS</a>
+          <a href="company.html?id=infosys">Infosys</a>
+          <a href="company.html?id=google">Google</a>
+          <a href="company.html?id=microsoft">Microsoft</a>
+          <a href="company.html?id=amazon">Amazon</a>
+        </div>
+        <div class="footer-links">
+          <h4>Categories</h4>
+          <a href="#">Quantitative Aptitude</a>
+          <a href="#">Logical Reasoning</a>
+          <a href="#">Verbal Ability</a>
+          <a href="#">Technical</a>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <a href="#">About PrepWise</a>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 PrepWise. All rights reserved.</span>
+        <span>Made with ❤️ for job seekers everywhere.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/company.js"></script>
+  <script src="js/news.js"></script>
+  <script src="js/ads.js"></script>
+</body>
+</html>
+

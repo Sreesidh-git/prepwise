@@ -1,0 +1,1106 @@
+[
+  {
+    "name": "United States",
+    "code": "US",
+    "gdpRank": 1,
+    "gdp": "$28.78 Trillion",
+    "currency": "USD ($)",
+    "flag": "🇺🇸",
+    "topCompanies": [
+      "Google",
+      "Microsoft",
+      "Amazon",
+      "Apple",
+      "NVIDIA",
+      "Meta",
+      "IBM",
+      "Oracle",
+      "Salesforce",
+      "Cisco"
+    ],
+    "techHubs": [
+      "Silicon Valley, CA",
+      "Seattle, WA",
+      "New York, NY",
+      "Austin, TX"
+    ]
+  },
+  {
+    "name": "China",
+    "code": "CN",
+    "gdpRank": 2,
+    "gdp": "$18.53 Trillion",
+    "currency": "CNY (¥)",
+    "flag": "🇨🇳",
+    "topCompanies": [
+      "Alibaba",
+      "Tencent",
+      "ByteDance",
+      "Huawei",
+      "Baidu",
+      "Xiaomi",
+      "JD.com",
+      "Meituan"
+    ],
+    "techHubs": [
+      "Beijing",
+      "Shenzhen",
+      "Hangzhou",
+      "Shanghai"
+    ]
+  },
+  {
+    "name": "Germany",
+    "code": "DE",
+    "gdpRank": 3,
+    "gdp": "$4.59 Trillion",
+    "currency": "EUR (€)",
+    "flag": "🇩🇪",
+    "topCompanies": [
+      "SAP",
+      "Siemens",
+      "BMW Group",
+      "Bosch",
+      "Delivery Hero",
+      "Zalando",
+      "Infineon",
+      "Deutsche Telekom"
+    ],
+    "techHubs": [
+      "Berlin",
+      "Munich",
+      "Frankfurt",
+      "Hamburg"
+    ]
+  },
+  {
+    "name": "Japan",
+    "code": "JP",
+    "gdpRank": 4,
+    "gdp": "$4.11 Trillion",
+    "currency": "JPY (¥)",
+    "flag": "🇯🇵",
+    "topCompanies": [
+      "Sony",
+      "SoftBank",
+      "Rakuten",
+      "NTT DATA",
+      "Toyota Connected",
+      "Nintendo",
+      "LINE",
+      "Hitachi"
+    ],
+    "techHubs": [
+      "Tokyo",
+      "Osaka",
+      "Kyoto",
+      "Fukuoka"
+    ]
+  },
+  {
+    "name": "India",
+    "code": "IN",
+    "gdpRank": 5,
+    "gdp": "$3.94 Trillion",
+    "currency": "INR (₹)",
+    "flag": "🇮🇳",
+    "topCompanies": [
+      "TCS",
+      "Infosys",
+      "Wipro",
+      "HCL Tech",
+      "Cognizant",
+      "Google",
+      "Amazon",
+      "Microsoft",
+      "Flipkart",
+      "Reliance Jio"
+    ],
+    "techHubs": [
+      "Bengaluru",
+      "Hyderabad",
+      "Pune",
+      "Chennai",
+      "Gurugram"
+    ]
+  },
+  {
+    "name": "United Kingdom",
+    "code": "GB",
+    "gdpRank": 6,
+    "gdp": "$3.50 Trillion",
+    "currency": "GBP (£)",
+    "flag": "🇬🇧",
+    "topCompanies": [
+      "ARM",
+      "DeepMind",
+      "Revolut",
+      "Barclays Tech",
+      "Dyson",
+      "Wise",
+      "Deliveroo",
+      "Vodafone"
+    ],
+    "techHubs": [
+      "London",
+      "Cambridge",
+      "Edinburgh",
+      "Manchester"
+    ]
+  },
+  {
+    "name": "France",
+    "code": "FR",
+    "gdpRank": 7,
+    "gdp": "$3.13 Trillion",
+    "currency": "EUR (€)",
+    "flag": "🇫🇷",
+    "topCompanies": [
+      "Capgemini",
+      "Dassault Systèmes",
+      "Ubisoft",
+      "Orange",
+      "Schneider Electric",
+      "Thales",
+      "BlaBlaCar",
+      "Criteo"
+    ],
+    "techHubs": [
+      "Paris",
+      "Lyon",
+      "Toulouse",
+      "Lille"
+    ]
+  },
+  {
+    "name": "Italy",
+    "code": "IT",
+    "gdpRank": 8,
+    "gdp": "$2.33 Trillion",
+    "currency": "EUR (€)",
+    "flag": "🇮🇹",
+    "topCompanies": [
+      "Ferrari Tech",
+      "Enel X",
+      "STMicroelectronics",
+      "Leonardo",
+      "TIM",
+      "Reply",
+      "Yoox Net-a-Porter"
+    ],
+    "techHubs": [
+      "Milan",
+      "Rome",
+      "Turin",
+      "Bologna"
+    ]
+  },
+  {
+    "name": "Brazil",
+    "code": "BR",
+    "gdpRank": 9,
+    "gdp": "$2.33 Trillion",
+    "currency": "BRL (R$)",
+    "flag": "🇧🇷",
+    "topCompanies": [
+      "Nubank",
+      "Mercado Libre",
+      "Totvs",
+      "Stone",
+      "iFood",
+      "PagSeguro",
+      "Embraer Tech"
+    ],
+    "techHubs": [
+      "São Paulo",
+      "Florianópolis",
+      "Curitiba",
+      "Belo Horizonte"
+    ]
+  },
+  {
+    "name": "Canada",
+    "code": "CA",
+    "gdpRank": 10,
+    "gdp": "$2.24 Trillion",
+    "currency": "CAD ($)",
+    "flag": "🇨🇦",
+    "topCompanies": [
+      "Shopify",
+      "OpenText",
+      "CGI",
+      "Constellation Software",
+      "BlackBerry",
+      "Hootsuite",
+      "Google",
+      "Amazon"
+    ],
+    "techHubs": [
+      "Toronto",
+      "Vancouver",
+      "Montreal",
+      "Waterloo"
+    ]
+  },
+  {
+    "name": "Russia",
+    "code": "RU",
+    "gdpRank": 11,
+    "gdp": "$2.06 Trillion",
+    "currency": "RUB (₽)",
+    "flag": "🇷🇺",
+    "topCompanies": [
+      "Yandex",
+      "Kaspersky Lab",
+      "VK",
+      "Sber Tech",
+      "Tinkoff",
+      "Ozon",
+      "Wildberries"
+    ],
+    "techHubs": [
+      "Moscow",
+      "Saint Petersburg",
+      "Novosibirsk"
+    ]
+  },
+  {
+    "name": "Mexico",
+    "code": "MX",
+    "gdpRank": 12,
+    "gdp": "$2.02 Trillion",
+    "currency": "MXN ($)",
+    "flag": "🇲🇽",
+    "topCompanies": [
+      "Kavak",
+      "Bitso",
+      "Clara",
+      "Softtek",
+      "Clip",
+      "Mercado Libre",
+      "Amazon"
+    ],
+    "techHubs": [
+      "Mexico City",
+      "Guadalajara",
+      "Monterrey"
+    ]
+  },
+  {
+    "name": "South Korea",
+    "code": "KR",
+    "gdpRank": 13,
+    "gdp": "$1.87 Trillion",
+    "currency": "KRW (₩)",
+    "flag": "🇰🇷",
+    "topCompanies": [
+      "Samsung Electronics",
+      "SK Hynix",
+      "LG Electronics",
+      "Naver",
+      "Kakao",
+      "Coupang",
+      "Krafton"
+    ],
+    "techHubs": [
+      "Seoul",
+      "Pangyo Techno Valley",
+      "Daejeon"
+    ]
+  },
+  {
+    "name": "Australia",
+    "code": "AU",
+    "gdpRank": 14,
+    "gdp": "$1.79 Trillion",
+    "currency": "AUD ($)",
+    "flag": "🇦🇺",
+    "topCompanies": [
+      "Atlassian",
+      "Canva",
+      "Afterpay",
+      "Commonwealth Bank Tech",
+      "Telstra",
+      "REA Group",
+      "SafetyCulture"
+    ],
+    "techHubs": [
+      "Sydney",
+      "Melbourne",
+      "Brisbane"
+    ]
+  },
+  {
+    "name": "Spain",
+    "code": "ES",
+    "gdpRank": 15,
+    "gdp": "$1.65 Trillion",
+    "currency": "EUR (€)",
+    "flag": "🇪🇸",
+    "topCompanies": [
+      "Amadeus",
+      "Indra Sistemas",
+      "Glovo",
+      "Cabify",
+      "Telefónica Tech",
+      "TravelPerk",
+      "Santander Tech"
+    ],
+    "techHubs": [
+      "Madrid",
+      "Barcelona",
+      "Valencia"
+    ]
+  },
+  {
+    "name": "Indonesia",
+    "code": "ID",
+    "gdpRank": 16,
+    "gdp": "$1.48 Trillion",
+    "currency": "IDR (Rp)",
+    "flag": "🇮🇩",
+    "topCompanies": [
+      "GoTo (Gojek/Tokopedia)",
+      "Traveloka",
+      "Bukalapak",
+      "Sea Group",
+      "Blibli",
+      "Kredivo"
+    ],
+    "techHubs": [
+      "Jakarta",
+      "Bandung",
+      "Surabaya"
+    ]
+  },
+  {
+    "name": "Turkey",
+    "code": "TR",
+    "gdpRank": 17,
+    "gdp": "$1.34 Trillion",
+    "currency": "TRY (₺)",
+    "flag": "🇹🇷",
+    "topCompanies": [
+      "Getir",
+      "Trendyol",
+      "Peak Games",
+      "Hepsiburada",
+      "Dream Games",
+      "Insider"
+    ],
+    "techHubs": [
+      "Istanbul",
+      "Ankara",
+      "Izmir"
+    ]
+  },
+  {
+    "name": "Netherlands",
+    "code": "NL",
+    "gdpRank": 18,
+    "gdp": "$1.14 Trillion",
+    "currency": "EUR (€)",
+    "flag": "🇳🇱",
+    "topCompanies": [
+      "ASML",
+      "Adyen",
+      "Booking.com",
+      "Philips",
+      "NXP Semiconductors",
+      "Just Eat Takeaway",
+      "TomTom"
+    ],
+    "techHubs": [
+      "Amsterdam",
+      "Eindhoven",
+      "Rotterdam",
+      "Utrecht"
+    ]
+  },
+  {
+    "name": "Saudi Arabia",
+    "code": "SA",
+    "gdpRank": 19,
+    "gdp": "$1.11 Trillion",
+    "currency": "SAR (﷼)",
+    "flag": "🇸🇦",
+    "topCompanies": [
+      "Aramco Digital",
+      "STC (Solutions by stc)",
+      "Jahez",
+      "Tamara",
+      "Elm",
+      "Neom Tech"
+    ],
+    "techHubs": [
+      "Riyadh",
+      "Jeddah",
+      "Dhahran"
+    ]
+  },
+  {
+    "name": "Switzerland",
+    "code": "CH",
+    "gdpRank": 20,
+    "gdp": "$938 Billion",
+    "currency": "CHF (Fr)",
+    "flag": "🇨🇭",
+    "topCompanies": [
+      "Google (Zurich)",
+      "ABB",
+      "Logitech",
+      "Swisscom",
+      "Novartis Tech",
+      "Roche Tech",
+      "Proton"
+    ],
+    "techHubs": [
+      "Zurich",
+      "Geneva",
+      "Lausanne",
+      "Basel"
+    ]
+  },
+  {
+    "name": "Poland",
+    "code": "PL",
+    "gdpRank": 21,
+    "gdp": "$845 Billion",
+    "currency": "PLN (zł)",
+    "flag": "🇵🇱",
+    "topCompanies": [
+      "Allegro",
+      "CD Projekt Red",
+      "InPost",
+      "DocPlanner",
+      "Asseco",
+      "Google (Warsaw)",
+      "Microsoft"
+    ],
+    "techHubs": [
+      "Warsaw",
+      "Krakow",
+      "Wroclaw",
+      "Gdansk"
+    ]
+  },
+  {
+    "name": "Argentina",
+    "code": "AR",
+    "gdpRank": 22,
+    "gdp": "$644 Billion",
+    "currency": "ARS ($)",
+    "flag": "🇦🇷",
+    "topCompanies": [
+      "Mercado Libre",
+      "Globant",
+      "Auth0",
+      "Ualá",
+      "Despegar",
+      "Tiendanube"
+    ],
+    "techHubs": [
+      "Buenos Aires",
+      "Cordoba",
+      "Rosario"
+    ]
+  },
+  {
+    "name": "Sweden",
+    "code": "SE",
+    "gdpRank": 23,
+    "gdp": "$623 Billion",
+    "currency": "SEK (kr)",
+    "flag": "🇸🇪",
+    "topCompanies": [
+      "Spotify",
+      "Klarna",
+      "Ericsson",
+      "King",
+      "Mojang",
+      "Truecaller",
+      "Sinch"
+    ],
+    "techHubs": [
+      "Stockholm",
+      "Gothenburg",
+      "Malmo"
+    ]
+  },
+  {
+    "name": "Belgium",
+    "code": "BE",
+    "gdpRank": 24,
+    "gdp": "$655 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇧🇪",
+    "topCompanies": [
+      "Collibra",
+      "Showpad",
+      "Odoo",
+      "Proximus Tech",
+      "Barco",
+      "Teamleader"
+    ],
+    "techHubs": [
+      "Brussels",
+      "Ghent",
+      "Antwerp",
+      "Leuven"
+    ]
+  },
+  {
+    "name": "Norway",
+    "code": "NO",
+    "gdpRank": 25,
+    "gdp": "$527 Billion",
+    "currency": "NOK (kr)",
+    "flag": "🇳🇴",
+    "topCompanies": [
+      "Kahoot!",
+      "Telenor Tech",
+      "Kongsberg Digital",
+      "Opera Software",
+      "Visma",
+      "Schibsted"
+    ],
+    "techHubs": [
+      "Oslo",
+      "Bergen",
+      "Trondheim"
+    ]
+  },
+  {
+    "name": "Ireland",
+    "code": "IE",
+    "gdpRank": 26,
+    "gdp": "$564 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇮🇪",
+    "topCompanies": [
+      "Stripe",
+      "Accenture",
+      "Google EMEA",
+      "Meta EMEA",
+      "Workday",
+      "Intercom",
+      "Pfizer Digital"
+    ],
+    "techHubs": [
+      "Dublin (Silicon Docks)",
+      "Cork",
+      "Galway"
+    ]
+  },
+  {
+    "name": "Israel",
+    "code": "IL",
+    "gdpRank": 27,
+    "gdp": "$530 Billion",
+    "currency": "ILS (₪)",
+    "flag": "🇮🇱",
+    "topCompanies": [
+      "Check Point",
+      "Mobileye",
+      "Wix",
+      "Monday.com",
+      "CyberArk",
+      "Waze",
+      "Fiverr",
+      "SolarEdge"
+    ],
+    "techHubs": [
+      "Tel Aviv (Silicon Wadi)",
+      "Haifa",
+      "Herzliya",
+      "Jerusalem"
+    ]
+  },
+  {
+    "name": "United Arab Emirates",
+    "code": "AE",
+    "gdpRank": 28,
+    "gdp": "$537 Billion",
+    "currency": "AED (د.إ)",
+    "flag": "🇦🇪",
+    "topCompanies": [
+      "Careem",
+      "Noon",
+      "G42 (Group 42)",
+      "Emirates NBD Tech",
+      "Kitopi",
+      "Anghami",
+      "Property Finder"
+    ],
+    "techHubs": [
+      "Dubai (Internet City)",
+      "Abu Dhabi (Hub71)"
+    ]
+  },
+  {
+    "name": "Thailand",
+    "code": "TH",
+    "gdpRank": 29,
+    "gdp": "$529 Billion",
+    "currency": "THB (฿)",
+    "flag": "🇹🇭",
+    "topCompanies": [
+      "Line Man Wongnai",
+      "Agoda",
+      "Bitkub",
+      "True Digital",
+      "Ascend Group",
+      "Flash Express"
+    ],
+    "techHubs": [
+      "Bangkok",
+      "Chiang Mai",
+      "Phuket"
+    ]
+  },
+  {
+    "name": "Singapore",
+    "code": "SG",
+    "gdpRank": 30,
+    "gdp": "$525 Billion",
+    "currency": "SGD ($)",
+    "flag": "🇸🇬",
+    "topCompanies": [
+      "Sea Group (Shopee/Garena)",
+      "Grab",
+      "Razer",
+      "Singtel",
+      "Carousell",
+      "Ninja Van",
+      "Google APAC"
+    ],
+    "techHubs": [
+      "Singapore (one-north)",
+      "Downtown Core"
+    ]
+  },
+  {
+    "name": "Austria",
+    "code": "AT",
+    "gdpRank": 31,
+    "gdp": "$540 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇦🇹",
+    "topCompanies": [
+      "Bitpanda",
+      "Dynatrace",
+      "Kapsch TrafficCom",
+      "Voestalpine Tech",
+      "Runtastic (Adidas)",
+      "TTTech"
+    ],
+    "techHubs": [
+      "Vienna",
+      "Linz",
+      "Graz",
+      "Salzburg"
+    ]
+  },
+  {
+    "name": "Bangladesh",
+    "code": "BD",
+    "gdpRank": 32,
+    "gdp": "$455 Billion",
+    "currency": "BDT (৳)",
+    "flag": "🇧🇩",
+    "topCompanies": [
+      "bKash",
+      "Pathao",
+      "Brain Station 23",
+      "TigerIT",
+      "Chaldal",
+      "ShopUp"
+    ],
+    "techHubs": [
+      "Dhaka",
+      "Chittagong",
+      "Sylhet"
+    ]
+  },
+  {
+    "name": "Vietnam",
+    "code": "VN",
+    "gdpRank": 33,
+    "gdp": "$466 Billion",
+    "currency": "VND (₫)",
+    "flag": "🇻🇳",
+    "topCompanies": [
+      "FPT Software",
+      "VNG Corporation",
+      "Viettel Solutions",
+      "MoMo",
+      "Tiki",
+      "VNPay"
+    ],
+    "techHubs": [
+      "Ho Chi Minh City",
+      "Hanoi",
+      "Da Nang"
+    ]
+  },
+  {
+    "name": "Malaysia",
+    "code": "MY",
+    "gdpRank": 34,
+    "gdp": "$445 Billion",
+    "currency": "MYR (RM)",
+    "flag": "🇲🇾",
+    "topCompanies": [
+      "Carsome",
+      "Aerodyne Group",
+      "JobStreet",
+      "Touch 'n Go Digital",
+      "Inari Amertron",
+      "Jardine Tech"
+    ],
+    "techHubs": [
+      "Kuala Lumpur",
+      "Cyberjaya",
+      "Penang"
+    ]
+  },
+  {
+    "name": "Philippines",
+    "code": "PH",
+    "gdpRank": 35,
+    "gdp": "$471 Billion",
+    "currency": "PHP (₱)",
+    "flag": "🇵🇭",
+    "topCompanies": [
+      "GCash (Mynt)",
+      "Maya (Voyager)",
+      "Accenture PH",
+      "TaskUs",
+      "Voyager Innovations",
+      "Kumu"
+    ],
+    "techHubs": [
+      "Manila (BGC)",
+      "Makati",
+      "Cebu City"
+    ]
+  },
+  {
+    "name": "South Africa",
+    "code": "ZA",
+    "gdpRank": 36,
+    "gdp": "$400 Billion",
+    "currency": "ZAR (R)",
+    "flag": "🇿🇦",
+    "topCompanies": [
+      "Naspers / Prosus",
+      "Takealot",
+      "Yoco",
+      "Jumo",
+      "Dimension Data",
+      "Luno",
+      "Capitec Bank Tech"
+    ],
+    "techHubs": [
+      "Cape Town (Silicon Cape)",
+      "Johannesburg",
+      "Durban"
+    ]
+  },
+  {
+    "name": "Denmark",
+    "code": "DK",
+    "gdpRank": 37,
+    "gdp": "$410 Billion",
+    "currency": "DKK (kr)",
+    "flag": "🇩🇰",
+    "topCompanies": [
+      "Trustpilot",
+      "Zendesk",
+      "Unity Technologies",
+      "SimCorp",
+      "Pleo",
+      "Sitecore",
+      "Lunar"
+    ],
+    "techHubs": [
+      "Copenhagen",
+      "Aarhus",
+      "Odense"
+    ]
+  },
+  {
+    "name": "Egypt",
+    "code": "EG",
+    "gdpRank": 38,
+    "gdp": "$380 Billion",
+    "currency": "EGP (E£)",
+    "flag": "🇪🇬",
+    "topCompanies": [
+      "Fawry",
+      "Swvl",
+      "Vezeeta",
+      "Paymob",
+      "Bosta",
+      "Vodafone Intelligent Solutions"
+    ],
+    "techHubs": [
+      "Cairo (Smart Village)",
+      "Alexandria",
+      "Giza"
+    ]
+  },
+  {
+    "name": "Pakistan",
+    "code": "PK",
+    "gdpRank": 39,
+    "gdp": "$375 Billion",
+    "currency": "PKR (Rs)",
+    "flag": "🇵🇰",
+    "topCompanies": [
+      "Systems Limited",
+      "Careem PK",
+      "Netsol Technologies",
+      "SadaPay",
+      "Bazaar Technologies",
+      "10Pearls"
+    ],
+    "techHubs": [
+      "Karachi",
+      "Lahore",
+      "Islamabad"
+    ]
+  },
+  {
+    "name": "Hong Kong",
+    "code": "HK",
+    "gdpRank": 40,
+    "gdp": "$407 Billion",
+    "currency": "HKD ($)",
+    "flag": "🇭🇰",
+    "topCompanies": [
+      "WeLab",
+      "Klook",
+      "Lalamove",
+      "Animoca Brands",
+      "Airwallex",
+      "Prenetics"
+    ],
+    "techHubs": [
+      "Cyberport",
+      "Hong Kong Science Park",
+      "Central"
+    ]
+  },
+  {
+    "name": "Colombia",
+    "code": "CO",
+    "gdpRank": 41,
+    "gdp": "$386 Billion",
+    "currency": "COP ($)",
+    "flag": "🇨🇴",
+    "topCompanies": [
+      "Rappi",
+      "Platzi",
+      "Habi",
+      "La Haus",
+      "Addi",
+      "Ruta N Tech Hub"
+    ],
+    "techHubs": [
+      "Bogotá",
+      "Medellín (Innovation Capital)",
+      "Cali"
+    ]
+  },
+  {
+    "name": "Chile",
+    "code": "CL",
+    "gdpRank": 42,
+    "gdp": "$335 Billion",
+    "currency": "CLP ($)",
+    "flag": "🇨🇱",
+    "topCompanies": [
+      "NotCo",
+      "Betterfly",
+      "Cornershop",
+      "Fintual",
+      "Buk",
+      "Kushki"
+    ],
+    "techHubs": [
+      "Santiago (Chilecon Valley)",
+      "Valparaíso"
+    ]
+  },
+  {
+    "name": "Romania",
+    "code": "RO",
+    "gdpRank": 43,
+    "gdp": "$370 Billion",
+    "currency": "RON (lei)",
+    "flag": "🇷🇴",
+    "topCompanies": [
+      "UiPath",
+      "Bitdefender",
+      "eMAG",
+      "FintechOS",
+      "Endava",
+      "Zitec"
+    ],
+    "techHubs": [
+      "Bucharest",
+      "Cluj-Napoca",
+      "Timișoara",
+      "Iași"
+    ]
+  },
+  {
+    "name": "Czech Republic",
+    "code": "CZ",
+    "gdpRank": 44,
+    "gdp": "$330 Billion",
+    "currency": "CZK (Kč)",
+    "flag": "🇨🇿",
+    "topCompanies": [
+      "Avast (Gen Digital)",
+      "JetBrains",
+      "Rohlik Group",
+      "Seznam.cz",
+      "Mews",
+      "GoodData"
+    ],
+    "techHubs": [
+      "Prague",
+      "Brno",
+      "Ostrava"
+    ]
+  },
+  {
+    "name": "Finland",
+    "code": "FI",
+    "gdpRank": 45,
+    "gdp": "$308 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇫🇮",
+    "topCompanies": [
+      "Nokia",
+      "Supercell",
+      "Rovio",
+      "Wolt",
+      "F-Secure",
+      "Relex Solutions"
+    ],
+    "techHubs": [
+      "Helsinki (Espoo)",
+      "Tampere",
+      "Oulu"
+    ]
+  },
+  {
+    "name": "Portugal",
+    "code": "PT",
+    "gdpRank": 46,
+    "gdp": "$287 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇵🇹",
+    "topCompanies": [
+      "OutSystems",
+      "Farfetch",
+      "Talkdesk",
+      "Feedzai",
+      "Sword Health",
+      "Critical Software"
+    ],
+    "techHubs": [
+      "Lisbon",
+      "Porto",
+      "Coimbra",
+      "Braga"
+    ]
+  },
+  {
+    "name": "New Zealand",
+    "code": "NZ",
+    "gdpRank": 47,
+    "gdp": "$253 Billion",
+    "currency": "NZD ($)",
+    "flag": "🇳🇿",
+    "topCompanies": [
+      "Xero",
+      "Rocket Lab",
+      "Datacom",
+      "Pushpay",
+      "Vend",
+      "Fisher & Paykel Tech"
+    ],
+    "techHubs": [
+      "Auckland",
+      "Wellington",
+      "Christchurch"
+    ]
+  },
+  {
+    "name": "Peru",
+    "code": "PE",
+    "gdpRank": 48,
+    "gdp": "$282 Billion",
+    "currency": "PEN (S/)",
+    "flag": "🇵🇪",
+    "topCompanies": [
+      "Crehana",
+      "Culqi",
+      "Chazki",
+      "Favo",
+      "Rextie",
+      "Belcorp Tech"
+    ],
+    "techHubs": [
+      "Lima",
+      "Arequipa",
+      "Trujillo"
+    ]
+  },
+  {
+    "name": "Greece",
+    "code": "GR",
+    "gdpRank": 49,
+    "gdp": "$250 Billion",
+    "currency": "EUR (€)",
+    "flag": "🇬🇷",
+    "topCompanies": [
+      "Viva Wallet",
+      "Workable",
+      "Blueground",
+      "Skroutz",
+      "Persado",
+      "ActionIQ"
+    ],
+    "techHubs": [
+      "Athens",
+      "Thessaloniki",
+      "Patras"
+    ]
+  },
+  {
+    "name": "Kazakhstan",
+    "code": "KZ",
+    "gdpRank": 50,
+    "gdp": "$291 Billion",
+    "currency": "KZT (₸)",
+    "flag": "🇰🇿",
+    "topCompanies": [
+      "Kaspi.kz",
+      "Chocofamily",
+      "Astana Hub Tech",
+      "Kolesa Group",
+      "One Technologies",
+      "Beeline KZ Digital"
+    ],
+    "techHubs": [
+      "Almaty",
+      "Astana (Astana Hub)",
+      "Shymkent"
+    ]
+  }
+]

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Practice aptitude and technical MCQs with detailed step-by-step solutions. Company-specific interview preparation.">
+  <title>Practice Quiz — PrepWise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" role="navigation">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo-icon">P</span>
+        Prep<span class="logo-text-wise">Wise</span>
+      </a>
+      <div class="navbar-nav" id="navMenu">
+        <a href="index.html">Companies</a>
+        <a href="index.html#mncNewsSection">📰 MNC News</a>
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="about.html">About</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ========== LIVE MNC NEWS TICKER ========== -->
+  <div class="news-ticker-bar">
+    <div class="container" style="display:flex; align-items:center; gap:12px; width:100%; max-width:800px;">
+      <span class="ticker-label"><span class="live-dot"></span> LIVE HIRING</span>
+      <div class="ticker-content" id="newsTickerText">
+        Loading latest MNC campus updates...
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOP LEADERBOARD AD ========== -->
+  <div class="container ad-billboard-top" style="max-width:800px;">
+    <div class="ad-slot ad-slot-inline" style="margin-top: var(--space-md); margin-bottom: 0;">
+      <span class="ad-badge">Leaderboard 728×90</span>
+      <div class="ad-creative-mock">
+        <span style="font-size:1.4rem;">🎓</span>
+        <div style="text-align:left;">
+          <strong>Build Your Resume with Certified Projects</strong> — Verified by Top Placement Recruiters
+          <div style="font-size:0.75rem;color:var(--color-text-muted);">Sponsored by DevSkills Academy</div>
+        </div>
+        <button style="margin-left:auto;background:var(--color-primary);color:white;padding:5px 14px;border-radius:6px;font-weight:700;font-size:0.75rem;">Join Free ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BREADCRUMB ========== -->
+  <div class="container" style="max-width:800px;">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="separator">›</span>
+      <a href="#" id="breadcrumbCompany">Company</a>
+      <span class="separator">›</span>
+      <span id="breadcrumbCategory">Quiz</span>
+    </div>
+  </div>
+
+  <!-- ========== QUIZ CONTAINER ========== -->
+  <div class="quiz-container" id="quizContainer">
+    <div class="loading-spinner" id="quizLoading">
+      <div class="spinner"></div>
+      <p>Loading questions...</p>
+    </div>
+
+    <!-- Role & Salary Target Banner -->
+    <div class="quiz-role-target-banner" id="quizRoleBanner" style="display:none;">
+      <div>
+        <div style="font-size:0.75rem; text-transform:uppercase; color:#94a3b8; font-weight:700;">Role Preparation Track:</div>
+        <div class="role-title" id="quizRoleTitle">Software Development Engineer</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:#94a3b8;">Benchmark Salary</div>
+        <div class="target-salary" id="quizRoleSalary">$168,000 / yr</div>
+      </div>
+    </div>
+
+    <!-- Quiz Header -->
+    <div class="quiz-header" id="quizHeader" style="display:none;">
+      <div class="quiz-header-top">
+        <span class="quiz-title" id="quizTitle">Company Quiz</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="tag" id="quizLevelBadge" style="display:none;">Level</span>
+          <span class="quiz-category-badge" id="quizCategoryBadge">Category</span>
+        </div>
+      </div>
+
+      <!-- Quick Level Switcher Inside Quiz -->
+      <div class="level-selector-bar" style="margin: 8px 0 12px; font-size:0.75rem;">
+        <span style="font-weight:700; color:var(--color-text-muted);">Filter Level:</span>
+        <button class="level-pill active" data-quiz-level="">All</button>
+        <button class="level-pill" data-quiz-level="Beginner">🌱 Beginner</button>
+        <button class="level-pill" data-quiz-level="Intermediate">⚡ Intermediate</button>
+        <button class="level-pill" data-quiz-level="Advanced">⚔️ Advanced</button>
+        <button class="level-pill pill-legend" data-quiz-level="Legend">👑 Legend</button>
+      </div>
+
+      <div class="quiz-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="progress-text">
+          <span id="progressText">Question 1 of 50</span>
+          <span id="scoreText">Score: 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div id="questionArea" style="display:none;">
+      <!-- Populated by quiz.js -->
+    </div>
+
+    <!-- Quiz Navigation -->
+    <div class="quiz-nav" id="quizNav" style="display:none;">
+      <button class="quiz-btn quiz-btn-secondary" id="prevBtn" disabled>
+        ← Previous
+      </button>
+      <button class="quiz-btn quiz-btn-secondary" id="skipBtn">
+        Skip →
+      </button>
+      <button class="quiz-btn quiz-btn-primary" id="nextBtn">
+        Next →
+      </button>
+    </div>
+
+    <!-- Quiz Results -->
+    <div class="quiz-results" id="quizResults" style="display:none;">
+      <!-- Populated by quiz.js -->
+    </div>
+  </div>
+
+  <!-- ========== AD SLOT ========== -->
+  <div style="max-width:800px;margin:0 auto;padding:0 var(--space-lg);">
+    <div class="ad-slot ad-slot-inline">
+      📢 Ad Space — In-content ad placement between quiz questions
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:none;padding-top:0;">
+        <span>&copy; 2026 PrepWise. All rights reserved.</span>
+        <span><a href="index.html" style="color:var(--color-text-muted);">← Back to Companies</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/quiz.js"></script>
+  <script src="js/news.js"></script>
+  <script src="js/ads.js"></script>
+</body>
+</html>
+

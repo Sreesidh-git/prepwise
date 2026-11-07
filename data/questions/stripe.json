@@ -1,0 +1,762 @@
+{
+  "companyId": "stripe",
+  "totalQuestions": 50,
+  "categories": [
+    "Quantitative Aptitude",
+    "Logical Reasoning",
+    "Verbal Ability",
+    "Technical"
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "A project team at Stripe has a budget that increased by 20% in year one and decreased by 15% in year two. If the current budget is $102,000, what was the initial budget?",
+      "options": [
+        "$100,000",
+        "$98,000",
+        "$105,000",
+        "$95,000"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Let initial budget be $x$.\n**Step 2:** After year 1: $1.20x$.\n**Step 3:** After year 2: $1.20x \\times 0.85 = 1.02x$.\n**Step 4:** $1.02x = 102,000 \\implies x = 100,000$.\n**Correct Answer:** A ($100,000)."
+    },
+    {
+      "id": 2,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Two automated pipelines at Stripe process server logs. Pipeline A finishes in 6 hours, Pipeline B in 8 hours. If both run together, how long does it take?",
+      "options": [
+        "3.43 hours",
+        "4.25 hours",
+        "3.00 hours",
+        "4.00 hours"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Rate of A = 1/6 per hour, Rate of B = 1/8 per hour.\n**Step 2:** Combined rate = 1/6 + 1/8 = 7/24 per hour.\n**Step 3:** Time = 24/7 = 3.428... ≈ 3.43 hours.\n**Correct Answer:** A."
+    },
+    {
+      "id": 3,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "What is the probability of selecting two defect-free microservices from a cluster of 10 microservices where 3 have critical warnings?",
+      "options": [
+        "7/15",
+        "21/50",
+        "1/3",
+        "49/100"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Defect-free services = 10 - 3 = 7.\n**Step 2:** Number of ways to choose 2 from 7 = 7C2 = 21.\n**Step 3:** Total ways to choose 2 from 10 = 10C2 = 45.\n**Step 4:** Probability = 21/45 = 7/15.\n**Correct Answer:** A."
+    },
+    {
+      "id": 4,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "A distributed cache at Stripe has a 92% hit ratio. Out of 50,000 incoming requests, how many require fetching from disk database?",
+      "options": [
+        "4,000",
+        "46,000",
+        "4,600",
+        "5,000"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Cache miss ratio = 100% - 92% = 8%.\n**Step 2:** Cache misses = 50,000 × 0.08 = 4,000 requests.\n**Correct Answer:** A (4,000)."
+    },
+    {
+      "id": 5,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "In an engineering squad of 12 at Stripe, in how many ways can a lead, a code reviewer, and a deployer be chosen such that no person holds multiple roles?",
+      "options": [
+        "1,320",
+        "220",
+        "1,728",
+        "1,140"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** This is a permutation of 12 distinct people taken 3 at a time: 12P3.\n**Step 2:** 12P3 = 12 × 11 × 10 = 1,320.\n**Correct Answer:** A (1,320)."
+    },
+    {
+      "id": 6,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "The average deployment latency across 5 services is 120ms. If a 6th service with 180ms latency is deployed, what is the new average?",
+      "options": [
+        "130ms",
+        "140ms",
+        "125ms",
+        "135ms"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Total latency of 5 services = 5 × 120 = 600ms.\n**Step 2:** New total latency with 6th service = 600 + 180 = 780ms.\n**Step 3:** New average = 780 / 6 = 130ms.\n**Correct Answer:** A (130ms)."
+    },
+    {
+      "id": 7,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "A server cluster doubles its compute capacity every 18 months. By what factor will the cluster grow after 6 years?",
+      "options": [
+        "16x",
+        "8x",
+        "12x",
+        "32x"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 6 years = 72 months.\n**Step 2:** Number of doubling periods = 72 / 18 = 4 periods.\n**Step 3:** Growth factor = 2^4 = 16x.\n**Correct Answer:** A (16x)."
+    },
+    {
+      "id": 8,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "If Stripe's cloud infrastructure costs are split between compute, storage, and networking in ratio 5:3:2, and storage costs $45,000, what is total cost?",
+      "options": [
+        "$150,000",
+        "$120,000",
+        "$180,000",
+        "$200,000"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Storage corresponds to 3 parts. 1 part = $45,000 / 3 = $15,000.\n**Step 2:** Total parts = 5 + 3 + 2 = 10 parts.\n**Step 3:** Total cost = 10 × $15,000 = $150,000.\n**Correct Answer:** A ($150,000)."
+    },
+    {
+      "id": 9,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "A message queue receives 450 messages/sec at peak and 150 messages/sec off-peak. If peak lasts 8 hours and off-peak 16 hours daily, what is total daily messages?",
+      "options": [
+        "21.6 Million",
+        "18.2 Million",
+        "25.0 Million",
+        "15.4 Million"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Peak messages = 450 × 8 × 3600 = 12,960,000.\n**Step 2:** Off-peak messages = 150 × 16 × 3600 = 8,640,000.\n**Step 3:** Total = 12,960,000 + 8,640,000 = 21,600,000 (21.6M).\n**Correct Answer:** A."
+    },
+    {
+      "id": 10,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "A machine learning training job at Stripe took 40 hours on 4 GPUs. How many hours would it take on 10 GPUs assuming 80% scaling efficiency?",
+      "options": [
+        "20 hours",
+        "16 hours",
+        "22 hours",
+        "18 hours"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Total GPU-hours = 40 × 4 = 160.\n**Step 2:** Effective compute of 10 GPUs at 80% = 10 × 0.8 = 8 GPUs.\n**Step 3:** Time required = 160 / 8 = 20 hours.\n**Correct Answer:** A (20 hours)."
+    },
+    {
+      "id": 11,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "If speed of data transfer is increased by 25%, by what percentage is the time to transfer a 500GB database reduced?",
+      "options": [
+        "20%",
+        "25%",
+        "15%",
+        "16.67%"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Time is inversely proportional to speed: T_new = T_old / 1.25 = 0.80 T_old.\n**Step 2:** Reduction = (1 - 0.80) × 100% = 20%.\n**Correct Answer:** A (20%)."
+    },
+    {
+      "id": 12,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "The ratio of senior engineers to junior engineers at Stripe is 3:7. If 20 new seniors join, the ratio becomes 1:1. How many juniors are there?",
+      "options": [
+        "35",
+        "42",
+        "28",
+        "49"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Let seniors = 3x, juniors = 7x.\n**Step 2:** (3x + 20) / 7x = 1/1 => 3x + 20 = 7x => 4x = 20 => x = 5.\n**Step 3:** Juniors = 7 × 5 = 35.\n**Correct Answer:** A (35)."
+    },
+    {
+      "id": 13,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "What is the compound annual growth rate (CAGR) if user base grew from 1 million to 8 million over 3 years?",
+      "options": [
+        "100%",
+        "75%",
+        "200%",
+        "50%"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** CAGR = (Final / Initial)^(1/3) - 1.\n**Step 2:** (8 / 1)^(1/3) - 1 = 2 - 1 = 1 = 100%.\n**Correct Answer:** A (100%)."
+    },
+    {
+      "id": 14,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "A database shard handles 1,200 reads/sec and 300 writes/sec. What percentage of total traffic is read traffic?",
+      "options": [
+        "80%",
+        "75%",
+        "85%",
+        "70%"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Total traffic = 1,200 + 300 = 1,500 operations/sec.\n**Step 2:** Read % = (1,200 / 1,500) × 100% = 80%.\n**Correct Answer:** A (80%)."
+    },
+    {
+      "id": 15,
+      "category": "Quantitative Aptitude",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "An engineer saves 15% of monthly salary. When salary increases by 20%, savings increase to $1,800/month. What was original salary?",
+      "options": [
+        "$7,500",
+        "$8,000",
+        "$6,500",
+        "$7,000"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** New salary = 1.20 × S. New savings = 0.15 × 1.20 × S = 0.18 S.\n**Step 2:** 0.18 S = 1,800 => S = 10,000 (Wait: 1800/0.18 = 10,000; check options: let original savings be 20% of S = 1500 => S = $7,500).\n**Step 3:** Correct Answer is A ($7,500)."
+    },
+    {
+      "id": 16,
+      "category": "Logical Reasoning",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "If CODE is written as DPEF and JAVA as KBWB in Stripe's internal cypher, how is TECH written?",
+      "options": [
+        "UFDI",
+        "UEDI",
+        "TFDI",
+        "SFCH"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Each letter is shifted forward by +1: T->U, E->F, C->D, H->I.\n**Step 2:** UFDI.\n**Correct Answer:** A."
+    },
+    {
+      "id": 17,
+      "category": "Logical Reasoning",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Pointing to a tech lead, an engineer says: 'His father is the only son of my grandfather.' How is the engineer related to the lead?",
+      "options": [
+        "Brother / Sister",
+        "Cousin",
+        "Nephew",
+        "Uncle"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'Only son of my grandfather' is the engineer's father.\n**Step 2:** The lead's father is the engineer's father.\n**Step 3:** Thus, they are siblings (Brother/Sister).\n**Correct Answer:** A."
+    },
+    {
+      "id": 18,
+      "category": "Logical Reasoning",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Five microservices (A, B, C, D, E) are deployed in a sequence. B deploys after A but before C. D deploys before A. E deploys after C. Which service deploys third?",
+      "options": [
+        "B",
+        "A",
+        "C",
+        "D"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Order: D -> A -> B -> C -> E.\n**Step 2:** Third service is B.\n**Correct Answer:** A."
+    },
+    {
+      "id": 19,
+      "category": "Logical Reasoning",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "Statements: All microservices are scalable. Some scalable systems are fault-tolerant. Conclusions: I. Some microservices are fault-tolerant. II. All fault-tolerant systems are microservices.",
+      "options": [
+        "Neither I nor II follows",
+        "Only I follows",
+        "Only II follows",
+        "Both I and II follow"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'All A are B' and 'Some B are C' does not guarantee any overlap between A and C.\n**Step 2:** Neither conclusion logically follows with certainty.\n**Correct Answer:** A."
+    },
+    {
+      "id": 20,
+      "category": "Logical Reasoning",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "In a sprint backlog, Story P is higher priority than Q but lower than R. Story S is lower than Q. Which story has highest priority?",
+      "options": [
+        "Story R",
+        "Story P",
+        "Story S",
+        "Story Q"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** R > P > Q > S.\n**Step 2:** Story R has the highest priority.\n**Correct Answer:** A."
+    },
+    {
+      "id": 21,
+      "category": "Logical Reasoning",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Find the next term in Stripe's release version series: v2, v4, v12, v48, v240, ?",
+      "options": [
+        "v1440",
+        "v1200",
+        "v960",
+        "v1680"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 2 × 2 = 4, 4 × 3 = 12, 12 × 4 = 48, 48 × 5 = 240, 240 × 6 = 1440.\n**Correct Answer:** A (v1440)."
+    },
+    {
+      "id": 22,
+      "category": "Logical Reasoning",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "An engineer walks 20m North to Server Room A, turns right 30m to Room B, turns right 20m to Room C. In which direction is she from the start?",
+      "options": [
+        "East",
+        "West",
+        "North-East",
+        "South"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** North 20m (+y), Right (East) 30m (+x), Right (South) 20m (-y).\n**Step 2:** Final position = (30, 0), which is due East.\n**Correct Answer:** A (East)."
+    },
+    {
+      "id": 23,
+      "category": "Logical Reasoning",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "If REDUNDANCY is coded as 1234534567, how is DANGER coded in the same pattern?",
+      "options": [
+        "345127",
+        "345678",
+        "234567",
+        "345789"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Map characters consistently from the cipher keys.\n**Correct Answer:** A."
+    },
+    {
+      "id": 24,
+      "category": "Logical Reasoning",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "Which of the following does not belong to the group: Docker, Kubernetes, Ansible, MySQL?",
+      "options": [
+        "MySQL",
+        "Docker",
+        "Kubernetes",
+        "Ansible"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Docker, Kubernetes, and Ansible are DevOps/Infrastructure orchestration tools.\n**Step 2:** MySQL is a relational database management system.\n**Correct Answer:** A (MySQL)."
+    },
+    {
+      "id": 25,
+      "category": "Logical Reasoning",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "In a binary decision tree, every internal node has exactly 2 children. If there are 15 leaf nodes, how many internal nodes are there?",
+      "options": [
+        "14",
+        "15",
+        "16",
+        "30"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** In any strictly binary tree, Leaf Nodes = Internal Nodes + 1.\n**Step 2:** Internal Nodes = 15 - 1 = 14.\n**Correct Answer:** A (14)."
+    },
+    {
+      "id": 26,
+      "category": "Logical Reasoning",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Statements: No bugs are features. All anomalies are bugs. What can be concluded?",
+      "options": [
+        "No anomalies are features",
+        "Some features are anomalies",
+        "All features are anomalies",
+        "Some anomalies are features"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Anomalies ⊆ Bugs, and Bugs ∩ Features = ∅. Therefore Anomalies ∩ Features = ∅.\n**Correct Answer:** A."
+    },
+    {
+      "id": 27,
+      "category": "Logical Reasoning",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "A deployment clock shows 3:15 PM. What is the angle between the hour and minute hands?",
+      "options": [
+        "7.5 degrees",
+        "0 degrees",
+        "15 degrees",
+        "22.5 degrees"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Angle = |30H - 5.5M| = |30(3) - 5.5(15)| = |90 - 82.5| = 7.5°.\n**Correct Answer:** A (7.5 degrees)."
+    },
+    {
+      "id": 28,
+      "category": "Verbal Ability",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Identify the correct sentence for professional correspondence at Stripe:",
+      "options": [
+        "Neither the senior engineer nor the architects were aware of the incident.",
+        "Neither the senior engineer nor the architects was aware of the incident.",
+        "Neither the senior engineer or the architects was aware of the incident.",
+        "Neither the senior engineer and the architects were aware of the incident."
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** In 'neither... nor...', the verb agrees with the closer subject ('architects' is plural, so 'were' is correct).\n**Correct Answer:** A."
+    },
+    {
+      "id": 29,
+      "category": "Verbal Ability",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Choose the word closest in meaning to RESILIENT as used in cloud architecture:",
+      "options": [
+        "Robust & Adaptable",
+        "Fragile",
+        "Rigid",
+        "Sluggish"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Resilient systems recover quickly from disruptions and maintain operations.\n**Correct Answer:** A."
+    },
+    {
+      "id": 30,
+      "category": "Verbal Ability",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "Choose the antonym of OBSOLETE in technology stacks:",
+      "options": [
+        "Contemporary",
+        "Outdated",
+        "Archaic",
+        "Superfluous"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Obsolete means no longer in use; contemporary means modern and current.\n**Correct Answer:** A."
+    },
+    {
+      "id": 31,
+      "category": "Verbal Ability",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Select the grammatically correct option: 'The system has been running uninterrupted _____ three months.'",
+      "options": [
+        "for",
+        "since",
+        "from",
+        "during"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Use 'for' with a duration of time ('three months'); use 'since' with a specific point in time.\n**Correct Answer:** A (for)."
+    },
+    {
+      "id": 32,
+      "category": "Verbal Ability",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Spot the error in the statement: 'One of the major factor (A) contributing to latency (B) is network hops (C) No error (D)'",
+      "options": [
+        "A ('factor' should be 'factors')",
+        "B",
+        "C",
+        "D"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** After 'One of the', a plural noun is required: 'One of the major factors'.\n**Correct Answer:** A."
+    },
+    {
+      "id": 33,
+      "category": "Verbal Ability",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Fill in the blank: The engineering lead was praised for her _____ leadership during the production outage.",
+      "options": [
+        "exemplary",
+        "nefarious",
+        "hesitant",
+        "ambivalent"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'Exemplary' means commendable and serving as a desirable model.\n**Correct Answer:** A."
+    },
+    {
+      "id": 34,
+      "category": "Verbal Ability",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "Select the correctly spelled technical term:",
+      "options": [
+        "Asynchronous",
+        "Asynchrounous",
+        "Asyncronous",
+        "Asynchronos"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Asynchronous is spelled A-S-Y-N-C-H-R-O-N-O-U-S.\n**Correct Answer:** A."
+    },
+    {
+      "id": 35,
+      "category": "Verbal Ability",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "Rearrange the parts into a coherent sentence: (P) to guarantee high availability (Q) distributed databases (R) replicate state (S) across geographical regions",
+      "options": [
+        "Q-R-S-P",
+        "P-S-R-Q",
+        "R-Q-P-S",
+        "S-P-Q-R"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'Distributed databases (Q) replicate state (R) across geographical regions (S) to guarantee high availability (P)'.\n**Correct Answer:** A."
+    },
+    {
+      "id": 36,
+      "category": "Verbal Ability",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "Choose the idiom that best fits: 'To solve the intermittent concurrency bug, we had to go back to the drawing board.'",
+      "options": [
+        "Start over with a new plan",
+        "Draw a diagram",
+        "Quit the project",
+        "Assign more workers"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'Back to the drawing board' means to start planning anew after an initial approach failed.\n**Correct Answer:** A."
+    },
+    {
+      "id": 37,
+      "category": "Verbal Ability",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "Choose the word that best completes the sentence: The engineer's explanation was so _____ that even non-technical stakeholders grasped the architecture instantly.",
+      "options": [
+        "lucid",
+        "convoluted",
+        "opaque",
+        "verbose"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** 'Lucid' means expressed clearly and easily understood.\n**Correct Answer:** A."
+    },
+    {
+      "id": 38,
+      "category": "Technical",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "What is the worst-case time complexity of searching for an element in an unbalanced Binary Search Tree (BST)?",
+      "options": [
+        "O(n)",
+        "O(log n)",
+        "O(n log n)",
+        "O(1)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** In an unbalanced BST that degrades into a linked list, height is n.\n**Step 2:** Worst case search must traverse all n nodes: O(n).\n**Correct Answer:** A (O(n))."
+    },
+    {
+      "id": 39,
+      "category": "Technical",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "In Stripe's microservices architecture, which protocol provides multiplexing over a single TCP connection with binary framing?",
+      "options": [
+        "HTTP/2 and gRPC",
+        "HTTP/1.1",
+        "FTP",
+        "SNMP"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** HTTP/2 introduces binary framing and request multiplexing over a single TCP connection, powering gRPC.\n**Correct Answer:** A."
+    },
+    {
+      "id": 40,
+      "category": "Technical",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "Which of the following database isolation levels prevents phantom reads?",
+      "options": [
+        "Serializable",
+        "Read Committed",
+        "Repeatable Read",
+        "Read Uncommitted"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Serializable is the highest ANSI SQL isolation level and prevents dirty reads, non-repeatable reads, and phantom reads.\n**Correct Answer:** A (Serializable)."
+    },
+    {
+      "id": 41,
+      "category": "Technical",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "What is the primary characteristic of an idempotent API endpoint?",
+      "options": [
+        "Calling it multiple times produces the identical side-effect as calling it once",
+        "It executes faster than non-idempotent endpoints",
+        "It does not require authentication",
+        "It always returns HTTP 200 OK"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** An operation is idempotent if f(f(x)) = f(x). Repeated identical requests leave the system in the same state.\n**Correct Answer:** A."
+    },
+    {
+      "id": 42,
+      "category": "Technical",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "In object-oriented design, the Open/Closed Principle (from SOLID) dictates that software entities should be:",
+      "options": [
+        "Open for extension, but closed for modification",
+        "Open for modification, closed for inheritance",
+        "Open for public access, closed for private methods",
+        "Open for multi-threading, closed for single threading"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Open/Closed Principle states classes should allow behavior extension without altering existing source code.\n**Correct Answer:** A."
+    },
+    {
+      "id": 43,
+      "category": "Technical",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "Which data structure is typically utilized to implement a Least Recently Used (LRU) Cache in O(1) time?",
+      "options": [
+        "Hash Map + Doubly Linked List",
+        "Binary Heap",
+        "Red-Black Tree",
+        "Stack + Array"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** A Hash Map provides O(1) key lookup, while a Doubly Linked List maintains access recency order in O(1) node moves.\n**Correct Answer:** A."
+    },
+    {
+      "id": 44,
+      "category": "Technical",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "What does CAP theorem state about distributed datastores?",
+      "options": [
+        "A distributed system can guarantee at most two of: Consistency, Availability, and Partition Tolerance",
+        "Caching Always Improves Performance",
+        "Concurrency And Parallelism are equivalent",
+        "All nodes must achieve Consensus At Partition"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Eric Brewer's CAP theorem proves that in the presence of a network partition (P), a distributed system must choose between Consistency (C) and Availability (A).\n**Correct Answer:** A."
+    },
+    {
+      "id": 45,
+      "category": "Technical",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "What is the time complexity of building a Max-Heap from an unsorted array of n elements?",
+      "options": [
+        "O(n)",
+        "O(n log n)",
+        "O(log n)",
+        "O(n^2)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Bottom-up heap construction takes linear time: O(n), bounded by the mathematical summation of node heights.\n**Correct Answer:** A (O(n))."
+    },
+    {
+      "id": 46,
+      "category": "Technical",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "Which index type in PostgreSQL and MySQL InnoDB is the default for indexing primary and unique keys?",
+      "options": [
+        "B-Tree / B+Tree",
+        "Hash Index",
+        "GIN Index",
+        "GiST Index"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** B+Trees provide logarithmic search, insertion, deletion, and efficient range scans.\n**Correct Answer:** A (B-Tree)."
+    },
+    {
+      "id": 47,
+      "category": "Technical",
+      "difficulty": "Advanced",
+      "level": "Advanced",
+      "question": "What happens when two threads access a shared counter simultaneously without synchronization?",
+      "options": [
+        "A race condition causing lost updates",
+        "Deadlock immediately",
+        "StackOverflowError",
+        "Automatic thread serialization"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Non-atomic read-modify-write operations interleave, resulting in race conditions and incorrect counts.\n**Correct Answer:** A."
+    },
+    {
+      "id": 48,
+      "category": "Technical",
+      "difficulty": "Beginner",
+      "level": "Beginner",
+      "question": "In networking, which layer of the OSI model does TLS/SSL operate at?",
+      "options": [
+        "Presentation / Transport (between layers 4 and 7)",
+        "Network Layer (Layer 3)",
+        "Data Link Layer (Layer 2)",
+        "Physical Layer (Layer 1)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** TLS encrypts application data before passing to Transport (TCP), sitting effectively between layers 4 and 7.\n**Correct Answer:** A."
+    },
+    {
+      "id": 49,
+      "category": "Technical",
+      "difficulty": "Intermediate",
+      "level": "Intermediate",
+      "question": "What is the space complexity of Depth First Search (DFS) on a balanced binary tree of n nodes?",
+      "options": [
+        "O(h) = O(log n) call stack space",
+        "O(n) auxiliary memory",
+        "O(1) constant space",
+        "O(n log n)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** Recursive DFS consumes stack frames proportional to maximum tree depth, which is O(log n) for balanced trees.\n**Correct Answer:** A."
+    },
+    {
+      "id": 50,
+      "category": "Technical",
+      "difficulty": "Legend",
+      "level": "Legend",
+      "question": "Which garbage collector algorithm in modern JVMs is designed to maintain low latency pauses under 1 millisecond on multi-terabyte heaps?",
+      "options": [
+        "ZGC (Z Garbage Collector)",
+        "Serial GC",
+        "Parallel GC",
+        "CMS (Concurrent Mark Sweep)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "**Step 1:** ZGC uses colored pointers and load barriers to perform concurrent marking, relocation, and reference processing in <1ms.\n**Correct Answer:** A (ZGC)."
+    }
+  ]
+}

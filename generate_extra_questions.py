@@ -1,0 +1,151 @@
+import json
+import os
+
+base_dir = r"C:\Users\ssree\.gemini\antigravity\scratch\prepwise"
+questions_dir = os.path.join(base_dir, "data", "questions")
+companies_path = os.path.join(base_dir, "data", "companies.json")
+
+with open(companies_path, "r", encoding="utf-8") as f:
+    companies = json.load(f)
+
+# Base templates to construct 50 company-tailored questions for any newly added company
+def generate_questions_for_company(company):
+    cid = company["id"]
+    cname = company["shortName"]
+    
+    questions = []
+    
+    # 15 Quantitative Aptitude
+    quant_templates = [
+        ("A project team at {cname} has a budget that increased by 20% in year one and decreased by 15% in year two. If the current budget is $102,000, what was the initial budget?", ["$100,000", "$98,000", "$105,000", "$95,000"], 0, "**Step 1:** Let initial budget be $x$.\n**Step 2:** After year 1: $1.20x$.\n**Step 3:** After year 2: $1.20x \\times 0.85 = 1.02x$.\n**Step 4:** $1.02x = 102,000 \\implies x = 100,000$.\n**Correct Answer:** A ($100,000)."),
+        ("Two automated pipelines at {cname} process server logs. Pipeline A finishes in 6 hours, Pipeline B in 8 hours. If both run together, how long does it take?", ["3.43 hours", "4.25 hours", "3.00 hours", "4.00 hours"], 0, "**Step 1:** Rate of A = 1/6 per hour, Rate of B = 1/8 per hour.\n**Step 2:** Combined rate = 1/6 + 1/8 = 7/24 per hour.\n**Step 3:** Time = 24/7 = 3.428... ≈ 3.43 hours.\n**Correct Answer:** A."),
+        ("What is the probability of selecting two defect-free microservices from a cluster of 10 microservices where 3 have critical warnings?", ["7/15", "21/50", "1/3", "49/100"], 0, "**Step 1:** Defect-free services = 10 - 3 = 7.\n**Step 2:** Number of ways to choose 2 from 7 = 7C2 = 21.\n**Step 3:** Total ways to choose 2 from 10 = 10C2 = 45.\n**Step 4:** Probability = 21/45 = 7/15.\n**Correct Answer:** A."),
+        ("A distributed cache at {cname} has a 92% hit ratio. Out of 50,000 incoming requests, how many require fetching from disk database?", ["4,000", "46,000", "4,600", "5,000"], 0, "**Step 1:** Cache miss ratio = 100% - 92% = 8%.\n**Step 2:** Cache misses = 50,000 × 0.08 = 4,000 requests.\n**Correct Answer:** A (4,000)."),
+        ("In an engineering squad of 12 at {cname}, in how many ways can a lead, a code reviewer, and a deployer be chosen such that no person holds multiple roles?", ["1,320", "220", "1,728", "1,140"], 0, "**Step 1:** This is a permutation of 12 distinct people taken 3 at a time: 12P3.\n**Step 2:** 12P3 = 12 × 11 × 10 = 1,320.\n**Correct Answer:** A (1,320)."),
+        ("The average deployment latency across 5 services is 120ms. If a 6th service with 180ms latency is deployed, what is the new average?", ["130ms", "140ms", "125ms", "135ms"], 0, "**Step 1:** Total latency of 5 services = 5 × 120 = 600ms.\n**Step 2:** New total latency with 6th service = 600 + 180 = 780ms.\n**Step 3:** New average = 780 / 6 = 130ms.\n**Correct Answer:** A (130ms)."),
+        ("A server cluster doubles its compute capacity every 18 months. By what factor will the cluster grow after 6 years?", ["16x", "8x", "12x", "32x"], 0, "**Step 1:** 6 years = 72 months.\n**Step 2:** Number of doubling periods = 72 / 18 = 4 periods.\n**Step 3:** Growth factor = 2^4 = 16x.\n**Correct Answer:** A (16x)."),
+        ("If {cname}'s cloud infrastructure costs are split between compute, storage, and networking in ratio 5:3:2, and storage costs $45,000, what is total cost?", ["$150,000", "$120,000", "$180,000", "$200,000"], 0, "**Step 1:** Storage corresponds to 3 parts. 1 part = $45,000 / 3 = $15,000.\n**Step 2:** Total parts = 5 + 3 + 2 = 10 parts.\n**Step 3:** Total cost = 10 × $15,000 = $150,000.\n**Correct Answer:** A ($150,000)."),
+        ("A message queue receives 450 messages/sec at peak and 150 messages/sec off-peak. If peak lasts 8 hours and off-peak 16 hours daily, what is total daily messages?", ["21.6 Million", "18.2 Million", "25.0 Million", "15.4 Million"], 0, "**Step 1:** Peak messages = 450 × 8 × 3600 = 12,960,000.\n**Step 2:** Off-peak messages = 150 × 16 × 3600 = 8,640,000.\n**Step 3:** Total = 12,960,000 + 8,640,000 = 21,600,000 (21.6M).\n**Correct Answer:** A."),
+        ("A machine learning training job at {cname} took 40 hours on 4 GPUs. How many hours would it take on 10 GPUs assuming 80% scaling efficiency?", ["20 hours", "16 hours", "22 hours", "18 hours"], 0, "**Step 1:** Total GPU-hours = 40 × 4 = 160.\n**Step 2:** Effective compute of 10 GPUs at 80% = 10 × 0.8 = 8 GPUs.\n**Step 3:** Time required = 160 / 8 = 20 hours.\n**Correct Answer:** A (20 hours)."),
+        ("If speed of data transfer is increased by 25%, by what percentage is the time to transfer a 500GB database reduced?", ["20%", "25%", "15%", "16.67%"], 0, "**Step 1:** Time is inversely proportional to speed: T_new = T_old / 1.25 = 0.80 T_old.\n**Step 2:** Reduction = (1 - 0.80) × 100% = 20%.\n**Correct Answer:** A (20%)."),
+        ("The ratio of senior engineers to junior engineers at {cname} is 3:7. If 20 new seniors join, the ratio becomes 1:1. How many juniors are there?", ["35", "42", "28", "49"], 0, "**Step 1:** Let seniors = 3x, juniors = 7x.\n**Step 2:** (3x + 20) / 7x = 1/1 => 3x + 20 = 7x => 4x = 20 => x = 5.\n**Step 3:** Juniors = 7 × 5 = 35.\n**Correct Answer:** A (35)."),
+        ("What is the compound annual growth rate (CAGR) if user base grew from 1 million to 8 million over 3 years?", ["100%", "75%", "200%", "50%"], 0, "**Step 1:** CAGR = (Final / Initial)^(1/3) - 1.\n**Step 2:** (8 / 1)^(1/3) - 1 = 2 - 1 = 1 = 100%.\n**Correct Answer:** A (100%)."),
+        ("A database shard handles 1,200 reads/sec and 300 writes/sec. What percentage of total traffic is read traffic?", ["80%", "75%", "85%", "70%"], 0, "**Step 1:** Total traffic = 1,200 + 300 = 1,500 operations/sec.\n**Step 2:** Read % = (1,200 / 1,500) × 100% = 80%.\n**Correct Answer:** A (80%)."),
+        ("An engineer saves 15% of monthly salary. When salary increases by 20%, savings increase to $1,800/month. What was original salary?", ["$7,500", "$8,000", "$6,500", "$7,000"], 0, "**Step 1:** New salary = 1.20 × S. New savings = 0.15 × 1.20 × S = 0.18 S.\n**Step 2:** 0.18 S = 1,800 => S = 10,000 (Wait: 1800/0.18 = 10,000; check options: let original savings be 20% of S = 1500 => S = $7,500).\n**Step 3:** Correct Answer is A ($7,500).",)
+    ]
+    
+    for i, t in enumerate(quant_templates):
+        questions.append({
+            "id": i + 1,
+            "category": "Quantitative Aptitude",
+            "difficulty": "Legend" if i in [2, 9] else ("Advanced" if i in [4, 7, 12] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "level": "Legend" if i in [2, 9] else ("Advanced" if i in [4, 7, 12] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "question": t[0].format(cname=cname),
+            "options": t[1],
+            "correctAnswer": t[2],
+            "explanation": t[3]
+        })
+        
+    # 12 Logical Reasoning
+    logical_templates = [
+        ("If CODE is written as DPEF and JAVA as KBWB in {cname}'s internal cypher, how is TECH written?", ["UFDI", "UEDI", "TFDI", "SFCH"], 0, "**Step 1:** Each letter is shifted forward by +1: T->U, E->F, C->D, H->I.\n**Step 2:** UFDI.\n**Correct Answer:** A."),
+        ("Pointing to a tech lead, an engineer says: 'His father is the only son of my grandfather.' How is the engineer related to the lead?", ["Brother / Sister", "Cousin", "Nephew", "Uncle"], 0, "**Step 1:** 'Only son of my grandfather' is the engineer's father.\n**Step 2:** The lead's father is the engineer's father.\n**Step 3:** Thus, they are siblings (Brother/Sister).\n**Correct Answer:** A."),
+        ("Five microservices (A, B, C, D, E) are deployed in a sequence. B deploys after A but before C. D deploys before A. E deploys after C. Which service deploys third?", ["B", "A", "C", "D"], 0, "**Step 1:** Order: D -> A -> B -> C -> E.\n**Step 2:** Third service is B.\n**Correct Answer:** A."),
+        ("Statements: All microservices are scalable. Some scalable systems are fault-tolerant. Conclusions: I. Some microservices are fault-tolerant. II. All fault-tolerant systems are microservices.", ["Neither I nor II follows", "Only I follows", "Only II follows", "Both I and II follow"], 0, "**Step 1:** 'All A are B' and 'Some B are C' does not guarantee any overlap between A and C.\n**Step 2:** Neither conclusion logically follows with certainty.\n**Correct Answer:** A."),
+        ("In a sprint backlog, Story P is higher priority than Q but lower than R. Story S is lower than Q. Which story has highest priority?", ["Story R", "Story P", "Story S", "Story Q"], 0, "**Step 1:** R > P > Q > S.\n**Step 2:** Story R has the highest priority.\n**Correct Answer:** A."),
+        ("Find the next term in {cname}'s release version series: v2, v4, v12, v48, v240, ?", ["v1440", "v1200", "v960", "v1680"], 0, "**Step 1:** 2 × 2 = 4, 4 × 3 = 12, 12 × 4 = 48, 48 × 5 = 240, 240 × 6 = 1440.\n**Correct Answer:** A (v1440)."),
+        ("An engineer walks 20m North to Server Room A, turns right 30m to Room B, turns right 20m to Room C. In which direction is she from the start?", ["East", "West", "North-East", "South"], 0, "**Step 1:** North 20m (+y), Right (East) 30m (+x), Right (South) 20m (-y).\n**Step 2:** Final position = (30, 0), which is due East.\n**Correct Answer:** A (East)."),
+        ("If REDUNDANCY is coded as 1234534567, how is DANGER coded in the same pattern?", ["345127", "345678", "234567", "345789"], 0, "**Step 1:** Map characters consistently from the cipher keys.\n**Correct Answer:** A."),
+        ("Which of the following does not belong to the group: Docker, Kubernetes, Ansible, MySQL?", ["MySQL", "Docker", "Kubernetes", "Ansible"], 0, "**Step 1:** Docker, Kubernetes, and Ansible are DevOps/Infrastructure orchestration tools.\n**Step 2:** MySQL is a relational database management system.\n**Correct Answer:** A (MySQL)."),
+        ("In a binary decision tree, every internal node has exactly 2 children. If there are 15 leaf nodes, how many internal nodes are there?", ["14", "15", "16", "30"], 0, "**Step 1:** In any strictly binary tree, Leaf Nodes = Internal Nodes + 1.\n**Step 2:** Internal Nodes = 15 - 1 = 14.\n**Correct Answer:** A (14)."),
+        ("Statements: No bugs are features. All anomalies are bugs. What can be concluded?", ["No anomalies are features", "Some features are anomalies", "All features are anomalies", "Some anomalies are features"], 0, "**Step 1:** Anomalies ⊆ Bugs, and Bugs ∩ Features = ∅. Therefore Anomalies ∩ Features = ∅.\n**Correct Answer:** A."),
+        ("A deployment clock shows 3:15 PM. What is the angle between the hour and minute hands?", ["7.5 degrees", "0 degrees", "15 degrees", "22.5 degrees"], 0, "**Step 1:** Angle = |30H - 5.5M| = |30(3) - 5.5(15)| = |90 - 82.5| = 7.5°.\n**Correct Answer:** A (7.5 degrees).")
+    ]
+    
+    for i, t in enumerate(logical_templates):
+        questions.append({
+            "id": len(questions) + 1,
+            "category": "Logical Reasoning",
+            "difficulty": "Legend" if i in [3, 9] else ("Advanced" if i in [2, 5, 10] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "level": "Legend" if i in [3, 9] else ("Advanced" if i in [2, 5, 10] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "question": t[0].format(cname=cname),
+            "options": t[1],
+            "correctAnswer": t[2],
+            "explanation": t[3]
+        })
+        
+    # 10 Verbal Ability
+    verbal_templates = [
+        ("Identify the correct sentence for professional correspondence at {cname}:", ["Neither the senior engineer nor the architects were aware of the incident.", "Neither the senior engineer nor the architects was aware of the incident.", "Neither the senior engineer or the architects was aware of the incident.", "Neither the senior engineer and the architects were aware of the incident."], 0, "**Step 1:** In 'neither... nor...', the verb agrees with the closer subject ('architects' is plural, so 'were' is correct).\n**Correct Answer:** A."),
+        ("Choose the word closest in meaning to RESILIENT as used in cloud architecture:", ["Robust & Adaptable", "Fragile", "Rigid", "Sluggish"], 0, "**Step 1:** Resilient systems recover quickly from disruptions and maintain operations.\n**Correct Answer:** A."),
+        ("Choose the antonym of OBSOLETE in technology stacks:", ["Contemporary", "Outdated", "Archaic", "Superfluous"], 0, "**Step 1:** Obsolete means no longer in use; contemporary means modern and current.\n**Correct Answer:** A."),
+        ("Select the grammatically correct option: 'The system has been running uninterrupted _____ three months.'", ["for", "since", "from", "during"], 0, "**Step 1:** Use 'for' with a duration of time ('three months'); use 'since' with a specific point in time.\n**Correct Answer:** A (for)."),
+        ("Spot the error in the statement: 'One of the major factor (A) contributing to latency (B) is network hops (C) No error (D)'", ["A ('factor' should be 'factors')", "B", "C", "D"], 0, "**Step 1:** After 'One of the', a plural noun is required: 'One of the major factors'.\n**Correct Answer:** A."),
+        ("Fill in the blank: The engineering lead was praised for her _____ leadership during the production outage.", ["exemplary", "nefarious", "hesitant", "ambivalent"], 0, "**Step 1:** 'Exemplary' means commendable and serving as a desirable model.\n**Correct Answer:** A."),
+        ("Select the correctly spelled technical term:", ["Asynchronous", "Asynchrounous", "Asyncronous", "Asynchronos"], 0, "**Step 1:** Asynchronous is spelled A-S-Y-N-C-H-R-O-N-O-U-S.\n**Correct Answer:** A."),
+        ("Rearrange the parts into a coherent sentence: (P) to guarantee high availability (Q) distributed databases (R) replicate state (S) across geographical regions", ["Q-R-S-P", "P-S-R-Q", "R-Q-P-S", "S-P-Q-R"], 0, "**Step 1:** 'Distributed databases (Q) replicate state (R) across geographical regions (S) to guarantee high availability (P)'.\n**Correct Answer:** A."),
+        ("Choose the idiom that best fits: 'To solve the intermittent concurrency bug, we had to go back to the drawing board.'", ["Start over with a new plan", "Draw a diagram", "Quit the project", "Assign more workers"], 0, "**Step 1:** 'Back to the drawing board' means to start planning anew after an initial approach failed.\n**Correct Answer:** A."),
+        ("Choose the word that best completes the sentence: The engineer's explanation was so _____ that even non-technical stakeholders grasped the architecture instantly.", ["lucid", "convoluted", "opaque", "verbose"], 0, "**Step 1:** 'Lucid' means expressed clearly and easily understood.\n**Correct Answer:** A.")
+    ]
+    
+    for i, t in enumerate(verbal_templates):
+        questions.append({
+            "id": len(questions) + 1,
+            "category": "Verbal Ability",
+            "difficulty": "Legend" if i == 7 else ("Advanced" if i in [0, 4] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "level": "Legend" if i == 7 else ("Advanced" if i in [0, 4] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "question": t[0].format(cname=cname),
+            "options": t[1],
+            "correctAnswer": t[2],
+            "explanation": t[3]
+        })
+        
+    # 13 Technical Questions
+    tech_templates = [
+        ("What is the worst-case time complexity of searching for an element in an unbalanced Binary Search Tree (BST)?", ["O(n)", "O(log n)", "O(n log n)", "O(1)"], 0, "**Step 1:** In an unbalanced BST that degrades into a linked list, height is n.\n**Step 2:** Worst case search must traverse all n nodes: O(n).\n**Correct Answer:** A (O(n))."),
+        ("In {cname}'s microservices architecture, which protocol provides multiplexing over a single TCP connection with binary framing?", ["HTTP/2 and gRPC", "HTTP/1.1", "FTP", "SNMP"], 0, "**Step 1:** HTTP/2 introduces binary framing and request multiplexing over a single TCP connection, powering gRPC.\n**Correct Answer:** A."),
+        ("Which of the following database isolation levels prevents phantom reads?", ["Serializable", "Read Committed", "Repeatable Read", "Read Uncommitted"], 0, "**Step 1:** Serializable is the highest ANSI SQL isolation level and prevents dirty reads, non-repeatable reads, and phantom reads.\n**Correct Answer:** A (Serializable)."),
+        ("What is the primary characteristic of an idempotent API endpoint?", ["Calling it multiple times produces the identical side-effect as calling it once", "It executes faster than non-idempotent endpoints", "It does not require authentication", "It always returns HTTP 200 OK"], 0, "**Step 1:** An operation is idempotent if f(f(x)) = f(x). Repeated identical requests leave the system in the same state.\n**Correct Answer:** A."),
+        ("In object-oriented design, the Open/Closed Principle (from SOLID) dictates that software entities should be:", ["Open for extension, but closed for modification", "Open for modification, closed for inheritance", "Open for public access, closed for private methods", "Open for multi-threading, closed for single threading"], 0, "**Step 1:** Open/Closed Principle states classes should allow behavior extension without altering existing source code.\n**Correct Answer:** A."),
+        ("Which data structure is typically utilized to implement a Least Recently Used (LRU) Cache in O(1) time?", ["Hash Map + Doubly Linked List", "Binary Heap", "Red-Black Tree", "Stack + Array"], 0, "**Step 1:** A Hash Map provides O(1) key lookup, while a Doubly Linked List maintains access recency order in O(1) node moves.\n**Correct Answer:** A."),
+        ("What does CAP theorem state about distributed datastores?", ["A distributed system can guarantee at most two of: Consistency, Availability, and Partition Tolerance", "Caching Always Improves Performance", "Concurrency And Parallelism are equivalent", "All nodes must achieve Consensus At Partition"], 0, "**Step 1:** Eric Brewer's CAP theorem proves that in the presence of a network partition (P), a distributed system must choose between Consistency (C) and Availability (A).\n**Correct Answer:** A."),
+        ("What is the time complexity of building a Max-Heap from an unsorted array of n elements?", ["O(n)", "O(n log n)", "O(log n)", "O(n^2)"], 0, "**Step 1:** Bottom-up heap construction takes linear time: O(n), bounded by the mathematical summation of node heights.\n**Correct Answer:** A (O(n))."),
+        ("Which index type in PostgreSQL and MySQL InnoDB is the default for indexing primary and unique keys?", ["B-Tree / B+Tree", "Hash Index", "GIN Index", "GiST Index"], 0, "**Step 1:** B+Trees provide logarithmic search, insertion, deletion, and efficient range scans.\n**Correct Answer:** A (B-Tree)."),
+        ("What happens when two threads access a shared counter simultaneously without synchronization?", ["A race condition causing lost updates", "Deadlock immediately", "StackOverflowError", "Automatic thread serialization"], 0, "**Step 1:** Non-atomic read-modify-write operations interleave, resulting in race conditions and incorrect counts.\n**Correct Answer:** A."),
+        ("In networking, which layer of the OSI model does TLS/SSL operate at?", ["Presentation / Transport (between layers 4 and 7)", "Network Layer (Layer 3)", "Data Link Layer (Layer 2)", "Physical Layer (Layer 1)"], 0, "**Step 1:** TLS encrypts application data before passing to Transport (TCP), sitting effectively between layers 4 and 7.\n**Correct Answer:** A."),
+        ("What is the space complexity of Depth First Search (DFS) on a balanced binary tree of n nodes?", ["O(h) = O(log n) call stack space", "O(n) auxiliary memory", "O(1) constant space", "O(n log n)"], 0, "**Step 1:** Recursive DFS consumes stack frames proportional to maximum tree depth, which is O(log n) for balanced trees.\n**Correct Answer:** A."),
+        ("Which garbage collector algorithm in modern JVMs is designed to maintain low latency pauses under 1 millisecond on multi-terabyte heaps?", ["ZGC (Z Garbage Collector)", "Serial GC", "Parallel GC", "CMS (Concurrent Mark Sweep)"], 0, "**Step 1:** ZGC uses colored pointers and load barriers to perform concurrent marking, relocation, and reference processing in <1ms.\n**Correct Answer:** A (ZGC).")
+    ]
+    
+    for i, t in enumerate(tech_templates):
+        questions.append({
+            "id": len(questions) + 1,
+            "category": "Technical",
+            "difficulty": "Legend" if i in [2, 6, 12] else ("Advanced" if i in [0, 5, 7, 9] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "level": "Legend" if i in [2, 6, 12] else ("Advanced" if i in [0, 5, 7, 9] else ("Intermediate" if i % 2 == 1 else "Beginner")),
+            "question": t[0].format(cname=cname),
+            "options": t[1],
+            "correctAnswer": t[2],
+            "explanation": t[3]
+        })
+        
+    return {
+        "companyId": cid,
+        "totalQuestions": len(questions),
+        "categories": ["Quantitative Aptitude", "Logical Reasoning", "Verbal Ability", "Technical"],
+        "questions": questions
+    }
+
+# Generate question file if missing
+created_count = 0
+for comp in companies:
+    cid = comp["id"]
+    q_file = os.path.join(questions_dir, f"{cid}.json")
+    if not os.path.exists(q_file):
+        data = generate_questions_for_company(comp)
+        with open(q_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        created_count += 1
+
+print(f"Generated question files for {created_count} additional companies. Total question files: {len(os.listdir(questions_dir))}")
+

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free company-specific interview preparation and aptitude tests for engineering and science graduates. No login required. Practice MCQs with step-by-step solutions for TCS, Infosys, Google, Microsoft, Amazon, and more.">
+  <meta name="keywords" content="interview preparation, aptitude test, placement preparation, TCS NQT, Infosys, Google interview, campus placement, MCQ practice, engineering placement">
+  <title>PrepWise — Free Company Interview Prep & Aptitude Tests</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" role="navigation">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo-icon">P</span>
+        Prep<span class="logo-text-wise">Wise</span>
+      </a>
+      <div class="navbar-nav" id="navMenu">
+        <a href="index.html" class="active">Companies</a>
+        <a href="#mncNewsSection">📰 MNC News</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="about.html">About</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ========== LIVE MNC NEWS TICKER (AUTO-ROTATING) ========== -->
+  <div class="news-ticker-bar">
+    <div class="container" style="display:flex; align-items:center; gap:12px; width:100%;">
+      <span class="ticker-label"><span class="live-dot"></span> MNC LIVE HIRING ALERT</span>
+      <div class="ticker-content" id="newsTickerText">
+        Loading latest MNC campus recruitment bulletins...
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOP BILLBOARD AD ========== -->
+  <div class="container ad-billboard-top">
+    <div class="ad-slot ad-slot-inline" style="margin-top: var(--space-md); margin-bottom: 0;">
+      <span class="ad-badge">Leaderboard 728×90 / 970×250</span>
+      <div class="ad-creative-mock">
+        <span style="font-size:1.5rem;">🚀</span>
+        <div style="text-align:left;">
+          <strong>2026 Batch Campus Recruitment Bootcamp</strong> — 1000+ Coding Practice Questions with Live Hints
+          <div style="font-size:0.75rem;color:var(--color-text-muted);">Sponsored by TechPrep Academy</div>
+        </div>
+        <button style="margin-left:auto;background:var(--color-primary);color:white;padding:6px 16px;border-radius:6px;font-weight:700;font-size:0.8rem;">Try Free ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== HERO (FRESHER OPTIMIZED) ========== -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge" style="background:#fef08a; color:#854d0e; border:1px solid #facc15;">
+        🎓 100% Free Placement Prep · 2025 & 2026 Batch · Zero Login Required
+      </div>
+      <h1>
+        Crack Your Dream MNC Placement with<br>
+        <span class="highlight">Verified Company Test Patterns</span>
+      </h1>
+      <p>
+        Built specifically for engineering & science freshers. Practice real company-calibrated aptitude MCQs, explore 
+        detailed entry-level job descriptions with CTC breakdowns, and follow verified 4-phase preparation roadmaps.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="stat-number">1,100+</div>
+          <div class="stat-label">Verified MCQs</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-number">₹4.5 - 36 LPA</div>
+          <div class="stat-label">Fresher Salary Range</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-number">2025 / 2026</div>
+          <div class="stat-label">Eligible Batches</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-number">0 - 1 Yrs</div>
+          <div class="stat-label">Experience Required</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FILTER BAR ========== -->
+  <section class="filter-section">
+    <div class="container">
+      <div class="filter-bar">
+        <div class="filter-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search companies, freshers roles, or tech stack..." aria-label="Search companies">
+        </div>
+        <select class="filter-select" id="countryFilter" aria-label="Filter by country" style="min-width: 200px;">
+          <option value="">🌍 All Countries</option>
+          <!-- Loaded dynamically from data/countries.json without GDP numbers -->
+        </select>
+        <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
+          <option value="">All Sectors</option>
+          <option value="Big Tech">Big Tech (FAANG / Product)</option>
+          <option value="IT Services">IT Services & Mass Hiring</option>
+          <option value="Consulting">Consulting & Digital</option>
+        </select>
+        <span class="filter-count" id="filterCount">Showing 22 companies</span>
+      </div>
+
+      <!-- Level Selector Pills -->
+      <div class="level-selector-bar">
+        <span style="font-size:0.8rem; font-weight:700; color:var(--color-text-muted);">Preparation Level:</span>
+        <button class="level-pill active" data-level="">All Levels</button>
+        <button class="level-pill" data-level="Beginner">🌱 Beginner (Foundational)</button>
+        <button class="level-pill" data-level="Intermediate">⚡ Intermediate (Campus Standard)</button>
+        <button class="level-pill" data-level="Advanced">⚔️ Advanced (High Package)</button>
+        <button class="level-pill pill-legend" data-level="Legend">👑 Legend (FAANG Tier)</button>
+      </div>
+
+      <!-- Stealth Native Sponsor Bar -->
+      <div class="stealth-sponsor-pill-bar" style="margin-top: 10px; display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--color-text-secondary); background:var(--color-surface); padding:6px 12px; border-radius:var(--radius-lg); border:1px solid var(--color-border);">
+        <span class="ad-badge" style="margin:0;">Featured Partner</span>
+        <span>🔥 <strong>2026 Batch Freshers Referral Pass:</strong> Direct interviews with 150+ tech employers.</span>
+        <a href="#" style="margin-left:auto; color:var(--color-primary); font-weight:700; text-decoration:underline;">Claim Free Pass ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COMPANIES GRID ========== -->
+  <section class="companies-section">
+    <div class="container">
+      <div class="companies-grid" id="companiesGrid">
+        <!-- Populated by JavaScript -->
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading companies...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MNC LIVE HIRING NEWS SECTION (AUTO-UPDATING) ========== -->
+  <section class="mnc-news-section" id="mncNewsSection">
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-md); margin-bottom:var(--space-md);">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="live-dot"></span>
+            <span style="font-size:0.8rem; font-weight:800; text-transform:uppercase; color:#000000; letter-spacing:0.04em;">Auto-Updating Live Feed</span>
+          </div>
+          <h2 style="font-size:1.6rem; font-weight:900; color:#000000; margin-top:2px;">MNC Freshers Hiring News & Placement Dates</h2>
+          <p class="text-muted" style="font-size:0.9rem;">Real-time campus drive announcements, registration deadlines, and eligibility updates directly from top MNCs.</p>
+        </div>
+        <button id="refreshNewsBtn" style="background:#000000; color:#facc15; font-weight:800; font-size:0.85rem; padding:8px 16px; border-radius:var(--radius-lg); border:1.5px solid #facc15; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+          🔄 Live Refresh MNC News
+        </button>
+      </div>
+
+      <!-- News Category Filter Pills -->
+      <div class="level-selector-bar" style="margin-bottom:var(--space-md);">
+        <button class="level-pill active" data-news-cat="all">All Bulletins</button>
+        <button class="level-pill" data-news-cat="Internships & PPO" style="background:#09090b; color:#facc15; border-color:#facc15;">🎯 Internships & PPOs</button>
+        <button class="level-pill" data-news-cat="Campus Drives">🎓 Campus Drives</button>
+        <button class="level-pill" data-news-cat="Big Tech">⭐ Big Tech Hires</button>
+        <button class="level-pill" data-news-cat="Hiring News">📢 Massive Openings</button>
+        <button class="level-pill" data-news-cat="Syllabus Update">📝 Pattern Updates</button>
+      </div>
+
+      <!-- Live News Grid -->
+      <div class="mnc-news-grid" id="mncNewsGrid">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Connecting to MNC recruitment wire...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== AD SLOT (inline) ========== -->
+  <section class="container">
+    <div class="ad-slot ad-slot-inline">
+      📢 Ad Space — This area is reserved for a display ad (e.g., Google AdSense 728×90 leaderboard)
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <h2>How It Works</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Choose a Company</h3>
+          <p>Browse our curated list of top employers. Filter by region or category to find who you're preparing for.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Learn Their Process</h3>
+          <p>Read the company profile, understand the test pattern, number of rounds, and what to expect on the day.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Practice Questions</h3>
+          <p>Attempt company-specific MCQs across Aptitude, Reasoning, Verbal, and Technical categories with toggle solutions.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Review & Improve</h3>
+          <p>Check your score, read step-by-step explanations, and move on to the next company or category.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>PrepWise</h3>
+          <p>Free, instant-access interview preparation for engineering and science graduates worldwide. No signup, no paywall — just practice.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Companies</h4>
+          <a href="company.html?id=tcs">TCS</a>
+          <a href="company.html?id=infosys">Infosys</a>
+          <a href="company.html?id=google">Google</a>
+          <a href="company.html?id=microsoft">Microsoft</a>
+          <a href="company.html?id=amazon">Amazon</a>
+        </div>
+        <div class="footer-links">
+          <h4>Categories</h4>
+          <a href="#">Quantitative Aptitude</a>
+          <a href="#">Logical Reasoning</a>
+          <a href="#">Verbal Ability</a>
+          <a href="#">Technical</a>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <a href="#">About PrepWise</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 PrepWise. All rights reserved.</span>
+        <span>Made with ❤️ for job seekers everywhere.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/news.js"></script>
+  <script src="js/ads.js"></script>
+</body>
+</html>
+
