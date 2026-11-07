@@ -12,9 +12,13 @@
     "duration": "10 - 12 Weeks (Summer 2026)",
     "timestamp": "Just now",
     "date": "Nov 2026",
-    "eligibleBatches": ["2026", "2027", "2028"],
+    "eligibleBatches": [
+      "2026",
+      "2027",
+      "2028"
+    ],
     "cutoff": "Currently enrolled in a Bachelor's or Master's STEM program; solid foundation in data structures & algorithms",
-    "applyLink": "https://careers.google.com/students/",
+    "applyLink": "https://careers.google.com/",
     "link": "company.html?id=google"
   },
   {
@@ -30,9 +34,12 @@
     "duration": "Summer (2-3 Months) or 6-Month Spring/Fall Co-op",
     "timestamp": "8 mins ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2026", "2027"],
+    "eligibleBatches": [
+      "2026",
+      "2027"
+    ],
     "cutoff": "Zero active backlogs; proficiency in Java, C++, or Python with object-oriented design fundamentals",
-    "applyLink": "https://www.amazon.jobs/en/business_categories/student-programs",
+    "applyLink": "https://www.amazon.jobs/",
     "link": "company.html?id=amazon"
   },
   {
@@ -48,9 +55,12 @@
     "duration": "12 Weeks (May - August 2026)",
     "timestamp": "15 mins ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2026", "2027"],
+    "eligibleBatches": [
+      "2026",
+      "2027"
+    ],
     "cutoff": "Pursuing degree in Computer Science, Software Engineering, or related circuit disciplines",
-    "applyLink": "https://careers.microsoft.com/students/us/en",
+    "applyLink": "https://careers.microsoft.com/",
     "link": "company.html?id=microsoft"
   },
   {
@@ -66,9 +76,13 @@
     "duration": "8 - 12 Weeks (Multiple cohorts throughout 2026)",
     "timestamp": "30 mins ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026", "2027"],
+    "eligibleBatches": [
+      "2025",
+      "2026",
+      "2027"
+    ],
     "cutoff": "Enrolled in recognized undergraduate or postgraduate university; strong academic record",
-    "applyLink": "https://www.infosys.com/instep.html",
+    "applyLink": "https://www.infosys.com/careers.html",
     "link": "company.html?id=infosys"
   },
   {
@@ -84,9 +98,12 @@
     "duration": "2 - 6 Months",
     "timestamp": "45 mins ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "Minimum 65% or 6.5 CGPA in current academic curriculum",
-    "applyLink": "https://nextstep.tcs.com/campus/",
+    "applyLink": "https://www.tcs.com/careers",
     "link": "company.html?id=tcs"
   },
   {
@@ -102,9 +119,12 @@
     "duration": "2 - 6 Months",
     "timestamp": "1 hour ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2026", "2027"],
+    "eligibleBatches": [
+      "2026",
+      "2027"
+    ],
     "cutoff": "B.Tech / M.Tech in CS, IT, Electronics with strong C++ or Python proficiency",
-    "applyLink": "https://research.samsung.com/",
+    "applyLink": "https://www.samsung.com/us/careers/",
     "link": "company.html?id=samsung"
   },
   {
@@ -120,9 +140,12 @@
     "duration": "10 - 12 Weeks (Summer)",
     "timestamp": "2 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2026", "2027"],
+    "eligibleBatches": [
+      "2026",
+      "2027"
+    ],
     "cutoff": "Enrolled in Bachelor's or Master's program graduating in 2026 or 2027",
-    "applyLink": "https://www.ibm.com/careers/internships",
+    "applyLink": "https://www.ibm.com/careers",
     "link": "company.html?id=ibm"
   },
   {
@@ -138,9 +161,12 @@
     "duration": "6 Months Co-op or 10-Week Summer",
     "timestamp": "3 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "Undergraduate or Graduate student in CS, Software Engineering, or Business Informatics",
-    "applyLink": "https://www.sap.com/about/careers/students-graduates/internships.html",
+    "applyLink": "https://jobs.sap.com/",
     "link": "company.html?id=sap"
   },
   {
@@ -154,9 +180,13 @@
     "category": "Campus Drives",
     "timestamp": "3 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026", "2024"],
+    "eligibleBatches": [
+      "2025",
+      "2026",
+      "2024"
+    ],
     "cutoff": "60% or 6.0 CGPA throughout 10th, 12th, and UG",
-    "applyLink": "https://nextstep.tcs.com/campus/",
+    "applyLink": "https://www.tcs.com/careers",
     "link": "company.html?id=tcs"
   },
   {
@@ -170,9 +200,12 @@
     "category": "Hiring News",
     "timestamp": "4 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "All B.E/B.Tech/MCA/M.Sc students with zero active backlogs",
-    "applyLink": "https://career.infosys.com/",
+    "applyLink": "https://www.infosys.com/careers.html",
     "link": "company.html?id=infosys"
   },
   {
@@ -186,9 +219,12 @@
     "category": "Big Tech",
     "timestamp": "5 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "Strong foundations in Data Structures, Algorithms, and System Concurrency",
-    "applyLink": "https://careers.google.com/students/",
+    "applyLink": "https://careers.google.com/",
     "link": "company.html?id=google"
   },
   {
@@ -202,9 +238,13 @@
     "category": "Campus Drives",
     "timestamp": "6 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026", "2024"],
+    "eligibleBatches": [
+      "2025",
+      "2026",
+      "2024"
+    ],
     "cutoff": "65% or 6.5 CGPA in current degree; max 1 active backlog allowed",
-    "applyLink": "https://www.accenture.com/in-en/careers/local/students-graduates",
+    "applyLink": "https://www.accenture.com/us-en/careers",
     "link": "company.html?id=accenture"
   },
   {
@@ -218,9 +258,12 @@
     "category": "Big Tech",
     "timestamp": "7 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "Graduating by mid-2026 with accredited CS or related degree",
-    "applyLink": "https://careers.microsoft.com/students/us/en",
+    "applyLink": "https://careers.microsoft.com/",
     "link": "company.html?id=microsoft"
   },
   {
@@ -234,9 +277,12 @@
     "category": "Campus Drives",
     "timestamp": "8 hours ago",
     "date": "Nov 2026",
-    "eligibleBatches": ["2025", "2026"],
+    "eligibleBatches": [
+      "2025",
+      "2026"
+    ],
     "cutoff": "Minimum 60% in 10th, 12th, Diploma, and Graduation",
-    "applyLink": "https://careers.cognizant.com/campus",
+    "applyLink": "https://careers.cognizant.com/",
     "link": "company.html?id=cognizant"
   }
 ]

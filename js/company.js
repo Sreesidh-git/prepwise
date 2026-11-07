@@ -201,9 +201,9 @@
           <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-bottom:12px;">
             Download curated cheatsheet & solutions PDF.
           </p>
-          <button style="background:var(--color-primary);color:white;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:700;">
+          <a href="https://www.placementcrack.com/" target="_blank" rel="noopener" style="background:var(--color-primary);color:white;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:700;">
             Free Download ↗
-          </button>
+          </a>
         </div>
       </div>
     `;
@@ -358,14 +358,14 @@
           </ul>
         </div>
 
-        <a href="#" class="prepare-role-btn" style="background:linear-gradient(135deg, #059669, #10b981);">
+        <a href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener" class="prepare-role-btn" style="background:linear-gradient(135deg, #059669, #10b981);">
           ⭐ Fast-Track Candidate Application (Free) →
         </a>
       </div>
     `;
 
     // Dedicated Student Internship Card with Direct Official Application Link
-    const careerUrl = company.website ? (company.website.endsWith('/') ? company.website + 'careers' : company.website + '/careers') : 'https://careers.google.com';
+    const careerUrl = company.careersUrl || company.website || 'https://careers.google.com/';
     const isTech = company.category === 'Big Tech';
     const stipendStr = isTech ? '$7,500 - $9,000 / month · ₹85,000 - ₹1,25,000 / mo' : '₹35,000 - ₹60,000 / month';
 

@@ -66,10 +66,19 @@ prepwise/
 
 ---
 
+## 📚 Beginner Documentation
+
+Start with the guides below:
+
+- [Master Project Summary](./PROJECT_SUMMARY.md) — architecture, pages, data flow, and maintenance notes
+- [Beginner Guide](./BEGINNER_GUIDE.md) — first steps, folder tour, and common debugging
+- [How To Run and Work on PrepWise](./HOW_TO_RUN.md) — local server, URLs, validation, and release checklist
+- [Data and Content Guide](./DATA_AND_CONTENT.md) — JSON shapes, relationships, and generator scripts
+
 ## 🚀 How to Run Locally
 
 ```powershell
-cd C:\Users\ssree\.gemini\antigravity\scratch\prepwise
+cd C:\Users\ra416\OneDrive\Desktop\prepwise
 python -m http.server 3456
 ```
 

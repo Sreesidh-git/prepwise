@@ -124,7 +124,7 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <a href="#" style="font-size:0.75rem;padding:6px 14px;background:var(--color-primary);color:white;border-radius:6px;font-weight:700;white-space:nowrap;" id="anchorCta">Learn More ↗</a>
+          <a href="https://www.coursera.org/" target="_blank" rel="noopener" style="font-size:0.75rem;padding:6px 14px;background:var(--color-primary);color:white;border-radius:6px;font-weight:700;white-space:nowrap;" id="anchorCta">Learn More ↗</a>
         </div>
       </div>
     `;

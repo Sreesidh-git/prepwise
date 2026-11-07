@@ -14,12 +14,12 @@
       "difficulty": "Legend",
       "question": "A number is increased by 20% and then decreased by 20%. What is the net change in percentage?",
       "options": [
-        "0%",
-        "4% decrease",
+        "2% decrease",
         "4% increase",
-        "2% decrease"
+        "4% decrease",
+        "0%"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** Let the original number = 100.\n\n**Step 2:** After 20% increase: 100 + 20 = 120.\n\n**Step 3:** After 20% decrease on 120: 120 - (20% of 120) = 120 - 24 = 96.\n\n**Step 4:** Net change = 96 - 100 = -4.\n\n**Step 5:** Percentage change = (4/100) × 100 = 4% decrease.\n\n**Formula shortcut:** When a value is increased and decreased by x%, net change = -x²/100 = -400/100 = -4%.\n\nTherefore, the answer is B.",
       "level": "Legend",
       "targetRoles": [
@@ -34,10 +34,10 @@
       "difficulty": "Intermediate",
       "question": "The average weight of a class of 30 students is 45 kg. If the weight of a teacher is included, the average increases by 1 kg. What is the weight of the teacher?",
       "options": [
-        "75 kg",
+        "77 kg",
         "76 kg",
-        "46 kg",
-        "77 kg"
+        "75 kg",
+        "46 kg"
       ],
       "correctAnswer": 1,
       "explanation": "**Step 1:** Total weight of 30 students = 30 × 45 = 1350 kg.\n\n**Step 2:** New average with teacher = 45 + 1 = 46 kg.\n\n**Step 3:** Total weight of 30 students + teacher = 31 × 46 = 1426 kg.\n\n**Step 4:** Weight of teacher = 1426 - 1350 = 76 kg.\n\nTherefore, the answer is B.",
@@ -54,12 +54,12 @@
       "difficulty": "Intermediate",
       "question": "If the cost price of 15 articles equals the selling price of 12 articles, what is the profit percentage?",
       "options": [
-        "20%",
-        "25%",
         "30%",
-        "15%"
+        "15%",
+        "25%",
+        "20%"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** Let CP of 1 article = C.\n\n**Step 2:** CP of 15 articles = 15C = SP of 12 articles.\n\n**Step 3:** SP of 1 article = 15C/12 = 5C/4.\n\n**Step 4:** Profit per article = SP - CP = 5C/4 - C = C/4.\n\n**Step 5:** Profit % = (C/4) / C × 100 = 25%.\n\nTherefore, the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
@@ -74,12 +74,12 @@
       "difficulty": "Beginner",
       "question": "What is the value of √(144 + 25)?",
       "options": [
-        "13",
+        "√169",
         "12",
         "17",
-        "√169"
+        "13"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** 144 + 25 = 169.\n\n**Step 2:** √169 = 13.\n\n**Step 3:** Note that option D (√169) is also equal to 13, but option A directly gives the numerical value.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -94,12 +94,12 @@
       "difficulty": "Advanced",
       "question": "A can do a piece of work in 10 days, and B can do it in 15 days. They work together for 4 days, and then A leaves. In how many more days will B finish the remaining work?",
       "options": [
-        "4 days",
         "5 days",
-        "3 days",
-        "6 days"
+        "6 days",
+        "4 days",
+        "3 days"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** A's rate = 1/10 per day, B's rate = 1/15 per day.\n\n**Step 2:** Combined rate = 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6 per day.\n\n**Step 3:** Work done in 4 days together = 4 × 1/6 = 4/6 = 2/3.\n\n**Step 4:** Remaining work = 1 - 2/3 = 1/3.\n\n**Step 5:** Time for B to finish 1/3 work = (1/3) ÷ (1/15) = (1/3) × 15 = 5 days.\n\nTherefore, the answer is B.",
       "level": "Advanced",
       "targetRoles": [
@@ -115,9 +115,9 @@
       "question": "A and B start from the same point and walk in opposite directions. A walks 3 km north, then turns right and walks 4 km. How far is A from the starting point?",
       "options": [
         "5 km",
+        "4 km",
         "7 km",
-        "6 km",
-        "4 km"
+        "6 km"
       ],
       "correctAnswer": 0,
       "explanation": "**Step 1:** A walks 3 km North, then turns right (facing East) and walks 4 km.\n\n**Step 2:** This forms a right-angled triangle with legs 3 km and 4 km.\n\n**Step 3:** Distance from starting point = √(3² + 4²) = √(9 + 16) = √25 = 5 km.\n\nTherefore, the answer is A.",
@@ -134,12 +134,12 @@
       "difficulty": "Beginner",
       "question": "If 3x + 2y = 12 and 2x + 3y = 13, what is the value of x + y?",
       "options": [
-        "5",
-        "4",
         "6",
-        "3"
+        "5",
+        "3",
+        "4"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** Equation 1: 3x + 2y = 12.\n\n**Step 2:** Equation 2: 2x + 3y = 13.\n\n**Step 3:** Add both equations: (3x + 2y) + (2x + 3y) = 12 + 13.\n\n**Step 4:** 5x + 5y = 25.\n\n**Step 5:** 5(x + y) = 25.\n\n**Step 6:** x + y = 5.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -155,11 +155,11 @@
       "question": "In a race of 200 m, A beats B by 20 m and B beats C by 25 m. By how many meters does A beat C in the same race?",
       "options": [
         "45 m",
-        "42.5 m",
+        "43 m",
         "40 m",
-        "43 m"
+        "42.5 m"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** When A finishes 200 m, B has run 180 m.\n\n**Step 2:** B's ratio to A: B runs 180 m when A runs 200 m.\n\n**Step 3:** When B finishes 200 m, C has run 175 m. So C runs 175/200 of what B runs.\n\n**Step 4:** When A finishes 200 m, B has run 180 m. At that point, C has run = 180 × (175/200) = 180 × 0.875 = 157.5 m.\n\n**Step 5:** A beats C by = 200 - 157.5 = 42.5 m.\n\nTherefore, the answer is B.",
       "level": "Legend",
       "targetRoles": [
@@ -174,12 +174,12 @@
       "difficulty": "Beginner",
       "question": "The ratio of two numbers is 3:5 and their sum is 160. What is the smaller number?",
       "options": [
-        "60",
-        "80",
         "100",
+        "80",
+        "60",
         "50"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** Let the two numbers be 3x and 5x.\n\n**Step 2:** 3x + 5x = 160.\n\n**Step 3:** 8x = 160, so x = 20.\n\n**Step 4:** Smaller number = 3x = 3 × 20 = 60.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -194,12 +194,12 @@
       "difficulty": "Beginner",
       "question": "A boat goes 12 km downstream in 1 hour and returns upstream in 1.5 hours. What is the speed of the stream?",
       "options": [
+        "1 km/hr",
         "2 km/hr",
         "3 km/hr",
-        "4 km/hr",
-        "1 km/hr"
+        "4 km/hr"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** Downstream speed = 12/1 = 12 km/hr.\n\n**Step 2:** Upstream speed = 12/1.5 = 8 km/hr.\n\n**Step 3:** Speed of stream = (Downstream - Upstream) / 2 = (12 - 8) / 2 = 4/2 = 2 km/hr.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -214,12 +214,12 @@
       "difficulty": "Legend",
       "question": "A shopkeeper sells an item at a loss of 10%. If he had sold it for ₹80 more, he would have gained 10%. What is the cost price of the item?",
       "options": [
-        "₹400",
         "₹450",
         "₹500",
-        "₹350"
+        "₹350",
+        "₹400"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** Let CP = x.\n\n**Step 2:** SP at 10% loss = 0.9x.\n\n**Step 3:** SP at 10% gain = 1.1x.\n\n**Step 4:** Difference = 1.1x - 0.9x = 0.2x = ₹80.\n\n**Step 5:** x = 80 / 0.2 = ₹400.\n\nTherefore, the answer is A.",
       "level": "Legend",
       "targetRoles": [
@@ -234,12 +234,12 @@
       "difficulty": "Intermediate",
       "question": "Find the next number in the series: 1, 4, 9, 16, 25, ?",
       "options": [
-        "30",
         "36",
         "49",
-        "35"
+        "35",
+        "30"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** The series is: 1, 4, 9, 16, 25.\n\n**Step 2:** These are perfect squares: 1², 2², 3², 4², 5².\n\n**Step 3:** The next term = 6² = 36.\n\nTherefore, the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
@@ -254,12 +254,12 @@
       "difficulty": "Beginner",
       "question": "A bag contains 5 red, 4 green, and 3 blue balls. If one ball is drawn at random, what is the probability that it is NOT green?",
       "options": [
-        "1/3",
         "2/3",
+        "1/4",
         "3/4",
-        "1/4"
+        "1/3"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** Total balls = 5 + 4 + 3 = 12.\n\n**Step 2:** Number of green balls = 4.\n\n**Step 3:** Number of non-green balls = 12 - 4 = 8.\n\n**Step 4:** P(not green) = 8/12 = 2/3.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -274,12 +274,12 @@
       "difficulty": "Advanced",
       "question": "The sum of ages of a father and his son is 50 years. Five years ago, the father's age was 4 times the son's age. What is the present age of the son?",
       "options": [
-        "12 years",
+        "10 years",
         "14 years",
-        "15 years",
-        "10 years"
+        "12 years",
+        "15 years"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** Let son's present age = x, father's present age = 50 - x.\n\n**Step 2:** Five years ago: Son = x - 5, Father = 45 - x.\n\n**Step 3:** Given: 45 - x = 4(x - 5).\n\n**Step 4:** 45 - x = 4x - 20.\n\n**Step 5:** 45 + 20 = 4x + x.\n\n**Step 6:** 65 = 5x.\n\n**Step 7:** x = 13.\n\nWait, 13 is not among the options. Let me recheck.\n\n45 - x = 4(x-5) → 45 - x = 4x - 20 → 65 = 5x → x = 13.\n\nHmm, let me re-examine. If the father's age was 4 times: (50-x-5) = 4(x-5) → 45-x = 4x-20 → 65 = 5x → x = 13. Not in options.\n\nLet me try: sum = 50, 'Five years ago father = 4 × son'. If sum currently is 50, maybe I should try the answer 15: Father = 35. Five years ago: Father = 30, Son = 10. 30 = 3 × 10 (not 4 times).\n\nTry 14: Father = 36. Five years ago: 31, 9. 31 ≠ 4 × 9 = 36.\n\nTry 12: Father = 38. Five years ago: 33, 7. 33 ≠ 28.\n\nTry 10: Father = 40. Five years ago: 35, 5. 35 = 7 × 5 (not 4).\n\nLet me adjust: The father was 4 times is not matching any option with sum = 50. Let me use sum = 55: try 15: Father = 40. Five years ago: 35, 10. 35 ≠ 40.\n\nActually with the correct answer being 15: Let father = 50 - 15 = 35. Five years ago: 30, 10. 30/10 = 3 times, not 4.\n\nLet me fix the problem to match answer 15: Sum = 56. Son = 15, Father = 41. Five years ago: 36, 10. 36/10 ≠ 4.\n\nOk, sum = 50, ratio 4 times 5 years ago: x = 13 is exact. Since 15 is closest and this is the intended answer for the problem variant where sum might be 52 or the multiple is 3: Let's say the problem uses 'three times': 45 - x = 3(x-5) → 45-x = 3x-15 → 60 = 4x → x = 15. ✓\n\nThe problem should state 'three times' for the answer to be 15. The explanation will reflect this.\n\nActually, let me just fix the problem statement to say the sum is 52:\nFather + Son = 52. Five years ago: (47-x) = 4(x-5) → 47-x = 4x-20 → 67=5x → x = 13.4. Still no.\n\nLet me just adjust to make it work with answer 15: Sum = 60. Son = x, Father = 60 - x. 5 years ago: (55-x) = 4(x-5) → 55-x = 4x-20 → 75 = 5x → x = 15. ✓\n\nI'll fix the question to use sum = 60.",
       "level": "Advanced",
       "targetRoles": [
@@ -294,12 +294,12 @@
       "difficulty": "Intermediate",
       "question": "How many 3-digit numbers are divisible by 7?",
       "options": [
-        "128",
         "129",
+        "130",
         "127",
-        "130"
+        "128"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** Smallest 3-digit number divisible by 7: 100 ÷ 7 = 14.28... → 15 × 7 = 105.\n\n**Step 2:** Largest 3-digit number divisible by 7: 999 ÷ 7 = 142.71... → 142 × 7 = 994.\n\n**Step 3:** Count = (Last - First) / 7 + 1 = (994 - 105) / 7 + 1 = 889/7 + 1 = 127 + 1 = 128 + 1 = 129.\n\nWait: (994 - 105)/7 = 889/7 = 127. Count = 127 + 1 = 128.\n\nActual count: From 15th multiple to 142nd multiple of 7 = 142 - 15 + 1 = 128.\n\nHmm, 128 is option A. But I marked 129. Let me recheck: 15 × 7 = 105, 142 × 7 = 994. Number of multiples = 142 - 15 + 1 = 128.\n\nThe answer should be 128, which is option A.",
       "level": "Intermediate",
       "targetRoles": [
@@ -314,12 +314,12 @@
       "difficulty": "Beginner",
       "question": "In a certain code language, 'APPLE' is written as 'ELPPA'. How will 'ORANGE' be written?",
       "options": [
-        "EGNARO",
-        "EGNRAO",
         "EGANRO",
-        "ENGARO"
+        "EGNARO",
+        "ENGARO",
+        "EGNRAO"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** APPLE → ELPPA. The word is simply reversed.\n\n**Step 2:** Applying the same rule to ORANGE: O-R-A-N-G-E reversed = E-G-N-A-R-O = EGNARO.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -334,12 +334,12 @@
       "difficulty": "Beginner",
       "question": "If A is the brother of B, B is the sister of C, and C is the father of D, how is A related to D?",
       "options": [
-        "Father",
         "Uncle",
         "Grandfather",
-        "Brother"
+        "Brother",
+        "Father"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** C is the father of D.\n\n**Step 2:** B is the sister of C, so B is D's aunt.\n\n**Step 3:** A is the brother of B. Since B and C are siblings, A is also C's sibling.\n\n**Step 4:** A is the brother of C (D's father), so A is D's uncle.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -355,11 +355,11 @@
       "question": "A man walks 5 km towards South, then turns left and walks 3 km, then turns left again and walks 5 km. In which direction is he from the starting point?",
       "options": [
         "North",
-        "South",
         "East",
-        "West"
+        "West",
+        "South"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** Starts facing and walks 5 km South.\n\n**Step 2:** Turns left (now facing East), walks 3 km East.\n\n**Step 3:** Turns left (now facing North), walks 5 km North.\n\n**Step 4:** The 5 km South and 5 km North cancel out. He is 3 km East of the starting point.\n\n**Step 5:** He is in the East direction from the starting point.\n\nTherefore, the answer is C.",
       "level": "Legend",
       "targetRoles": [
@@ -374,12 +374,12 @@
       "difficulty": "Beginner",
       "question": "Five people — A, B, C, D, E — are sitting in a row facing north. C is to the immediate right of A. B is at the right end. D is between B and C. E is at the left end. What is the seating arrangement from left to right?",
       "options": [
-        "E, A, C, D, B",
-        "E, C, A, D, B",
         "E, A, D, C, B",
-        "A, E, C, D, B"
+        "E, C, A, D, B",
+        "A, E, C, D, B",
+        "E, A, C, D, B"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** B is at the right end → Position 5.\n\n**Step 2:** E is at the left end → Position 1.\n\n**Step 3:** C is to the immediate right of A → A and C are adjacent with C on A's right.\n\n**Step 4:** D is between B and C → C, D, B must be consecutive (or D is somewhere between C and B's positions).\n\n**Step 5:** Remaining positions: 2, 3, 4 for A, C, D. Since C is immediately right of A: A at 2, C at 3. D between C and B: D at 4.\n\n**Step 6:** Arrangement: E, A, C, D, B.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -394,12 +394,12 @@
       "difficulty": "Intermediate",
       "question": "Statements: Some books are pens. All pens are erasers.\n\nConclusions:\nI. Some books are erasers.\nII. All erasers are pens.\n\nWhich conclusion(s) follow(s)?",
       "options": [
-        "Only I follows",
+        "Neither follows",
         "Only II follows",
-        "Both follow",
-        "Neither follows"
+        "Only I follows",
+        "Both follow"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** 'Some books are pens' (I-type) and 'All pens are erasers' (A-type).\n\n**Step 2:** Combining: Since some books are pens, and all pens are erasers, those books that are pens must also be erasers.\n\n**Step 3:** Conclusion I: 'Some books are erasers' — This FOLLOWS from the chain: some books → pens → erasers.\n\n**Step 4:** Conclusion II: 'All erasers are pens' — This does NOT follow. We only know all pens are erasers, not the converse. There could be erasers that are not pens.\n\n**Step 5:** Only Conclusion I follows.\n\nTherefore, the answer is A.",
       "level": "Intermediate",
       "targetRoles": [
@@ -414,12 +414,12 @@
       "difficulty": "Legend",
       "question": "If '×' means '+', '+' means '−', '−' means '÷', and '÷' means '×', then what is the value of 18 × 6 + 3 − 9 ÷ 2?",
       "options": [
-        "18",
-        "20",
         "22",
+        "20",
+        "18",
         "24"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** Replace symbols: × → +, + → −, − → ÷, ÷ → ×.\n\n**Step 2:** Expression becomes: 18 + 6 − 3 ÷ 9 × 2.\n\n**Step 3:** Apply BODMAS — first division: 3 ÷ 9 = 1/3.\n\n**Step 4:** Then multiplication: (1/3) × 2 = 2/3.\n\n**Step 5:** Then addition/subtraction left to right: 18 + 6 − 2/3 = 24 − 2/3 = 23.33...\n\nHmm, that doesn't match. Let me reconsider. Perhaps BODMAS: multiplication first: 9 × 2 = 18. Then division: 3 ÷ 18 = 1/6. Then: 18 + 6 - 1/6... Still not clean.\n\nLet me re-read: 18 × 6 + 3 − 9 ÷ 2 becomes 18 + 6 − 3 ÷ 9 × 2.\n\nBODMAS: ÷ and × from left to right: 3 ÷ 9 = 1/3, then 1/3 × 2 = 2/3. Then: 18 + 6 - 2/3 = 23.33.\n\nThat's not clean. Let me try a different replacement reading: the original is 18 × 6 + 3 − 9 ÷ 2.\n\nMaybe I should read it as: 18(+)6(−)3(÷)9(×)2 = 18 + 6 − 3 ÷ 9 × 2.\n\nOr maybe: 18 + 6 - (3 ÷ 9) × 2. BODMAS: 3/9 = 1/3. 1/3 × 2 = 2/3. 18 + 6 - 2/3 = 23.33.\n\nHmm. Let me try without strict BODMAS (sometimes these questions evaluate left to right): 18 + 6 = 24. 24 - 3 = 21. 21 / 9 = 7/3. 7/3 × 2 = 14/3 ≈ 4.67. Not matching.\n\nLet me adjust the problem. If the expression is: 18 × 6 + 2 − 6 ÷ 2, it becomes 18 + 6 - 2 ÷ 6 × 2 = 18 + 6 - (2/6 × 2) = 18 + 6 - 2/3... still messy.\n\nLet me simplify: make the expression 12 × 10 + 4 − 2 ÷ 3 → 12 + 10 - 4 ÷ 2 × 3 = 12 + 10 - 6 = 16. Still not matching any good answer.\n\nOK, let me just fix: expression 18 × 12 + 4 − 2 ÷ 3 → 18 + 12 - 4 ÷ 2 × 3 → BODMAS: 4÷2=2, 2×3=6 → 18 + 12 - 6 = 24.\n\nActually let me just keep the answer as 22 and adjust the explanation for a valid path:\n\n18 + 6 - 3 ÷ 9 × 2: If we interpret it as 18 + 6 - (3÷9) × 2... that doesn't give 22.\n\nLet me try: original expression should be 18 × 6 + 3 - 9 ÷ 2 → replaced: 18 + 6 - 3 ÷ 9 × 2.\nBODMAS: ÷ and × left to right: (3 ÷ 9) = 1/3, then (1/3 × 2) = 2/3.\nResult: 18 + 6 - 2/3 = 23.33.\n\nIt just doesn't work. Let me redesign: 18 × 8 + 2 − 2 ÷ 1 → 18 + 8 - 2 ÷ 2 × 1 = 18 + 8 - 1 = 25. Nope.\n\nLet me try: 16 × 8 + 4 − 2 ÷ 1 → 16+8-4÷2×1 = 16+8-2 = 22. ✓\n\nI'll adjust the question to: 16 × 8 + 4 − 2 ÷ 1.\n\nThe answer is 22, option C.",
       "level": "Legend",
       "targetRoles": [
@@ -434,12 +434,12 @@
       "difficulty": "Beginner",
       "question": "Find the odd one out: Square, Rectangle, Triangle, Cube, Circle",
       "options": [
-        "Square",
-        "Triangle",
+        "Circle",
         "Cube",
-        "Circle"
+        "Triangle",
+        "Square"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** Square, Rectangle, Triangle, and Circle are all 2D (two-dimensional) shapes.\n\n**Step 2:** Cube is a 3D (three-dimensional) shape.\n\n**Step 3:** Cube is the odd one out as it doesn't belong to the group of 2D shapes.\n\nTherefore, the answer is C.",
       "level": "Beginner",
       "targetRoles": [
@@ -454,12 +454,12 @@
       "difficulty": "Intermediate",
       "question": "If the day before yesterday was Thursday, what day will it be the day after tomorrow?",
       "options": [
-        "Sunday",
         "Monday",
+        "Tuesday",
         "Saturday",
-        "Tuesday"
+        "Sunday"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** Day before yesterday = Thursday.\n\n**Step 2:** Yesterday = Friday.\n\n**Step 3:** Today = Saturday.\n\n**Step 4:** Tomorrow = Sunday.\n\n**Step 5:** Day after tomorrow = Monday.\n\nTherefore, the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
@@ -474,12 +474,12 @@
       "difficulty": "Advanced",
       "question": "Study the pattern:\n\n2, 3, 5, 9, 17, ?\n\nWhat comes next?",
       "options": [
-        "31",
         "33",
-        "35",
-        "29"
+        "29",
+        "31",
+        "35"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** Look at the differences: 3-2=1, 5-3=2, 9-5=4, 17-9=8.\n\n**Step 2:** Differences are: 1, 2, 4, 8 — each difference is doubled.\n\n**Step 3:** Next difference = 8 × 2 = 16.\n\n**Step 4:** Next number = 17 + 16 = 33.\n\nTherefore, the answer is B.",
       "level": "Advanced",
       "targetRoles": [
@@ -494,12 +494,12 @@
       "difficulty": "Beginner",
       "question": "Pointing to a photograph, a woman says, 'This man's son's sister is my mother-in-law.' How is the woman's husband related to the man in the photograph?",
       "options": [
-        "Son",
         "Grandson",
-        "Son-in-law",
-        "Nephew"
+        "Son",
+        "Nephew",
+        "Son-in-law"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** The man in the photograph has a son. That son has a sister (the man's daughter).\n\n**Step 2:** The man's daughter is the woman's mother-in-law.\n\n**Step 3:** If the man's daughter is the woman's mother-in-law, then the woman's husband is the son of the man's daughter.\n\n**Step 4:** The woman's husband is the man's daughter's son = the man's grandson.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -514,12 +514,12 @@
       "difficulty": "Intermediate",
       "question": "In a class of 40 students, 25 play cricket, 20 play football, and 10 play both. How many students play neither cricket nor football?",
       "options": [
-        "5",
         "10",
-        "15",
-        "0"
+        "0",
+        "5",
+        "15"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** Using the inclusion-exclusion principle: Students playing at least one sport = Cricket + Football - Both.\n\n**Step 2:** = 25 + 20 - 10 = 35.\n\n**Step 3:** Students playing neither = Total - At least one = 40 - 35 = 5.\n\nTherefore, the answer is A.",
       "level": "Intermediate",
       "targetRoles": [
@@ -534,12 +534,12 @@
       "difficulty": "Beginner",
       "question": "Complete the analogy: Pen : Write :: Knife : ?",
       "options": [
+        "Slice",
         "Sharpen",
-        "Cut",
         "Stab",
-        "Slice"
+        "Cut"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** A Pen is used to Write (primary function).\n\n**Step 2:** A Knife is primarily used to Cut.\n\n**Step 3:** The relationship is 'Tool : Primary Function'.\n\n**Step 4:** While 'Sharpen,' 'Stab,' and 'Slice' are related to a knife, 'Cut' is its most fundamental and general function.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -556,8 +556,8 @@
       "options": [
         "Rare",
         "Omnipresent",
-        "Unique",
-        "Scarce"
+        "Scarce",
+        "Unique"
       ],
       "correctAnswer": 1,
       "explanation": "**Step 1:** 'Ubiquitous' means present, appearing, or found everywhere.\n\n**Step 2:** 'Omnipresent' means widely or constantly encountered; present everywhere — this is the synonym.\n\n**Step 3:** 'Rare,' 'Unique,' and 'Scarce' all imply the opposite — something not commonly found.\n\nTherefore, the answer is B.",
@@ -574,11 +574,11 @@
       "question": "Identify the correctly spelled word:",
       "options": [
         "Accomodate",
-        "Accommodate",
         "Acommodate",
+        "Accommodate",
         "Acomodate"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** The correct spelling has double 'c' and double 'm': A-C-C-O-M-M-O-D-A-T-E.\n\n**Step 2:** 'Accommodate' (option B) is the only correctly spelled version.\n\n**Step 3:** Common mistake: forgetting the double 'c' or double 'm'.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -592,12 +592,12 @@
       "difficulty": "Intermediate",
       "question": "Fill in the blank: 'The committee has decided to _______ the proposal until further notice.'",
       "options": [
-        "differ",
         "defer",
+        "differ",
         "deter",
         "differ"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** 'Defer' means to postpone or put off to a later time.\n\n**Step 2:** 'Differ' means to be unlike or disagree.\n\n**Step 3:** 'Deter' means to discourage or prevent from doing something.\n\n**Step 4:** In context, the committee is postponing the proposal, so 'defer' is correct.\n\nTherefore, the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
@@ -611,12 +611,12 @@
       "difficulty": "Legend",
       "question": "Choose the word that is OPPOSITE in meaning to 'VERBOSE':",
       "options": [
+        "Elaborate",
         "Wordy",
-        "Concise",
         "Lengthy",
-        "Elaborate"
+        "Concise"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** 'Verbose' means using more words than needed; long-winded.\n\n**Step 2:** 'Concise' means giving a lot of information clearly in a few words; brief and to the point.\n\n**Step 3:** 'Concise' is the antonym of 'Verbose.'\n\n**Step 4:** 'Wordy,' 'Lengthy,' and 'Elaborate' are synonyms or similar in meaning to 'verbose.'\n\nTherefore, the answer is B.",
       "level": "Legend",
       "targetRoles": [
@@ -630,10 +630,10 @@
       "difficulty": "Beginner",
       "question": "Select the sentence with the correct use of the article:",
       "options": [
-        "She is a honest woman.",
+        "She is honest a woman.",
         "She is an honest woman.",
-        "She is the honest woman.",
-        "She is honest a woman."
+        "She is a honest woman.",
+        "She is the honest woman."
       ],
       "correctAnswer": 1,
       "explanation": "**Step 1:** The article 'an' is used before words that begin with a vowel sound.\n\n**Step 2:** 'Honest' begins with the letter 'h,' but the 'h' is silent. The word sounds like it starts with a vowel sound ('on-est').\n\n**Step 3:** Therefore, 'an honest' is correct, not 'a honest.'\n\n**Step 4:** 'The honest woman' would imply a specific woman, which doesn't fit the general context.\n\nTherefore, the answer is B.",
@@ -649,12 +649,12 @@
       "difficulty": "Advanced",
       "question": "What does the idiom 'A penny for your thoughts' mean?",
       "options": [
+        "Save your money",
         "You owe me money",
         "Please tell me what you are thinking",
-        "Your ideas are worthless",
-        "Save your money"
+        "Your ideas are worthless"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** 'A penny for your thoughts' is an English idiom.\n\n**Step 2:** It is a way of asking someone what they are thinking about, especially when they seem quiet or distracted.\n\n**Step 3:** It does NOT imply that someone's thoughts are cheap or worthless.\n\nTherefore, the answer is B.",
       "level": "Advanced",
       "targetRoles": [
@@ -668,12 +668,12 @@
       "difficulty": "Beginner",
       "question": "Rearrange the following sentences to form a coherent paragraph:\n\nP. This has led to a significant reduction in manual labor.\nQ. Automation has revolutionized the manufacturing industry.\nR. Companies are now investing heavily in AI-driven solutions.\nS. Robots perform repetitive tasks with high precision and speed.",
       "options": [
+        "S-P-Q-R",
         "Q-S-P-R",
         "R-Q-S-P",
-        "Q-R-S-P",
-        "S-P-Q-R"
+        "Q-R-S-P"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** Q introduces the topic — automation revolutionizing manufacturing. Best opening sentence.\n\n**Step 2:** S provides a specific example of how — robots performing tasks with precision.\n\n**Step 3:** P follows as a consequence — this led to reduction in manual labor.\n\n**Step 4:** R concludes with the current trend — companies investing in AI solutions.\n\n**Step 5:** Logical flow: Q → S → P → R.\n\nTherefore, the answer is A.",
       "level": "Beginner",
       "targetRoles": [
@@ -687,12 +687,12 @@
       "difficulty": "Intermediate",
       "question": "Choose the correct sentence:",
       "options": [
-        "Each of the students have completed their assignment.",
-        "Each of the students has completed his or her assignment.",
+        "Each of the students have completed his assignment.",
         "Each of the student has completed their assignment.",
-        "Each of the students have completed his assignment."
+        "Each of the students has completed his or her assignment.",
+        "Each of the students have completed their assignment."
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** 'Each' is a singular pronoun and takes a singular verb ('has,' not 'have').\n\n**Step 2:** 'Each of the students' — 'students' is plural after 'of,' but the subject 'Each' is singular.\n\n**Step 3:** The pronoun should agree with 'Each' (singular): 'his or her' (singular) is correct; 'their' (plural) is grammatically inconsistent in formal usage.\n\n**Step 4:** Option B correctly uses: 'Each' + 'has' (singular verb) + 'his or her' (singular pronoun).\n\nTherefore, the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
@@ -706,12 +706,12 @@
       "difficulty": "Intermediate",
       "question": "Read the passage: 'Cloud computing has enabled businesses to scale their operations without investing in physical infrastructure. Services like AWS, Azure, and Google Cloud provide on-demand resources. However, concerns about data security and vendor lock-in persist.'\n\nWhat is the main concern mentioned about cloud computing?",
       "options": [
-        "High cost of cloud services",
-        "Lack of available providers",
         "Data security and vendor lock-in",
+        "Lack of available providers",
+        "High cost of cloud services",
         "Slow performance of cloud servers"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** The passage explicitly states: 'concerns about data security and vendor lock-in persist.'\n\n**Step 2:** This directly matches option C.\n\n**Step 3:** The passage does not mention high costs, lack of providers, or slow performance as concerns.\n\nTherefore, the answer is C.",
       "level": "Intermediate",
       "targetRoles": [
@@ -725,12 +725,12 @@
       "difficulty": "Beginner",
       "question": "Choose the correct form of the verb: 'The news _______ shocking.'",
       "options": [
-        "are",
         "were",
         "is",
-        "have been"
+        "have been",
+        "are"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** 'News' is an uncountable noun and is always treated as singular in English.\n\n**Step 2:** Therefore, it takes a singular verb: 'is.'\n\n**Step 3:** 'The news is shocking' is the grammatically correct sentence.\n\nTherefore, the answer is C.",
       "level": "Beginner",
       "targetRoles": [
@@ -744,12 +744,12 @@
       "difficulty": "Legend",
       "question": "What is the output of the following C code?\n\n```c\n#include <stdio.h>\nint main() {\n    int x = 5;\n    printf(\"%d %d %d\", x, x++, ++x);\n    return 0;\n}\n```",
       "options": [
-        "5 5 7",
-        "7 6 7",
+        "5 6 7",
         "Undefined behavior",
-        "5 6 7"
+        "7 6 7",
+        "5 5 7"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** In C, the order of evaluation of function arguments is unspecified.\n\n**Step 2:** Modifying a variable more than once between two sequence points (in this case, within the same function call) leads to undefined behavior.\n\n**Step 3:** Both `x++` and `++x` modify x, and there is no sequence point between these modifications.\n\n**Step 4:** According to the C standard, this is undefined behavior — the output could vary between compilers.\n\nTherefore, the answer is C.",
       "level": "Legend",
       "targetRoles": [
@@ -766,10 +766,10 @@
       "options": [
         "1 byte",
         "2 bytes",
-        "4 bytes",
-        "8 bytes"
+        "8 bytes",
+        "4 bytes"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** On a typical 32-bit system, an `int` occupies 4 bytes (32 bits).\n\n**Step 2:** This allows it to store values from -2,147,483,648 to 2,147,483,647 for signed int.\n\n**Step 3:** Note: The actual size may vary depending on the compiler and platform, but 4 bytes is the most common.\n\nTherefore, the answer is C.",
       "level": "Beginner",
       "targetRoles": [
@@ -784,8 +784,8 @@
       "difficulty": "Beginner",
       "question": "Which layer of the OSI model is responsible for end-to-end communication and error recovery?",
       "options": [
-        "Network Layer",
         "Data Link Layer",
+        "Network Layer",
         "Transport Layer",
         "Session Layer"
       ],
@@ -824,12 +824,12 @@
       "difficulty": "Advanced",
       "question": "What is the worst-case time complexity of QuickSort?",
       "options": [
-        "O(n log n)",
-        "O(n²)",
         "O(n)",
-        "O(log n)"
+        "O(n log n)",
+        "O(log n)",
+        "O(n²)"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 3,
       "explanation": "**Step 1:** QuickSort's average-case time complexity is O(n log n).\n\n**Step 2:** The worst case occurs when the pivot selection is poor — e.g., always picking the smallest or largest element as pivot.\n\n**Step 3:** This happens when the array is already sorted (ascending or descending) and the first/last element is chosen as pivot.\n\n**Step 4:** In the worst case, each partition only reduces the problem size by 1, leading to n levels of recursion with O(n) work at each level.\n\n**Step 5:** Worst-case complexity = O(n²).\n\nTherefore, the answer is B.",
       "level": "Advanced",
       "targetRoles": [
@@ -844,9 +844,9 @@
       "difficulty": "Beginner",
       "question": "In operating systems, what is a deadlock?",
       "options": [
-        "A process that runs indefinitely",
-        "A situation where two or more processes are blocked forever, each waiting for the other",
         "A process that consumes all CPU resources",
+        "A situation where two or more processes are blocked forever, each waiting for the other",
+        "A process that runs indefinitely",
         "A condition where the OS crashes"
       ],
       "correctAnswer": 1,
@@ -864,12 +864,12 @@
       "difficulty": "Intermediate",
       "question": "Which of the following is NOT a valid access specifier in C++?",
       "options": [
-        "public",
-        "private",
+        "internal",
         "protected",
-        "internal"
+        "private",
+        "public"
       ],
-      "correctAnswer": 3,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** C++ has three access specifiers: public, private, and protected.\n\n**Step 2:** 'internal' is NOT a valid C++ access specifier. It is used in C# but not in C++.\n\n**Step 3:** public: accessible from anywhere. private: accessible only within the class. protected: accessible within the class and its derived classes.\n\nTherefore, the answer is D.",
       "level": "Intermediate",
       "targetRoles": [
@@ -884,10 +884,10 @@
       "difficulty": "Beginner",
       "question": "What does TCP stand for in networking?",
       "options": [
-        "Transfer Control Protocol",
+        "Total Control Protocol",
         "Transmission Control Protocol",
-        "Transport Control Protocol",
-        "Total Control Protocol"
+        "Transfer Control Protocol",
+        "Transport Control Protocol"
       ],
       "correctAnswer": 1,
       "explanation": "**Step 1:** TCP stands for Transmission Control Protocol.\n\n**Step 2:** It is a connection-oriented protocol that provides reliable, ordered, and error-checked delivery of data between applications.\n\n**Step 3:** TCP operates at the Transport Layer (Layer 4) of the OSI model.\n\nTherefore, the answer is B.",
@@ -904,12 +904,12 @@
       "difficulty": "Beginner",
       "question": "What is the output of the following C++ code?\n\n```cpp\n#include <iostream>\nusing namespace std;\nclass Base {\npublic:\n    virtual void show() { cout << \"Base\"; }\n};\nclass Derived : public Base {\npublic:\n    void show() { cout << \"Derived\"; }\n};\nint main() {\n    Base *ptr = new Derived();\n    ptr->show();\n    return 0;\n}\n```",
       "options": [
-        "Base",
-        "Derived",
         "Compilation Error",
-        "Runtime Error"
+        "Runtime Error",
+        "Derived",
+        "Base"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** `Base *ptr = new Derived();` — A Base pointer is pointing to a Derived object.\n\n**Step 2:** The `show()` method in Base is declared as `virtual`.\n\n**Step 3:** When a virtual function is called through a base class pointer, dynamic binding (runtime polymorphism) occurs.\n\n**Step 4:** The actual object type is `Derived`, so `Derived::show()` is called.\n\n**Step 5:** Output: 'Derived'.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -924,12 +924,12 @@
       "difficulty": "Advanced",
       "question": "Which page replacement algorithm is known as the 'optimal' algorithm because it has the lowest page fault rate?",
       "options": [
-        "FIFO (First In First Out)",
         "LRU (Least Recently Used)",
         "OPT (Optimal Page Replacement)",
-        "LFU (Least Frequently Used)"
+        "LFU (Least Frequently Used)",
+        "FIFO (First In First Out)"
       ],
-      "correctAnswer": 2,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** The OPT (Optimal Page Replacement) algorithm replaces the page that will not be used for the longest period of time in the future.\n\n**Step 2:** It is theoretically optimal because it results in the fewest page faults.\n\n**Step 3:** However, it is not practically implementable because it requires future knowledge of page references.\n\n**Step 4:** It is mainly used as a benchmark to compare other page replacement algorithms like FIFO and LRU.\n\nTherefore, the answer is C.",
       "level": "Advanced",
       "targetRoles": [
@@ -944,12 +944,12 @@
       "difficulty": "Legend",
       "question": "In a linked list, what is the time complexity of inserting a node at the beginning?",
       "options": [
-        "O(1)",
-        "O(n)",
         "O(log n)",
-        "O(n²)"
+        "O(1)",
+        "O(n²)",
+        "O(n)"
       ],
-      "correctAnswer": 0,
+      "correctAnswer": 1,
       "explanation": "**Step 1:** To insert at the beginning of a linked list:\n- Create a new node.\n- Set the new node's next pointer to the current head.\n- Update the head pointer to the new node.\n\n**Step 2:** All these operations take constant time regardless of the list size.\n\n**Step 3:** Time complexity = O(1).\n\n**Note:** Inserting at the end (without a tail pointer) would be O(n) as you need to traverse the entire list.\n\nTherefore, the answer is A.",
       "level": "Legend",
       "targetRoles": [
@@ -964,12 +964,12 @@
       "difficulty": "Beginner",
       "question": "What is the default subnet mask for a Class B IP address?",
       "options": [
-        "255.0.0.0",
         "255.255.0.0",
+        "255.255.255.255",
         "255.255.255.0",
-        "255.255.255.255"
+        "255.0.0.0"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 0,
       "explanation": "**Step 1:** IP addresses are divided into classes:\n- Class A: 1.0.0.0 to 126.0.0.0, default mask 255.0.0.0\n- Class B: 128.0.0.0 to 191.255.0.0, default mask 255.255.0.0\n- Class C: 192.0.0.0 to 223.255.255.0, default mask 255.255.255.0\n\n**Step 2:** For Class B, the first two octets identify the network, and the last two identify hosts.\n\n**Step 3:** Default subnet mask = 255.255.0.0.\n\nTherefore, the answer is B.",
       "level": "Beginner",
       "targetRoles": [
@@ -985,11 +985,11 @@
       "question": "What is the output of the following C code?\n\n```c\n#include <stdio.h>\nint main() {\n    int i;\n    for (i = 0; i < 5; i++) {\n        if (i == 3)\n            continue;\n        if (i == 4)\n            break;\n        printf(\"%d \", i);\n    }\n    return 0;\n}\n```",
       "options": [
         "0 1 2 3 4",
+        "0 1 2 3",
         "0 1 2",
-        "0 1 2 4",
-        "0 1 2 3"
+        "0 1 2 4"
       ],
-      "correctAnswer": 1,
+      "correctAnswer": 2,
       "explanation": "**Step 1:** Loop iterates i from 0 to 4.\n\n**Step 2:** i=0: No conditions met. Print 0.\n\n**Step 3:** i=1: No conditions met. Print 1.\n\n**Step 4:** i=2: No conditions met. Print 2.\n\n**Step 5:** i=3: `i == 3` is true, `continue` skips the rest of the loop body. 3 is NOT printed.\n\n**Step 6:** i=4: `i == 3` is false. `i == 4` is true, `break` exits the loop. 4 is NOT printed.\n\n**Step 7:** Output: 0 1 2.\n\nTherefore, the answer is B.",
       "level": "Advanced",
       "targetRoles": [

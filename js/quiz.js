@@ -241,9 +241,9 @@
             <div style="font-weight:700; font-size:0.875rem; color:var(--color-text);">Direct Campus Placement Referral Network</div>
             <div style="font-size:0.75rem; color:var(--color-text-secondary);">Get referred directly to hiring managers at top tech firms with a pre-screened resume.</div>
           </div>
-          <button style="margin-left:auto; background:var(--color-primary); color:white; padding:6px 14px; border-radius:6px; font-size:0.75rem; font-weight:700; white-space:nowrap;">
+          <a href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener" style="margin-left:auto; background:var(--color-primary); color:white; padding:6px 14px; border-radius:6px; font-size:0.75rem; font-weight:700; white-space:nowrap;">
             Apply Free ↗
-          </button>
+          </a>
         </div>
       </div>
     ` : '';
@@ -278,7 +278,7 @@
             <!-- Stealth Sponsored Study Unit -->
             <div style="margin-top:14px; padding:8px 12px; background:rgba(37,99,235,0.05); border:1px dashed var(--color-primary); border-radius:var(--radius-md); font-size:0.75rem; display:flex; align-items:center; justify-content:space-between; gap:8px;">
               <span>💡 <strong>Sponsored Preparation Tool:</strong> Practice live 1-on-1 mock interviews for this question with ex-FAANG engineers.</span>
-              <a href="#" style="font-weight:700; color:var(--color-primary); white-space:nowrap;">Claim Free Session ↗</a>
+              <a href="https://www.pramp.com/" target="_blank" rel="noopener" style="font-weight:700; color:var(--color-primary); white-space:nowrap;">Claim Free Session ↗</a>
             </div>
           </div>
         </div>
@@ -448,9 +448,9 @@
             <div style="font-weight:700; font-size:0.95rem; color:var(--color-text);">Full-Stack Engineering Career Accelerator</div>
             <div style="font-size:0.8rem; color:var(--color-text-secondary);">Guaranteed placement assistance + 1-on-1 mock interviews with senior FAANG engineers.</div>
           </div>
-          <button style="margin-left:auto; background:var(--color-secondary); color:white; padding:8px 18px; border-radius:6px; font-weight:700; font-size:0.8rem; white-space:nowrap;">
+          <a href="https://www.coursera.org/" target="_blank" rel="noopener" style="margin-left:auto; background:var(--color-secondary); color:white; padding:8px 18px; border-radius:6px; font-weight:700; font-size:0.8rem; white-space:nowrap;">
             Claim 40% Off ↗
-          </button>
+          </a>
         </div>
       </div>
 

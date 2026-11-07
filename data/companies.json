@@ -391,7 +391,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.tcs.com/careers"
   },
   {
     "id": "infosys",
@@ -777,7 +778,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.infosys.com/careers.html"
   },
   {
     "id": "wipro",
@@ -1156,7 +1158,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://careers.wipro.com/"
   },
   {
     "id": "google",
@@ -1519,7 +1522,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://careers.google.com/"
   },
   {
     "id": "microsoft",
@@ -1885,7 +1889,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://careers.microsoft.com/"
   },
   {
     "id": "amazon",
@@ -2242,7 +2247,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.amazon.jobs/"
   },
   {
     "id": "accenture",
@@ -2650,7 +2656,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.accenture.com/us-en/careers"
   },
   {
     "id": "cognizant",
@@ -3032,7 +3039,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://careers.cognizant.com/"
   },
   {
     "id": "hcl",
@@ -3411,7 +3419,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.hcltech.com/careers"
   },
   {
     "id": "ibm",
@@ -3783,7 +3792,8 @@
       "intermediate": "⚡ Level 2: Intermediate — Campus placement standard, DSA fundamentals, OOP, SQL",
       "advanced": "⚔️ Level 3: Advanced — Dynamic programming, graph algorithms, complex system architecture",
       "legend": "👑 Level 4: Legend — FAANG hard, low-level concurrency, extreme time constraints"
-    }
+    },
+    "careersUrl": "https://www.ibm.com/careers"
   },
   {
     "id": "sap",
@@ -4108,7 +4118,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read SAP's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://jobs.sap.com/"
   },
   {
     "id": "samsung",
@@ -4427,7 +4438,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Samsung's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.samsung.com/us/careers/"
   },
   {
     "id": "sony",
@@ -4736,7 +4748,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Sony's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.sony.com/en/SonyInfo/Careers/"
   },
   {
     "id": "atlassian",
@@ -5043,7 +5056,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Atlassian's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.atlassian.com/company/careers"
   },
   {
     "id": "spotify",
@@ -5352,7 +5366,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Spotify's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.lifeatspotify.com/"
   },
   {
     "id": "shopify",
@@ -5657,7 +5672,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Shopify's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.shopify.com/careers"
   },
   {
     "id": "asml",
@@ -5962,7 +5978,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read ASML's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.asml.com/en/careers"
   },
   {
     "id": "stripe",
@@ -6272,7 +6289,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Stripe's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://stripe.com/jobs"
   },
   {
     "id": "capgemini",
@@ -6633,7 +6651,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Capgemini's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.capgemini.com/careers/"
   },
   {
     "id": "careem",
@@ -6936,7 +6955,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Careem's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://www.careem.com/en-AE/careers/"
   },
   {
     "id": "nubank",
@@ -7237,7 +7257,8 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Nubank's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://international.nubank.com.br/careers/"
   },
   {
     "id": "mercadolibre",
@@ -7540,6 +7561,7 @@
       "Focus on system reliability, clean architecture, and scalability",
       "Practice algorithmic problem solving on LeetCode medium-to-hard level",
       "Read Mercado Libre's engineering blogs to understand their architectural challenges"
-    ]
+    ],
+    "careersUrl": "https://careers.mercadolibre.com/"
   }
 ]
