@@ -48,7 +48,9 @@ commit only completed work, and leave the exact next action under "Next action".
 - **Public access:** no registration or login required.
 - **Private access:** `/admin/` requires Supabase Auth and the configured owner.
 - **Advertising:** demo advertising runtime and sponsored placements are disabled.
-- **Supabase credentials:** not provided and not used yet.
+- **Supabase credentials:** `.env` exists but all canonical values are empty;
+  no credentials have been used.
+- **Supabase CLI:** not installed or available on PATH.
 - **Production migrations/import:** intentionally not executed.
 
 ## Completed work
@@ -199,5 +201,10 @@ hash if created, blockers, and the next action. Never remove prior entries.
   publishable configuration cannot be committed accidentally.
 - Created checkpoint `bc3f969` and pushed it to `RayyanShajahan/prepwise`.
 - Current work is credential-free and safe to continue.
+- Resumed the handoff and verified `.env` variables without exposing values:
+  all six canonical variables are empty.
+- Verified `supabase --version` is unavailable; the Supabase CLI is not
+  installed on PATH.
+- No migration, import, link, login, or production command was executed.
 - Next action is to wait for the user to fill `.env` and explicitly approve
   migration execution.
