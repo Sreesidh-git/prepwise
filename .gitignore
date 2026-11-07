@@ -9,4 +9,5 @@ Thumbs.db
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+admin/config.js
 .wrangler/
