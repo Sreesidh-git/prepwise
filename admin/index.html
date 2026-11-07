@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>PrepWise Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main id="app">
+    <section class="auth-card" id="loginView">
+      <div class="brand-mark">P</div>
+      <p class="eyebrow">Private owner access</p>
+      <h1>PrepWise Admin</h1>
+      <p class="muted">Sign in with the Supabase Auth account that has an active administrator profile.</p>
+      <form id="loginForm">
+        <label>Email <input id="email" type="email" autocomplete="username" required></label>
+        <label>Password <input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary" type="submit">Sign in securely</button>
+      </form>
+      <form id="recoveryForm" class="recovery-form">
+        <label>Send password recovery to <input id="recoveryEmail" type="email" required></label>
+        <button class="link-button" type="submit">Send recovery email</button>
+      </form>
+      <p class="status" id="loginStatus" role="status"></p>
+    </section>
+
+    <section id="dashboardView" hidden>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Owner control panel</p>
+          <h1>PrepWise Admin</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="adminIdentity" class="muted"></span>
+          <button class="secondary" id="logoutButton">Log out</button>
+        </div>
+      </header>
+      <div class="layout">
+        <nav class="sidebar" aria-label="Admin sections">
+          <button class="nav-item active" data-section="overview">Overview</button>
+          <button class="nav-item" data-section="content">Content management</button>
+          <button class="nav-item" data-section="quiz">Quiz analytics</button>
+          <button class="nav-item" data-section="seo">SEO</button>
+          <button class="nav-item" data-section="feedback">Feedback</button>
+          <button class="nav-item" data-section="settings">Website settings</button>
+          <button class="nav-item" data-section="activity">Activity logs</button>
+        </nav>
+        <div class="content">
+          <section class="panel active" id="section-overview">
+            <div class="section-heading"><div><p class="eyebrow">Verified database counts</p><h2>Overview</h2></div><button class="secondary" data-refresh="overview">Refresh</button></div>
+            <div class="cards" id="overviewCards"></div>
+            <div class="chart-card"><h3>Analytics status</h3><canvas id="overviewChart" height="120"></canvas><p class="muted" id="overviewNote">No first-party analytics data loaded yet.</p></div>
+          </section>
+
+          <section class="panel" id="section-content">
+            <div class="section-heading"><div><p class="eyebrow">Published content</p><h2>Content management</h2></div></div>
+            <div class="resource-tabs" id="resourceTabs"></div>
+            <div class="toolbar"><input id="resourceSearch" placeholder="Search loaded records"><button class="primary" id="newRecordButton">New record</button></div>
+            <div id="resourceTable" class="table-wrap"></div>
+            <form id="recordForm" class="record-form" hidden><h3 id="recordFormTitle">Edit record</h3><p class="muted">Use JSON for advanced fields. Validation is enforced by PostgreSQL constraints and RLS.</p><textarea id="recordJson" spellcheck="false"></textarea><div><button type="submit" class="primary">Save record</button><button type="button" class="secondary" id="cancelRecordButton">Cancel</button></div><p class="status" id="recordStatus"></p></form>
+          </section>
+
+          <section class="panel" id="section-quiz"><div class="section-heading"><div><p class="eyebrow">First-party events</p><h2>Quiz analytics</h2></div><button class="secondary" data-refresh="quiz">Refresh</button></div><div class="cards" id="quizCards"></div><div class="empty-state">Detailed category and question difficulty charts will populate after quiz attempts are collected.</div></section>
+          <section class="panel" id="section-seo"><div class="section-heading"><div><p class="eyebrow">Search visibility</p><h2>SEO dashboard</h2></div></div><div class="empty-state"><h3>Search Console is not connected</h3><p>Configure server-only Google Search Console OAuth values before showing impressions, clicks, position, or indexed-page data. No metrics are fabricated here.</p></div></section>
+          <section class="panel" id="section-feedback"><div class="section-heading"><div><p class="eyebrow">Reports from visitors</p><h2>Feedback</h2></div><button class="secondary" data-refresh="feedback">Refresh</button></div><div id="feedbackTable" class="table-wrap"></div></section>
+          <section class="panel" id="section-settings"><div class="section-heading"><div><p class="eyebrow">Public configuration</p><h2>Website settings</h2></div><button class="secondary" data-refresh="settings">Refresh</button></div><div id="settingsTable" class="table-wrap"></div></section>
+          <section class="panel" id="section-activity"><div class="section-heading"><div><p class="eyebrow">Audit trail</p><h2>Activity logs</h2></div><button class="secondary" data-refresh="activity">Refresh</button></div><div id="activityTable" class="table-wrap"></div></section>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

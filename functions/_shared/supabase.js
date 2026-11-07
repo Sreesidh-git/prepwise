@@ -54,6 +54,23 @@ export async function supabaseRequest(env, path, options = {}) {
   return payload;
 }
 
+export async function supabaseCount(env, path, accessToken) {
+  const baseUrl = envValue(env, 'PUBLIC_SUPABASE_URL').replace(/\/$/, '');
+  const response = await fetch(`${baseUrl}${path}`, {
+    headers: {
+      ...supabaseHeaders(env, accessToken),
+      Prefer: 'count=exact',
+      Range: '0-0'
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Supabase count failed: ${response.status}`);
+  }
+  const contentRange = response.headers.get('content-range') || '';
+  const total = contentRange.split('/')[1];
+  return total && total !== '*' ? Number.parseInt(total, 10) : 0;
+}
+
 export function bearerToken(request) {
   const value = request.headers.get('Authorization') || '';
   if (!value.startsWith('Bearer ')) {

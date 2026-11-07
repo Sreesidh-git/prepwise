@@ -48,3 +48,9 @@ After the schema is applied:
 4. Verify that an anonymous client can only read published content and cannot read or modify admin/analytics tables.
 
 The schema intentionally does not create an administrator automatically because doing so would require committing or transmitting credentials.
+
+## Admin dashboard
+
+The private dashboard is at `/admin/`. Copy [`admin/config.example.js`](../admin/config.example.js) to `admin/config.js` for local connected testing and add the public Supabase URL and anon/publishable key. The owner still must authenticate through Supabase Auth and have an active row in `admin_profiles`; the browser key does not grant administrator access.
+
+Cloudflare Pages must receive `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as environment variables for the Pages Functions under [`functions/`](../functions/) to serve admin operations.
