@@ -51,6 +51,8 @@ commit only completed work, and leave the exact next action under "Next action".
 - **Supabase credentials:** `.env` exists but all canonical values are empty;
   no credentials have been used.
 - **Supabase CLI:** not installed or available on PATH.
+- **Supabase project ref:** `jwkllwqabixzmtfiuncd` (provided by user; no
+  project connection has been attempted).
 - **Production migrations/import:** intentionally not executed.
 
 ## Completed work
@@ -206,5 +208,9 @@ hash if created, blockers, and the next action. Never remove prior entries.
 - Verified `supabase --version` is unavailable; the Supabase CLI is not
   installed on PATH.
 - No migration, import, link, login, or production command was executed.
+- User confirmed credentials are not ready and declined CLI setup for now.
+- User provided the project URL
+  `https://jwkllwqabixzmtfiuncd.supabase.co/rest/v1/`; the usable project ref
+  is `jwkllwqabixzmtfiuncd`.
 - Next action is to wait for the user to fill `.env` and explicitly approve
   migration execution.
