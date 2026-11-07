@@ -27,6 +27,8 @@ Keep these relationships consistent:
 - `countries` values should use the same country names as `data/countries.json`.
 - `category` should match the categories used by the home-page filter.
 
+After the Supabase schema is applied, [`scripts/import_json_to_supabase.py`](./scripts/import_json_to_supabase.py) can repeatably upsert these datasets into PostgreSQL. It requires `PUBLIC_SUPABASE_URL` and the server-only `SUPABASE_SERVICE_ROLE_KEY`; it does not delete or rewrite local JSON.
+
 ### `data/questions/<company-id>.json`
 
 Each question file has a company id, summary metadata, and a `questions` array. A question normally contains:
@@ -102,4 +104,3 @@ python -c "import json, pathlib; [json.loads(p.read_text(encoding='utf-8')) for 
 - Keep explanations understandable to a beginner.
 - Avoid changing an existing company id because links and question filenames depend on it.
 - If adding a company, add its catalogue record, question file, and any country mappings together.
-

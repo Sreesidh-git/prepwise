@@ -24,6 +24,20 @@ supabase db push
 
 Do not paste keys into source files or commit them. The migration/import tooling will be added separately and will use environment variables.
 
+## Import existing JSON content
+
+After applying the schema, run the repeatable importer from the repository root in a trusted PowerShell session:
+
+```powershell
+$env:PUBLIC_SUPABASE_URL = "https://your-project-ref.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY = "server-only-secret"
+python .\scripts\import_json_to_supabase.py
+```
+
+The importer reads the existing JSON files, upserts normalized categories/countries/companies/questions/news, creates one published full-test quiz per company, and links each quiz to its questions. It does not modify or delete the local JSON files.
+
+The importer has not been run in this checkout because no Supabase project URL or service-role key is available.
+
 ## Initial owner setup
 
 After the schema is applied:
