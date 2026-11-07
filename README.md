@@ -74,6 +74,8 @@ Start with the guides below:
 - [Beginner Guide](./BEGINNER_GUIDE.md) — first steps, folder tour, and common debugging
 - [How To Run and Work on PrepWise](./HOW_TO_RUN.md) — local server, URLs, validation, and release checklist
 - [Data and Content Guide](./DATA_AND_CONTENT.md) — JSON shapes, relationships, and generator scripts
+- [Phase 1 Audit](./PHASE1_AUDIT.md) — current architecture, migration boundaries, and risks
+- [Supabase Setup](./supabase/README.md) — schema application, environment values, and owner setup
 
 ## 🚀 How to Run Locally
 
