@@ -1,7 +1,7 @@
 /**
  * PrepWise — Main Application Logic (index.html)
  * Standard Country Filtering (strict country operations, zero GDP clutter),
- * Level-based filtering (Beginner to Legend), stealth native in-feed ads, and dynamic search.
+ * Level-based filtering (Beginner to Legend) and dynamic search.
  */
 
 (function () {
@@ -36,8 +36,10 @@
         throw new Error('Failed to load companies or countries data');
       }
 
-      allCompanies = await companiesRes.json();
-      allCountries = await countriesRes.json();
+      const rawCompanies = await companiesRes.json();
+      allCompanies = Array.isArray(rawCompanies) ? rawCompanies : (rawCompanies.companies || []);
+      const rawCountries = await countriesRes.json();
+      allCountries = Array.isArray(rawCountries) ? rawCountries : (rawCountries.countries || []);
       filteredCompanies = [...allCompanies];
 
       populateCountryDropdown(allCountries);
@@ -70,7 +72,7 @@
     `;
   }
 
-  // ---------- Render Companies (With Stealth Native Sponsored Cards In-Feed) ----------
+  // ---------- Render Companies ----------
   function renderCompanies(companies) {
     if (companies.length === 0) {
       companiesGrid.innerHTML = `
@@ -146,95 +148,6 @@
           <span class="arrow">→</span>
         </div>
       </a>
-    `;
-  }
-
-  // Stealth Native Sponsor Card 1 (Disguised as an elite accelerator / hiring company)
-  function createStealthSponsorCard1() {
-    return `
-      <div class="company-card" style="border: 1.5px solid rgba(37, 99, 235, 0.4); background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);">
-        <div class="company-card-header">
-          <div class="company-logo" style="background:#dbeafe; color:#1d4ed8; font-size:1.8rem;">
-            🚀
-          </div>
-          <div class="company-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <h3 style="color:#1d4ed8;">TechAccelerate Fellowship</h3>
-              <span class="ad-badge" style="margin:0;">Sponsored</span>
-            </div>
-            <span class="company-industry">Global Remote Hiring Partner</span>
-          </div>
-        </div>
-
-        <div class="company-card-body">
-          <p>Accelerated placement pipeline for engineering graduates. Direct interviews with top US, European, and Asian tech unicorns with 1-on-1 mentorship.</p>
-          
-          <div style="margin-bottom:var(--space-md); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
-            <span class="salary-tag" style="background:linear-gradient(135deg, #2563eb, #7c3aed);">💰 Avg: $115,000 / yr</span>
-            <span style="font-size:0.75rem; font-weight:700; color:var(--color-primary);">Guaranteed Referrals ↗</span>
-          </div>
-
-          <div class="company-tags" style="margin-bottom: var(--space-sm);">
-            <span class="tag tag-region">100% Remote / Global</span>
-            <span class="tag level-advanced">Level: All Welcome</span>
-          </div>
-
-          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-            <span class="country-badge">🇺🇸 United States</span>
-            <span class="country-badge">🇮🇳 India</span>
-            <span class="country-badge">🇪🇺 Europe</span>
-          </div>
-        </div>
-
-        <div class="company-card-footer" style="background:rgba(37,99,235,0.06); margin:-16px; margin-top:auto; padding:12px 16px; border-radius:0 0 var(--radius-xl) var(--radius-xl);">
-          <span class="question-count" style="color:var(--color-primary); font-weight:700;">⭐ Free Placement Application</span>
-          <span class="arrow" style="background:var(--color-primary); color:white;">↗</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // Stealth Native Sponsor Card 2 (Disguised as high-demand cloud certification partner)
-  function createStealthSponsorCard2() {
-    return `
-      <div class="company-card" style="border: 1.5px solid rgba(124, 58, 237, 0.4); background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);">
-        <div class="company-card-header">
-          <div class="company-logo" style="background:#ede9fe; color:#7c3aed; font-size:1.8rem;">
-            ☁️
-          </div>
-          <div class="company-info">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <h3 style="color:#7c3aed;">Cloud Architect Academy</h3>
-              <span class="ad-badge" style="margin:0;">Sponsored</span>
-            </div>
-            <span class="company-industry">AWS & Azure Certification Partner</span>
-          </div>
-        </div>
-
-        <div class="company-card-body">
-          <p>Get certified in AWS Solutions Architect & Kubernetes. Highest-paying technical skills for 2026 campus placements with interactive sandboxes.</p>
-          
-          <div style="margin-bottom:var(--space-md); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
-            <span class="salary-tag" style="background:linear-gradient(135deg, #7c3aed, #db2777);">💰 Avg: $142,000 / yr</span>
-            <span style="font-size:0.75rem; font-weight:700; color:var(--color-secondary);">Official Voucher ↗</span>
-          </div>
-
-          <div class="company-tags" style="margin-bottom: var(--space-sm);">
-            <span class="tag tag-degree">Cloud & DevOps</span>
-            <span class="tag level-intermediate">Student Discount Available</span>
-          </div>
-
-          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
-            <span class="country-badge">Global Access</span>
-            <span class="country-badge">Self-Paced Labs</span>
-          </div>
-        </div>
-
-        <div class="company-card-footer" style="background:rgba(124,58,237,0.06); margin:-16px; margin-top:auto; padding:12px 16px; border-radius:0 0 var(--radius-xl) var(--radius-xl);">
-          <span class="question-count" style="color:var(--color-secondary); font-weight:700;">🎁 Claim 50% Student Pass</span>
-          <span class="arrow" style="background:var(--color-secondary); color:white;">↗</span>
-        </div>
-      </div>
     `;
   }
 

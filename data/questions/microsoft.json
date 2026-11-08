@@ -20,7 +20,7 @@
         "1"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Divide the 8 balls into three groups: {3, 3, 2}.\n\n**Step 2:** First weighing: Compare the two groups of 3.\n- If one side is heavier, the heavy ball is in that group of 3.\n- If balanced, the heavy ball is in the remaining group of 2.\n\n**Step 3:** Second weighing:\n- If in a group of 3: Compare any 2 of those 3. If balanced, the third is heavy. If not, the heavier side has it.\n- If in a group of 2: Compare them directly.\n\n**Step 4:** Maximum 2 weighings are needed.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Divide the 8 balls into three groups: {3, 3, 2}.\n\n**Step 2:** First weighing: Compare the two groups of 3.\n- If one side is heavier, the heavy ball is in that group of 3.\n- If balanced, the heavy ball is in the remaining group of 2.\n\n**Step 3:** Second weighing:\n- If in a group of 3: Compare any 2 of those 3. If balanced, the third is heavy. If not, the heavier side has it.\n- If in a group of 2: Compare them directly.\n\n**Step 4:** Maximum 2 weighings are needed.\n\nTherefore the answer is B.",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -100,7 +100,7 @@
         "Light one end of rope 1; when it burns halfway, light rope 2"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** Light both ends of Rope 1 and one end of Rope 2 at the same time.\n\n**Step 2:** Rope 1, burning from both ends, will burn out in 30 minutes.\n\n**Step 3:** At this point (30 minutes elapsed), Rope 2 has 30 minutes of burn time left.\n\n**Step 4:** Now light the other end of Rope 2. Burning from both ends, it will take 15 more minutes.\n\n**Step 5:** Total time = 30 + 15 = 45 minutes.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Light both ends of Rope 1 and one end of Rope 2 at the same time.\n\n**Step 2:** Rope 1, burning from both ends, will burn out in 30 minutes.\n\n**Step 3:** At this point (30 minutes elapsed), Rope 2 has 30 minutes of burn time left.\n\n**Step 4:** Now light the other end of Rope 2. Burning from both ends, it will take 15 more minutes.\n\n**Step 5:** Total time = 30 + 15 = 45 minutes.\n\nTherefore the answer is C.",
       "level": "Advanced",
       "targetRoles": [
         "Data Scientist",
@@ -120,7 +120,7 @@
         "$0.05"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Let ball cost = x. Bat cost = x + $1.00.\n\n**Step 2:** Total: x + (x + 1.00) = 1.10.\n\n**Step 3:** 2x + 1.00 = 1.10 → 2x = 0.10 → x = $0.05.\n\n**Step 4:** Verification: Ball = $0.05, Bat = $1.05. Total = $1.10 ✓. Difference = $1.00 ✓.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Let ball cost = x. Bat cost = x + $1.00.\n\n**Step 2:** Total: x + (x + 1.00) = 1.10.\n\n**Step 3:** 2x + 1.00 = 1.10 → 2x = 0.10 → x = $0.05.\n\n**Step 4:** Verification: Ball = $0.05, Bat = $1.05. Total = $1.10 ✓. Difference = $1.00 ✓.\n\nTherefore the answer is D.",
       "level": "Intermediate",
       "targetRoles": [
         "Data Scientist",
@@ -140,7 +140,7 @@
         "There is no missing dollar; the $27 includes the bellboy's $2"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** This is a classic misdirection puzzle. The error is in the addition.\n\n**Step 2:** The $27 the friends paid consists of: $25 for the room + $2 for the bellboy.\n\n**Step 3:** You should NOT add the bellboy's $2 to the $27 — it's already included in the $27.\n\n**Step 4:** Correct accounting: $27 (paid by friends) = $25 (to hotel) + $2 (to bellboy). Plus $3 returned = $30 total. No money is missing.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** This is a classic misdirection puzzle. The error is in the addition.\n\n**Step 2:** The $27 the friends paid consists of: $25 for the room + $2 for the bellboy.\n\n**Step 3:** You should NOT add the bellboy's $2 to the $27 — it's already included in the $27.\n\n**Step 4:** Correct accounting: $27 (paid by friends) = $25 (to hotel) + $2 (to bellboy). Plus $3 returned = $30 total. No money is missing.\n\nTherefore the answer is D.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -155,12 +155,12 @@
       "question": "If you pick 3 socks randomly from a drawer containing 10 blue, 8 black, and 7 red socks, what is the probability that all 3 are of the same color?",
       "options": [
         "120/2300",
-        "292/2300",
+        "211/2300",
         "56/2300",
         "200/2300"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Total socks = 10 + 8 + 7 = 25. Total ways to pick 3 = C(25,3) = 2300.\n\n**Step 2:** All blue: C(10,3) = 120.\n\n**Step 3:** All black: C(8,3) = 56.\n\n**Step 4:** All red: C(7,3) = 35.\n\n**Step 5:** Total favorable = 120 + 56 + 35 = 211. Hmm, that's 211/2300, not 292/2300.\n\nLet me recalculate: C(10,3) = 120, C(8,3) = 56, C(7,3) = 35. Sum = 211.\n\nActually the correct answer is 211/2300. But since I wrote 292/2300 as option A, let me reconsider. With 12 blue instead of 10: C(12,3) = 220, 220+56+35 = 311. That's not it either.\n\nOr with the drawer having different counts. Actually: 120 + 56 + 35 = 211. The closest option should be... let me adjust. Let me say the drawer has 10 blue, 8 black, and 7 red = 25. C(25,3) = 2300. Favorable = 120 + 56 + 35 = 211. Probability = 211/2300.\n\nI'll use 211/2300 as the correct answer. But since I already specified the options, let me match. Actually this is being written fresh so let me recalculate with numbers that give a clean answer.\n\nWith 10 blue, 10 black, 5 red = 25 total. C(10,3)=120, C(10,3)=120, C(5,3)=10. Total = 250. 250/2300 = 25/230.\n\nActually I should just fix the options. Let me use 211/2300.",
+      "explanation": "**Given:**\n- Drawer contents: 10 blue, 8 black, 7 red socks (Total = 25 socks)\n- 3 socks are drawn randomly without replacement.\n\n**Formula / Method:**\n- Total possible outcomes = C(25, 3)\n- Favorable outcomes = C(10, 3) [all blue] + C(8, 3) [all black] + C(7, 3) [all red]\n- Probability = Favorable outcomes / Total outcomes\n\n**Step-by-Step Calculation:**\n1. C(25, 3) = (25 × 24 × 23) / (3 × 2 × 1) = 25 × 4 × 23 = 2300\n2. C(10, 3) = (10 × 9 × 8) / (3 × 2 × 1) = 120 (all blue)\n3. C(8, 3) = (8 × 7 × 6) / (3 × 2 × 1) = 56 (all black)\n4. C(7, 3) = (7 × 6 × 5) / (3 × 2 × 1) = 35 (all red)\n5. Total favorable outcomes = 120 + 56 + 35 = 211\n6. Probability = 211 / 2300\n\n**Final Answer:**\nThe probability that all 3 socks are of the same color is 211/2300. (B) 211/2300",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -200,7 +200,7 @@
         "10"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Door k is toggled once for each of its divisors. If k has an even number of divisors, it ends up closed. If odd, it ends up open.\n\n**Step 2:** A number has an odd number of divisors if and only if it is a perfect square.\n\n**Step 3:** Perfect squares from 1 to 100: 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 = 10 perfect squares.\n\n**Step 4:** Therefore, 10 doors are left open.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Door k is toggled once for each of its divisors. If k has an even number of divisors, it ends up closed. If odd, it ends up open.\n\n**Step 2:** A number has an odd number of divisors if and only if it is a perfect square.\n\n**Step 3:** Perfect squares from 1 to 100: 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 = 10 perfect squares.\n\n**Step 4:** Therefore, 10 doors are left open.\n\nTherefore the answer is D.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -220,7 +220,7 @@
         "48 hours"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** Filling rate = 1/6 tank per hour. Emptying rate = 1/8 tank per hour.\n\n**Step 2:** Net filling rate = 1/6 - 1/8 = (4-3)/24 = 1/24 tank per hour.\n\n**Step 3:** Time to fill = 1 ÷ (1/24) = 24 hours.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Filling rate = 1/6 tank per hour. Emptying rate = 1/8 tank per hour.\n\n**Step 2:** Net filling rate = 1/6 - 1/8 = (4-3)/24 = 1/24 tank per hour.\n\n**Step 3:** Time to fill = 1 ÷ (1/24) = 24 hours.\n\nTherefore the answer is C.",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -240,7 +240,7 @@
         "About 25%"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** This is the famous Birthday Problem.\n\n**Step 2:** P(no shared birthday) = (365/365) × (364/365) × (363/365) × ... × (343/365).\n\n**Step 3:** Computing this product: P(no match) ≈ 0.4927.\n\n**Step 4:** P(at least one match) = 1 - 0.4927 ≈ 0.5073 ≈ 50.7%.\n\n**Key Insight:** Counterintuitively, with just 23 people, there's already about a 50% chance of a shared birthday.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** This is the famous Birthday Problem.\n\n**Step 2:** P(no shared birthday) = (365/365) × (364/365) × (363/365) × ... × (343/365).\n\n**Step 3:** Computing this product: P(no match) ≈ 0.4927.\n\n**Step 4:** P(at least one match) = 1 - 0.4927 ≈ 0.5073 ≈ 50.7%.\n\n**Key Insight:** Counterintuitively, with just 23 people, there's already about a 50% chance of a shared birthday.\n\nTherefore the answer is C.",
       "level": "Advanced",
       "targetRoles": [
         "Data Scientist",
@@ -260,7 +260,7 @@
         "6"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** With each weighing, there are 3 possible outcomes (left heavy, balanced, right heavy).\n\n**Step 2:** With 3 weighings, we can distinguish 3³ = 27 outcomes.\n\n**Step 3:** We need to identify 1 of 12 coins AND whether it's heavy or light = 24 possibilities.\n\n**Step 4:** Since 27 ≥ 24, 3 weighings are sufficient (and this can be achieved with a careful strategy).\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** With each weighing, there are 3 possible outcomes (left heavy, balanced, right heavy).\n\n**Step 2:** With 3 weighings, we can distinguish 3³ = 27 outcomes.\n\n**Step 3:** We need to identify 1 of 12 coins AND whether it's heavy or light = 24 possibilities.\n\n**Step 4:** Since 27 ≥ 24, 3 weighings are sufficient (and this can be achieved with a careful strategy).\n\nTherefore the answer is C.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -320,7 +320,7 @@
         "No programmer is creative"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** From statement 1: Programmers ⊆ Logical Thinkers.\n\n**Step 2:** From statement 2: Logical Thinkers ∩ Creative ≠ ∅.\n\n**Step 3:** The creative logical thinkers might or might not include programmers. We can't be certain, but it's possible.\n\n**Step 4:** Therefore, 'Some programmers MAY be creative' is the only valid conclusion.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** From statement 1: Programmers ⊆ Logical Thinkers.\n\n**Step 2:** From statement 2: Logical Thinkers ∩ Creative ≠ ∅.\n\n**Step 3:** The creative logical thinkers might or might not include programmers. We can't be certain, but it's possible.\n\n**Step 4:** Therefore, 'Some programmers MAY be creative' is the only valid conclusion.\n\nTherefore the answer is B.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -340,7 +340,7 @@
         "All Lazzies are Bloops"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** All Bloops are Razzies → Bloops ⊆ Razzies.\n\n**Step 2:** All Razzies are Lazzies → Razzies ⊆ Lazzies.\n\n**Step 3:** By transitivity: Bloops ⊆ Razzies ⊆ Lazzies, so Bloops ⊆ Lazzies.\n\n**Step 4:** All Bloops are Lazzies.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** All Bloops are Razzies → Bloops ⊆ Razzies.\n\n**Step 2:** All Razzies are Lazzies → Razzies ⊆ Lazzies.\n\n**Step 3:** By transitivity: Bloops ⊆ Razzies ⊆ Lazzies, so Bloops ⊆ Lazzies.\n\n**Step 4:** All Bloops are Lazzies.\n\nTherefore the answer is C.",
       "level": "Advanced",
       "targetRoles": [
         "Product Analyst",
@@ -380,7 +380,7 @@
         "9"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** Trip 1: Farmer takes chicken across. (Fox and grain safe together)\n\n**Step 2:** Trip 2: Farmer returns alone.\n\n**Step 3:** Trip 3: Farmer takes fox across.\n\n**Step 4:** Trip 4: Farmer brings chicken back. (Can't leave fox and chicken together)\n\n**Step 5:** Trip 5: Farmer takes grain across. (Fox and grain now on other side)\n\n**Step 6:** Trip 6: Farmer returns alone.\n\n**Step 7:** Trip 7: Farmer takes chicken across.\n\nTotal = 7 crossings.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Trip 1: Farmer takes chicken across. (Fox and grain safe together)\n\n**Step 2:** Trip 2: Farmer returns alone.\n\n**Step 3:** Trip 3: Farmer takes fox across.\n\n**Step 4:** Trip 4: Farmer brings chicken back. (Can't leave fox and chicken together)\n\n**Step 5:** Trip 5: Farmer takes grain across. (Fox and grain now on other side)\n\n**Step 6:** Trip 6: Farmer returns alone.\n\n**Step 7:** Trip 7: Farmer takes chicken across.\n\nTotal = 7 crossings.\n\nTherefore the answer is C.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -460,7 +460,7 @@
         "FV"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** First letters: A, B, C, D → increasing alphabetically. Next = E.\n\n**Step 2:** Second letters: Z, Y, X, W → decreasing alphabetically. Next = V.\n\n**Step 3:** Next pair = EV.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** First letters: A, B, C, D → increasing alphabetically. Next = E.\n\n**Step 2:** Second letters: Z, Y, X, W → decreasing alphabetically. Next = V.\n\n**Step 3:** Next pair = EV.\n\nTherefore the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
         "Product Analyst",
@@ -480,7 +480,7 @@
         "Monday"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Day before yesterday = Thursday.\n\n**Step 2:** Yesterday = Friday.\n\n**Step 3:** Today = Saturday.\n\n**Step 4:** Tomorrow = Sunday.\n\n**Step 5:** Day after tomorrow = Monday.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Day before yesterday = Thursday.\n\n**Step 2:** Yesterday = Friday.\n\n**Step 3:** Today = Saturday.\n\n**Step 4:** Tomorrow = Sunday.\n\n**Step 5:** Day after tomorrow = Monday.\n\nTherefore the answer is D.",
       "level": "Advanced",
       "targetRoles": [
         "Product Analyst",
@@ -520,7 +520,7 @@
         "10"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** This is a binary encoding problem. Number the bottles 0 to 999.\n\n**Step 2:** Represent each bottle number in binary. 999 in binary = 1111100111, which needs 10 bits.\n\n**Step 3:** Assign each prisoner to a bit position. Prisoner i drinks from all bottles whose binary representation has a 1 in position i.\n\n**Step 4:** After 24 hours, the pattern of sick/healthy prisoners gives the binary number of the poisoned bottle.\n\n**Step 5:** Since 2¹⁰ = 1024 ≥ 1000, 10 prisoners suffice.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** This is a binary encoding problem. Number the bottles 0 to 999.\n\n**Step 2:** Represent each bottle number in binary. 999 in binary = 1111100111, which needs 10 bits.\n\n**Step 3:** Assign each prisoner to a bit position. Prisoner i drinks from all bottles whose binary representation has a 1 in position i.\n\n**Step 4:** After 24 hours, the pattern of sick/healthy prisoners gives the binary number of the poisoned bottle.\n\n**Step 5:** Since 2¹⁰ = 1024 ≥ 1000, 10 prisoners suffice.\n\nTherefore the answer is D.",
       "level": "Advanced",
       "targetRoles": [
         "Product Analyst",
@@ -534,13 +534,13 @@
       "difficulty": "Intermediate",
       "question": "If APPLE is coded as 50 (A=1, P=16, P=16, L=12, E=5), what is the code for MICROSOFT?",
       "options": [
-        "112",
+        "118",
         "98",
         "124",
         "107"
       ],
-      "correctAnswer": 3,
-      "explanation": "**Step 1:** M=13, I=9, C=3, R=18, O=15, S=19, O=15, F=6, T=20.\n\n**Step 2:** Wait, MICROSOFT: M-I-C-R-O-S-O-F-T = 9 letters.\n\n**Step 3:** Sum = 13 + 9 + 3 + 18 + 15 + 19 + 15 + 6 + 20 = 118.\n\nHmm, that gives 118, not 107. Let me recheck: M(13) + I(9) + C(3) + R(18) + O(15) + S(19) + O(15) + F(6) + T(20) = 13+9=22, +3=25, +18=43, +15=58, +19=77, +15=92, +6=98, +20=118.\n\nSo the sum is 118. But let me check APPLE: A(1)+P(16)+P(16)+L(12)+E(5) = 50. ✓\n\nMICROSOFT = 118. That's not among my options. Let me recount the letters: M-I-C-R-O-S-O-F-T. Yes, 9 letters.\n\nActually, let me reconsider. Maybe the question uses a different spelling or encoding. Let me adjust to make the answer work: The question says the code is 107. With MICROSOFT being 118, that's off by 11. Perhaps it's using a different encoding like A=0 instead of A=1? Then M=12, I=8, C=2, R=17, O=14, S=18, O=14, F=5, T=19 = 12+8+2+17+14+18+14+5+19 = 109. Still not 107.\n\nOr reverse alphabet: M=14, I=18, C=24, R=9, O=12, S=8, O=12, F=21, T=7 = 14+18+24+9+12+8+12+21+7 = 125.\n\nLet me just use the straightforward sum = 118 and update the option. I'll set option A = 118.",
+      "correctAnswer": 0,
+      "explanation": "**Given:**\n- Coding rule: Letter values are based on alphabetical positions (A=1, B=2, ..., Z=26).\n- Example: APPLE = 1 + 16 + 16 + 12 + 5 = 50\n\n**Formula / Method:**\n- Code for MICROSOFT = Sum of alphabetical positions of all letters in 'MICROSOFT'.\n\n**Step-by-Step Calculation:**\n1. M = 13\n2. I = 9\n3. C = 3\n4. R = 18\n5. O = 15\n6. S = 19\n7. O = 15\n8. F = 6\n9. T = 20\n10. Sum = 13 + 9 + 3 + 18 + 15 + 19 + 15 + 6 + 20 = 118\n\n**Final Answer:**\nThe code for MICROSOFT is 118. (A) 118",
       "level": "Intermediate",
       "targetRoles": [
         "Product Analyst",
@@ -560,7 +560,7 @@
         "Abstract"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** 'Pragmatic' means dealing with things sensibly and realistically.\n\n**Step 2:** 'Practical' is the closest synonym — focused on real-world application.\n\n**Step 3:** Theoretical, Idealistic, and Abstract are closer to antonyms.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** 'Pragmatic' means dealing with things sensibly and realistically.\n\n**Step 2:** 'Practical' is the closest synonym — focused on real-world application.\n\n**Step 3:** Theoretical, Idealistic, and Abstract are closer to antonyms.\n\nTherefore the answer is B.",
       "level": "Legend",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -579,7 +579,7 @@
         "The team of developers are completing the project."
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** 'The team' is a collective noun and takes a singular verb in American English.\n\n**Step 2:** 'of developers' is a prepositional phrase that does not affect the subject-verb agreement.\n\n**Step 3:** 'has completed' is the correct singular verb form.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** 'The team' is a collective noun and takes a singular verb in American English.\n\n**Step 2:** 'of developers' is a prepositional phrase that does not affect the subject-verb agreement.\n\n**Step 3:** 'has completed' is the correct singular verb form.\n\nTherefore the answer is B.",
       "level": "Advanced",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -636,7 +636,7 @@
         "Thorough"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** 'Meticulous' means showing great attention to detail; very careful and precise.\n\n**Step 2:** The opposite is 'Careless' — lacking attention to detail.\n\n**Step 3:** Precise, Thorough, and Diligent are synonyms of meticulous.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** 'Meticulous' means showing great attention to detail; very careful and precise.\n\n**Step 2:** The opposite is 'Careless' — lacking attention to detail.\n\n**Step 3:** Precise, Thorough, and Diligent are synonyms of meticulous.\n\nTherefore the answer is B.",
       "level": "Advanced",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -674,7 +674,7 @@
         "Azure was the first cloud platform"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** The passage states Microsoft 'shifted' its model, reflecting 'broader industry trends.'\n\n**Step 2:** This implies Microsoft adapted to changes happening across the industry.\n\n**Step 3:** The passage does NOT claim Microsoft invented cloud computing or that Azure was first. It also doesn't say licensing is completely gone — just that Microsoft shifted away from it.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** The passage states Microsoft 'shifted' its model, reflecting 'broader industry trends.'\n\n**Step 2:** This implies Microsoft adapted to changes happening across the industry.\n\n**Step 3:** The passage does NOT claim Microsoft invented cloud computing or that Azure was first. It also doesn't say licensing is completely gone — just that Microsoft shifted away from it.\n\nTherefore the answer is C.",
       "level": "Beginner",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -693,7 +693,7 @@
         "RSPQ"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** The meaningful sentence: 'Cloud computing has revolutionized the way businesses manage their data.'\n\n**Step 2:** This follows the order: P (cloud computing) → Q (has revolutionized) → R (the way businesses) → S (manage their data).\n\n**Step 3:** Order = PQRS.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** The meaningful sentence: 'Cloud computing has revolutionized the way businesses manage their data.'\n\n**Step 2:** This follows the order: P (cloud computing) → Q (has revolutionized) → R (the way businesses) → S (manage their data).\n\n**Step 3:** Order = PQRS.\n\nTherefore the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -712,7 +712,7 @@
         "acclaim"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** 'Acumen' means the ability to make good judgments and quick decisions, especially in a specific field.\n\n**Step 2:** In the context of problem-solving, 'acumen' fits perfectly — showing sharp insight.\n\n**Step 3:** 'Acuity' refers to sharpness of thought/vision, 'acclaim' means praise, and 'acrimony' means bitterness.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** 'Acumen' means the ability to make good judgments and quick decisions, especially in a specific field.\n\n**Step 2:** In the context of problem-solving, 'acumen' fits perfectly — showing sharp insight.\n\n**Step 3:** 'Acuity' refers to sharpness of thought/vision, 'acclaim' means praise, and 'acrimony' means bitterness.\n\nTherefore the answer is C.",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -750,7 +750,7 @@
         "5 6 8"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** In C, modifying a variable more than once between sequence points is undefined behavior.\n\n**Step 2:** The expression `printf(\"%d %d %d\", x++, x++, ++x)` modifies `x` three times without a sequence point between them.\n\n**Step 3:** Different compilers may evaluate the arguments in different orders (left-to-right, right-to-left, or any order).\n\n**Step 4:** The C standard explicitly states this is undefined behavior.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** In C, modifying a variable more than once between sequence points is undefined behavior.\n\n**Step 2:** The expression `printf(\"%d %d %d\", x++, x++, ++x)` modifies `x` three times without a sequence point between them.\n\n**Step 3:** Different compilers may evaluate the arguments in different orders (left-to-right, right-to-left, or any order).\n\n**Step 4:** The C standard explicitly states this is undefined behavior.\n\nTherefore the answer is B.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -770,7 +770,7 @@
         "Derived"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** `Base *ptr = new Derived()` creates a Derived object pointed to by a Base pointer.\n\n**Step 2:** `show()` is declared `virtual` in Base, so dynamic dispatch (runtime polymorphism) applies.\n\n**Step 3:** At runtime, the actual object type is Derived, so `Derived::show()` is called.\n\n**Step 4:** Output: \"Derived\".\n\n**Note:** This demonstrates C++ polymorphism through virtual functions and the vtable mechanism.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** `Base *ptr = new Derived()` creates a Derived object pointed to by a Base pointer.\n\n**Step 2:** `show()` is declared `virtual` in Base, so dynamic dispatch (runtime polymorphism) applies.\n\n**Step 3:** At runtime, the actual object type is Derived, so `Derived::show()` is called.\n\n**Step 4:** Output: \"Derived\".\n\n**Note:** This demonstrates C++ polymorphism through virtual functions and the vtable mechanism.\n\nTherefore the answer is D.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -810,7 +810,7 @@
         "Priority Scheduling"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** The convoy effect occurs when a long-running process holds the CPU while shorter processes wait in the queue.\n\n**Step 2:** In FCFS, processes are executed in the order they arrive. A long process arriving first forces all subsequent processes to wait.\n\n**Step 3:** SJF avoids this by prioritizing shorter jobs. Round Robin uses time slicing. Priority scheduling uses priorities.\n\n**Step 4:** The convoy effect is specifically associated with FCFS.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** The convoy effect occurs when a long-running process holds the CPU while shorter processes wait in the queue.\n\n**Step 2:** In FCFS, processes are executed in the order they arrive. A long process arriving first forces all subsequent processes to wait.\n\n**Step 3:** SJF avoids this by prioritizing shorter jobs. Round Robin uses time slicing. Priority scheduling uses priorities.\n\n**Step 4:** The convoy effect is specifically associated with FCFS.\n\nTherefore the answer is C.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -830,7 +830,7 @@
         "20 20 30"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** `int a = 10` — a is 10.\n\n**Step 2:** `int &ref = a` — ref is a reference (alias) to a.\n\n**Step 3:** `ref = 20` — sets a to 20 (since ref IS a).\n\n**Step 4:** `int *ptr = &a` — ptr points to a.\n\n**Step 5:** `*ptr = 30` — sets a to 30 through the pointer.\n\n**Step 6:** Now a = 30, ref = a = 30, *ptr = a = 30.\n\nOutput: `30 30 30`.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** `int a = 10` — a is 10.\n\n**Step 2:** `int &ref = a` — ref is a reference (alias) to a.\n\n**Step 3:** `ref = 20` — sets a to 20 (since ref IS a).\n\n**Step 4:** `int *ptr = &a` — ptr points to a.\n\n**Step 5:** `*ptr = 30` — sets a to 30 through the pointer.\n\n**Step 6:** Now a = 30, ref = a = 30, *ptr = a = 30.\n\nOutput: `30 30 30`.\n\nTherefore the answer is C.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -850,7 +850,7 @@
         "Optimal Page Replacement"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** LRU replaces the page that hasn't been used for the longest time — valid and widely used.\n\n**Step 2:** FIFO replaces the oldest page in memory — valid and simple.\n\n**Step 3:** Optimal replaces the page that won't be used for the longest time in the future — valid (theoretical benchmark).\n\n**Step 4:** MRU (Most Recently Used) is used in some buffer management contexts but is NOT a standard page replacement algorithm in OS textbooks.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** LRU replaces the page that hasn't been used for the longest time — valid and widely used.\n\n**Step 2:** FIFO replaces the oldest page in memory — valid and simple.\n\n**Step 3:** Optimal replaces the page that won't be used for the longest time in the future — valid (theoretical benchmark).\n\n**Step 4:** MRU (Most Recently Used) is used in some buffer management contexts but is NOT a standard page replacement algorithm in OS textbooks.\n\nTherefore the answer is C.",
       "level": "Beginner",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -890,7 +890,7 @@
         "2m"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** By definition, a B-tree of order m allows each node to have at most m children.\n\n**Step 2:** Each node can have at most m-1 keys.\n\n**Step 3:** The minimum number of children for a non-root internal node is ⌈m/2⌉.\n\n**Step 4:** Maximum children = m.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** By definition, a B-tree of order m allows each node to have at most m children.\n\n**Step 2:** Each node can have at most m-1 keys.\n\n**Step 3:** The minimum number of children for a non-root internal node is ⌈m/2⌉.\n\n**Step 4:** Maximum children = m.\n\nTherefore the answer is B.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -930,7 +930,7 @@
         "Presentation Layer (Layer 6)"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** The Session Layer (Layer 5) manages sessions — establishing, maintaining, and terminating connections between applications.\n\n**Step 2:** Transport Layer handles end-to-end data transfer. Application Layer provides network services to applications. Presentation Layer handles data formatting.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** The Session Layer (Layer 5) manages sessions — establishing, maintaining, and terminating connections between applications.\n\n**Step 2:** Transport Layer handles end-to-end data transfer. Application Layer provides network services to applications. Presentation Layer handles data formatting.\n\nTherefore the answer is B.",
       "level": "Intermediate",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -950,7 +950,7 @@
         "4\\n5\\n3"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** `*(p + 3)` → p points to arr[0], so *(p+3) = arr[3] = 4.\n\n**Step 2:** `*(arr + 4)` → arr[4] = 5.\n\n**Step 3:** `2[arr]` → In C/C++, `a[b]` is equivalent to `*(a+b)` which equals `*(b+a)` which equals `b[a]`. So `2[arr]` = `arr[2]` = 3.\n\n**Step 4:** Output:\n4\n5\n3\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** `*(p + 3)` → p points to arr[0], so *(p+3) = arr[3] = 4.\n\n**Step 2:** `*(arr + 4)` → arr[4] = 5.\n\n**Step 3:** `2[arr]` → In C/C++, `a[b]` is equivalent to `*(a+b)` which equals `*(b+a)` which equals `b[a]`. So `2[arr]` = `arr[2]` = 3.\n\n**Step 4:** Output:\n4\n5\n3\n\nTherefore the answer is D.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -970,7 +970,7 @@
         "All four conditions (mutual exclusion, hold and wait, no preemption, circular wait) must hold simultaneously"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Deadlock requires ALL four Coffman conditions to hold simultaneously:\n1. **Mutual Exclusion** — Resources can't be shared.\n2. **Hold and Wait** — Processes hold resources while waiting for others.\n3. **No Preemption** — Resources can't be forcibly taken away.\n4. **Circular Wait** — A circular chain of processes exists, each waiting for a resource held by the next.\n\n**Step 2:** Removing any one condition prevents deadlock.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** Deadlock requires ALL four Coffman conditions to hold simultaneously:\n1. **Mutual Exclusion** — Resources can't be shared.\n2. **Hold and Wait** — Processes hold resources while waiting for others.\n3. **No Preemption** — Resources can't be forcibly taken away.\n4. **Circular Wait** — A circular chain of processes exists, each waiting for a resource held by the next.\n\n**Step 2:** Removing any one condition prevents deadlock.\n\nTherefore the answer is D.",
       "level": "Beginner",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -990,7 +990,7 @@
         "10"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** `MyClass a(10)` creates object a with x=10. `MyClass b(20)` creates object b with x=20.\n\n**Step 2:** `a + b` calls the overloaded `operator+`, which creates a new MyClass with x = 10 + 20 = 30.\n\n**Step 3:** `MyClass c = a + b` → c.x = 30.\n\n**Step 4:** `c.display()` prints 30.\n\n**Note:** This demonstrates operator overloading in C++.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** `MyClass a(10)` creates object a with x=10. `MyClass b(20)` creates object b with x=20.\n\n**Step 2:** `a + b` calls the overloaded `operator+`, which creates a new MyClass with x = 10 + 20 = 30.\n\n**Step 3:** `MyClass c = a + b` → c.x = 30.\n\n**Step 4:** `c.display()` prints 30.\n\n**Note:** This demonstrates operator overloading in C++.\n\nTherefore the answer is B.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",

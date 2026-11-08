@@ -78,7 +78,7 @@ export async function onRequestPost(context) {
         headers: { Prefer: 'return=minimal' },
         body: JSON.stringify([{
           anonymous_id: anonymousId,
-          query: safeText(properties.query, 200) || 'unknown',
+          query: '[redacted]',
           result_count: Number.isInteger(properties.resultCount) ? Math.max(properties.resultCount, 0) : null
         }])
       });

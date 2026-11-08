@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -105,6 +107,8 @@
       <!-- Populated by quiz.js -->
     </div>
 
+    <div class="ad-slot ad-slot-inline" id="ad-quiz-between-questions" data-ad-slot="quiz-between-questions" data-ad-trigger="between-questions" aria-label="Advertisement"></div>
+
     <!-- Quiz Navigation -->
     <div class="quiz-nav" id="quizNav" style="display:none;">
       <button class="quiz-btn quiz-btn-secondary" id="prevBtn" disabled>
@@ -122,6 +126,24 @@
     <div class="quiz-results" id="quizResults" style="display:none;">
       <!-- Populated by quiz.js -->
     </div>
+
+    <!-- Reserved for a future responsive ad integration. Kept empty until enabled. -->
+    <div class="ad-slot ad-slot-banner" id="ad-quiz-results" data-ad-slot="quiz-results" data-ad-trigger="results-render" aria-label="Advertisement"></div>
+    <div class="ad-slot ad-slot-inline" id="ad-quiz-before-results" data-ad-slot="quiz-before-results" data-ad-trigger="before-results" aria-label="Advertisement"></div>
+  </div>
+
+  <div class="ad-slot ad-slot-sticky ad-slot-sticky-desktop" id="ad-sticky-bottom-desktop" data-ad-slot="sticky-bottom-desktop" data-ad-trigger="after-page-load" data-ad-dismissible="true" aria-label="Advertisement">
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+  <div class="ad-slot ad-slot-sticky ad-slot-sticky-mobile" id="ad-sticky-bottom-mobile" data-ad-slot="sticky-bottom-mobile" data-ad-trigger="after-page-load" data-ad-dismissible="true" aria-label="Advertisement">
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+
+  <div class="ad-slot ad-slot-overlay" id="ad-interstitial" data-ad-slot="interstitial" data-ad-trigger="future-page-transition" data-ad-dismissible="true" role="dialog" aria-modal="true" aria-label="Advertisement" hidden>
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+  <div class="ad-slot ad-slot-overlay" id="ad-exit-intent" data-ad-slot="exit-intent" data-ad-trigger="future-exit-intent" data-ad-dismissible="true" role="dialog" aria-modal="true" aria-label="Advertisement" hidden>
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
   </div>
 
   <!-- ========== FOOTER ========== -->
@@ -136,6 +158,8 @@
 
   <script src="js/public-config.js"></script>
   <script src="js/analytics.js"></script>
+  <script src="js/ad-registry.js"></script>
+  <script src="js/ad-loader.js"></script>
   <script src="js/quiz.js"></script>
   <script src="js/news.js"></script>
 </body>

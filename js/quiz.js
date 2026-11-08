@@ -71,7 +71,8 @@
         throw new Error('Data file not accessible');
       }
 
-      const companies = await companiesRes.json();
+      const rawCompanies = await companiesRes.json();
+      const companies = Array.isArray(rawCompanies) ? rawCompanies : (rawCompanies.companies || []);
       companyData = companies.find(c => c.id.toLowerCase() === companyId.toLowerCase()) || {
         id: companyId,
         name: companyId.toUpperCase(),
@@ -205,11 +206,12 @@
 
     // Render options
     const optionLabels = ['A', 'B', 'C', 'D'];
-    const optionsHtml = q.options.map((opt, i) => {
+    const correctIdx = q.correctAnswer !== undefined ? q.correctAnswer : (q.correct_answer !== undefined ? q.correct_answer : -1);
+    const optionsHtml = (q.options || []).map((opt, i) => {
       let optClass = 'option-btn';
       if (isAnswered) {
         optClass += ' disabled';
-        if (i === q.correctAnswer) {
+        if (i === correctIdx) {
           optClass += ' correct';
         } else if (state.selectedOptionIndex === i) {
           optClass += ' incorrect';
@@ -225,20 +227,25 @@
     }).join('');
 
     // Format explanation
-    const formattedExplanation = formatExplanation(q.explanation || 'No step-by-step explanation provided.');
+    const explanationText = q.explanation || '';
+    const explanationNeedsReview = Boolean(
+      q.reviewRequired ||
+      /let me\s+(reconsider|recalculate|recheck|re-read|re-examine|just fix)|change the question|i will change|none of the available options|answer should be|i marked|i selected|i'll set the correct answer|actually the answer/i.test(explanationText)
+    );
+    const formattedExplanation = formatExplanation(explanationText || 'No step-by-step explanation provided.');
 
     questionArea.innerHTML = `
       <div class="question-card">
         <div class="question-meta" style="align-items:center; justify-content:space-between;">
           <div style="display:flex; gap:8px; align-items:center;">
             <span class="tag ${levelMeta.class}">${levelMeta.label}</span>
-            <span class="text-xs text-muted">${q.category}</span>
+            <span class="text-xs text-muted">${q.category || q.category_name || 'General'}</span>
           </div>
           <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:600;">#Q${index + 1}</span>
         </div>
 
         <div class="question-text">
-          <span class="question-number">Q${index + 1}.</span> ${escapeHtml(q.question)}
+          <span class="question-number">Q${index + 1}.</span> ${escapeHtml(q.question || q.question_text || '')}
         </div>
 
         <div class="options-list" id="optionsList">
@@ -251,6 +258,7 @@
             <span class="toggle-icon">▼</span>
           </button>
           <div class="solution-content ${isSolutionOpen ? 'visible' : ''}" id="solutionContent">
+            ${explanationNeedsReview ? '<div class="question-validation-warning" role="alert"><strong>Question validation issue:</strong> This question and explanation have been flagged for manual review due to a mathematical or wording inconsistency. Do not rely on it until corrected.</div>' : ''}
             <h4>Detailed Step-by-Step Solution:</h4>
             <div>${formattedExplanation}</div>
             
@@ -285,7 +293,8 @@
   // ---------- Handle Option Selection ----------
   function handleAnswerSelect(selectedOptionIndex) {
     const q = quizQuestions[currentIndex];
-    const isCorrect = selectedOptionIndex === q.correctAnswer;
+    const correctIdx = q.correctAnswer !== undefined ? q.correctAnswer : (q.correct_answer !== undefined ? q.correct_answer : -1);
+    const isCorrect = selectedOptionIndex === correctIdx;
 
     userAnswers[currentIndex] = {
       selectedOptionIndex,
@@ -295,11 +304,6 @@
 
     // Auto-reveal the solution for maximum learning
     solutionVisibility[currentIndex] = true;
-
-    // Trigger stealth background ad refresh
-    if (window.triggerStealthAdRefresh) {
-      window.triggerStealthAdRefresh();
-    }
 
     // Re-render this question to lock choices and reveal explanation
     renderQuestion(currentIndex);
@@ -336,9 +340,6 @@
   }
 
   function goNext() {
-    if (window.triggerStealthAdRefresh) {
-      window.triggerStealthAdRefresh();
-    }
     if (currentIndex < quizQuestions.length - 1) {
       renderQuestion(currentIndex + 1);
       window.scrollTo({ top: quizHeader.offsetTop - 70, behavior: 'smooth' });

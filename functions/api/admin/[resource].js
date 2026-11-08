@@ -29,11 +29,13 @@ const MUTABLE_RESOURCES = new Set([
 ]);
 
 function resourceName(context) {
-  const resource = context.params?.resource;
+  const resource = context?.params?.resource;
   return RESOURCES.has(resource) ? resource : null;
 }
 
-async function handle(request, context) {
+async function handle(contextOrRequest, maybeContext) {
+  const context = maybeContext || contextOrRequest;
+  const request = contextOrRequest.request || contextOrRequest;
   const resource = resourceName(context);
   if (!resource) {
     return json({ error: 'Unknown admin resource' }, 404);

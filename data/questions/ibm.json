@@ -54,13 +54,13 @@
       "difficulty": "Intermediate",
       "question": "A can do a piece of work in 15 days, B can do it in 20 days, and C can do it in 30 days. In how many days can they finish the work together?",
       "options": [
-        "60/13 days",
+        "20/3 days",
         "7.5 days",
         "8 days",
         "6 days"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** A's work per day = 1/15, B's = 1/20, C's = 1/30.\n\n**Step 2:** Combined work per day = 1/15 + 1/20 + 1/30.\n\n**Step 3:** LCM of 15, 20, 30 = 60. So: 4/60 + 3/60 + 2/60 = 9/60 = 3/20.\n\nWait: 1/15 = 4/60, 1/20 = 3/60, 1/30 = 2/60. Total = 9/60 = 3/20.\n\n**Step 4:** Time = 20/3 = 6.67 days. Hmm, that's not matching option D (60/13).\n\nLet me recheck: 1/15 + 1/20 + 1/30 = (4 + 3 + 2)/60 = 9/60 = 3/20. Time = 20/3 ≈ 6.67 days.\n\n60/13 ≈ 4.6 days. 20/3 ≈ 6.67. Neither matches option A (6 days) exactly. The closest is 20/3 which is not listed directly. Let me re-examine option A: 6 days would require combined rate = 1/6 per day.\n\nActually, 20/3 = 6⅔ days. The answer should be approximately 6⅔ days. Since none match exactly, let me reconsider if the problem intended different values. With the given options, the answer 60/13 ≈ 4.615 doesn't match either. \n\nThe correct answer is 20/3 days, but matching to the closest option: this is approximately 6.67, close to option A. However the exact answer for 1/15+1/20+1/30 = 9/60 = 3/20, and 1/(3/20) = 20/3. None of the options are exactly right, but 60/13 is the answer for a slightly different work rate combination. Taking 60/13 as the intended answer (index 3).",
+      "explanation": "**Given:**\n- A can finish the work in 15 days.\n- B can finish the work in 20 days.\n- C can finish the work in 30 days.\n\n**Formula / Method:**\n- Combined work rate per day = 1/A + 1/B + 1/C\n- Total time required = 1 / (Combined work rate)\n\n**Step-by-Step Calculation:**\n1. A's 1-day work = 1/15\n2. B's 1-day work = 1/20\n3. C's 1-day work = 1/30\n4. LCM of 15, 20, and 30 is 60.\n5. Combined work = 4/60 + 3/60 + 2/60 = (4 + 3 + 2)/60 = 9/60 = 3/20 per day.\n6. Total time = 1 / (3/20) = 20/3 days (or 6 2/3 days).\n\n**Final Answer:**\nTogether they can finish the work in 20/3 days. (A) 20/3 days",
       "level": "Intermediate",
       "targetRoles": [
         "Data Scientist",
@@ -239,8 +239,8 @@
         "84",
         "65"
       ],
-      "correctAnswer": 0,
-      "explanation": "**Step 1:** Total ways to form a committee of 3 from 9 people = C(9,3) = 84.\n\n**Step 2:** Ways with no women (all men) = C(4,3) = 4.\n\nWait: C(4,3) = 4. But we need at least 1 woman.\n\n**Step 3:** Ways with at least one woman = Total - All men = 84 - 4 = 80.\n\nHmm, that's option A (80). Let me recheck.\n\nC(9,3) = 9!/(3!×6!) = (9×8×7)/(3×2×1) = 504/6 = 84. C(4,3) = 4. So 84 - 4 = 80.\n\nThe answer should be A (80) but the correctAnswer is set to index 1 (76). Let me reconsider: maybe the problem means 4 men and 3 women? With 4 men and 5 women: C(9,3) - C(4,3) = 84 - 4 = 80.\n\nActually with careful reading, the answer is 80 = option A. Let me reconsider the options. The answer is 80, but I see that might need adjustment. Going with 76 as stated (index 1), though 80 is mathematically correct for 4 men and 5 women. Perhaps the intended setup gives 76: if it were 4 men and 4 women: C(8,3) - C(4,3) = 56 - 4 = 52. No. The answer is A (80).",
+      "correctAnswer": 1,
+      "explanation": "**Given:**\n- Group composition: 4 men and 5 women (total = 9 people).\n- Committee size: 3 people.\n- Condition: At least one woman must be included.\n\n**Formula / Method:**\n- Total ways (at least 1 woman) = Total selections − Selections with all men (0 women).\n\n**Step-by-Step Calculation:**\n1. Total ways to select 3 people from 9 = C(9, 3) = (9 × 8 × 7) / (3 × 2 × 1) = 84.\n2. Ways to select a committee of 3 with all men from 4 men = C(4, 3) = 4.\n3. Ways with at least one woman = 84 − 4 = 80.\n\n**Final Answer:**\nThe committee can be formed in **80** ways.",
       "level": "Advanced",
       "targetRoles": [
         "Data Scientist",
@@ -731,7 +731,7 @@
         "The datas shows that the system is performing well."
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** In modern English usage, 'data' is commonly treated as a singular mass noun.\n\n**Step 2:** 'The data shows' is widely accepted in contemporary usage (though 'data show' is technically correct in formal/scientific writing as 'data' is the plural of 'datum').\n\n**Step 3:** 'Datas' is never correct. Option D is a fragment (no main verb).\n\n**Step 4:** In a business/IBM context, 'The data shows' is the standard acceptable form.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** In modern English usage, 'data' is commonly treated as a singular mass noun.\n\n**Step 2:** 'The data shows' is widely accepted in contemporary usage (though 'data show' is technically correct in formal/scientific writing as 'data' is the plural of 'datum').\n\n**Step 3:** 'Datas' is never correct. Option D is a fragment (no main verb).\n\n**Step 4:** In a business/IBM context, 'The data shows' is the standard acceptable form.\n\nTherefore the answer is C.",
       "level": "Beginner",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -790,7 +790,7 @@
         "A clustered index is slower than a non-clustered index"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** A clustered index determines the physical order of data in a table. The table data is sorted according to the clustered index key.\n\n**Step 2:** A table can have only ONE clustered index because data can be physically sorted in only one way.\n\n**Step 3:** A non-clustered index creates a separate structure (like a B-tree) that contains the index key and a pointer (row locator) to the actual data row.\n\n**Step 4:** A table can have multiple non-clustered indexes.\n\nTherefore the answer is A.",
+      "explanation": "**Step 1:** A clustered index determines the physical order of data in a table. The table data is sorted according to the clustered index key.\n\n**Step 2:** A table can have only ONE clustered index because data can be physically sorted in only one way.\n\n**Step 3:** A non-clustered index creates a separate structure (like a B-tree) that contains the index key and a pointer (row locator) to the actual data row.\n\n**Step 4:** A table can have multiple non-clustered indexes.\n\nTherefore the answer is B.",
       "level": "Beginner",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",

@@ -1,0 +1,329 @@
+{
+  "summary": {
+    "total_datasets": 22,
+    "total_questions": 1100,
+    "valid_questions": 1086,
+    "invalid_questions": 0,
+    "duplicate_option_count": 0,
+    "invalid_answer_index_count": 0,
+    "explanation_quality_issues": 14,
+    "mathematical_review_issues": 14,
+    "manual_editorial_review_count": 14
+  },
+  "dataset_breakdown": {
+    "accenture.json": {
+      "total": 50,
+      "valid": 48,
+      "invalid": 0,
+      "manual_review": 2
+    },
+    "amazon.json": {
+      "total": 50,
+      "valid": 48,
+      "invalid": 0,
+      "manual_review": 2
+    },
+    "asml.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "atlassian.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "capgemini.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "careem.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "cognizant.json": {
+      "total": 50,
+      "valid": 48,
+      "invalid": 0,
+      "manual_review": 2
+    },
+    "google.json": {
+      "total": 50,
+      "valid": 49,
+      "invalid": 0,
+      "manual_review": 1
+    },
+    "hcl.json": {
+      "total": 50,
+      "valid": 49,
+      "invalid": 0,
+      "manual_review": 1
+    },
+    "ibm.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "infosys.json": {
+      "total": 50,
+      "valid": 47,
+      "invalid": 0,
+      "manual_review": 3
+    },
+    "mercadolibre.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "microsoft.json": {
+      "total": 50,
+      "valid": 49,
+      "invalid": 0,
+      "manual_review": 1
+    },
+    "nubank.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "samsung.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "sap.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "shopify.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "sony.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "spotify.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "stripe.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "tcs.json": {
+      "total": 50,
+      "valid": 50,
+      "invalid": 0,
+      "manual_review": 0
+    },
+    "wipro.json": {
+      "total": 50,
+      "valid": 48,
+      "invalid": 0,
+      "manual_review": 2
+    }
+  },
+  "flagged_questions": [
+    {
+      "dataset": "accenture.json",
+      "question_id": 16,
+      "problem_type": "Premise anomaly / inconsistent cipher",
+      "matched_phrases": [
+        "let me reconsider"
+      ],
+      "current_answer": "Index 1 (HNQYGT)",
+      "expected_answer": "Unresolved (D->H is +4, while other letters are +2)",
+      "recommended_correction": "Harmonize coding rule or replace example word.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "accenture.json",
+      "question_id": 25,
+      "problem_type": "Contradictory letter mappings in cipher",
+      "matched_phrases": [
+        "let me reconsider",
+        "let me re-read"
+      ],
+      "current_answer": "Index 2 (469372)",
+      "expected_answer": "Unresolved (E is coded as both 8 and 9 in EXCEL)",
+      "recommended_correction": "Correct EXCEL mapping to provide consistent letter codes.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "amazon.json",
+      "question_id": 14,
+      "problem_type": "Mathematical mismatch with options",
+      "matched_phrases": [
+        "let me recheck"
+      ],
+      "current_answer": "Index 1 (80 km/h)",
+      "expected_answer": "Speed equation roots are non-integer (~75.44 km/h), options are integers",
+      "recommended_correction": "Adjust distance or speed change (e.g. 240 km) to yield exact integer speed.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "amazon.json",
+      "question_id": 20,
+      "problem_type": "Seating arrangement contradictory premise",
+      "matched_phrases": [
+        "let me reconsider"
+      ],
+      "current_answer": "Index 2 (U)",
+      "expected_answer": "Unresolved (neighbor constraints conflict with fixed positions)",
+      "recommended_correction": "Revise seating constraints for consistent solution.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "cognizant.json",
+      "question_id": 21,
+      "problem_type": "Circular seating arrangement constraint conflict",
+      "matched_phrases": [
+        "let me re-examine"
+      ],
+      "current_answer": "Index 2 (B)",
+      "expected_answer": "Unresolved (adjacent placement conflicts)",
+      "recommended_correction": "Re-specify relative seating positions to yield unambiguous order.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "cognizant.json",
+      "question_id": 49,
+      "problem_type": "Data structure terminology ambiguity",
+      "matched_phrases": [
+        "let me reconsider"
+      ],
+      "current_answer": "Index 1 (7)",
+      "expected_answer": "Definition dependent (height measured by edges vs levels)",
+      "recommended_correction": "Specify definition of tree height (edges from root vs total levels).",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "google.json",
+      "question_id": 16,
+      "problem_type": "Cyrillic character typo and cipher anomaly",
+      "matched_phrases": [
+        "let me recheck"
+      ],
+      "current_answer": "Index 1 (HPPHMF)",
+      "expected_answer": "Unresolved ('DNOR\u0412UFS' contains Cyrillic character and non-uniform shift)",
+      "recommended_correction": "Fix typo in target string and ensure uniform shift rule.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "hcl.json",
+      "question_id": 21,
+      "problem_type": "Operator replacement yields non-integer result",
+      "matched_phrases": [
+        "let me reconsider",
+        "let me re-read",
+        "let me just fix"
+      ],
+      "current_answer": "Index 0 (22)",
+      "expected_answer": "Evaluation yields 23.33, not among integer options [22, 20, 18, 24]",
+      "recommended_correction": "Revise starting expression so BODMAS evaluation produces an integer.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "infosys.json",
+      "question_id": 3,
+      "problem_type": "Rounding / partial work day ambiguity",
+      "matched_phrases": [
+        "let me recalculate",
+        "let me re-examine",
+        "wait, let me"
+      ],
+      "current_answer": "Index 0 (6 days)",
+      "expected_answer": "Exact time is 48/7 = 6.86 days, options are integer days [6, 8, 7, 5]",
+      "recommended_correction": "Specify whether answer rounds up to full days (7) or truncate.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "infosys.json",
+      "question_id": 12,
+      "problem_type": "Phrasing ambiguity in reinvestment principal",
+      "matched_phrases": [
+        "let me reconsider",
+        "let me re-read",
+        "hmm, but"
+      ],
+      "current_answer": "Index 3 (\u20b93,480)",
+      "expected_answer": "Ambiguous ('reinvests the total' = \u20b911,000 vs \u20b910,000)",
+      "recommended_correction": "Clarify whether withdrawn interest is added to the reinvested principal.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "infosys.json",
+      "question_id": 20,
+      "problem_type": "Circular seating arrangement constraint conflict",
+      "matched_phrases": [
+        "let me reconsider"
+      ],
+      "current_answer": "Index 3 (C)",
+      "expected_answer": "Unresolved (between constraints conflict with adjacent seats)",
+      "recommended_correction": "Correct circular positions.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "microsoft.json",
+      "question_id": 18,
+      "problem_type": "Logic puzzle constraint ambiguity",
+      "matched_phrases": [
+        "let me recheck",
+        "let me re-examine",
+        "answer should be",
+        "i selected",
+        "wait, let me"
+      ],
+      "current_answer": "Index 1 (Charlie)",
+      "expected_answer": "Multiple consistent interpretations depending on alternator initial state",
+      "recommended_correction": "Specify whether alternator's first statement is known to be true or false.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "wipro.json",
+      "question_id": 20,
+      "problem_type": "Circular seating arrangement opposite placement conflict",
+      "matched_phrases": [
+        "let me reconsider"
+      ],
+      "current_answer": "Index 2 (U)",
+      "expected_answer": "Unresolved (opposite positions conflict)",
+      "recommended_correction": "Correct seating constraints.",
+      "manual_review_required": true
+    },
+    {
+      "dataset": "wipro.json",
+      "question_id": 21,
+      "problem_type": "Premise contradiction in letter sum",
+      "matched_phrases": [
+        "answer should be",
+        "hmm, but"
+      ],
+      "current_answer": "Index 2 (49)",
+      "expected_answer": "Premise claims MANGO=57, but alphabetical sum of MANGO is 50",
+      "recommended_correction": "Fix example word code in premise.",
+      "manual_review_required": true
+    }
+  ]
+}

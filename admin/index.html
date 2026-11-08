@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <title>PrepWise Admin</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="alternate icon" href="../favicon.ico">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -40,8 +42,15 @@
       <div class="layout">
         <nav class="sidebar" aria-label="Admin sections">
           <button class="nav-item active" data-section="overview">Overview</button>
+          <button class="nav-item" data-section="analytics">Analytics</button>
+          <button class="nav-item" data-section="visitors">Visitor activity</button>
           <button class="nav-item" data-section="content">Content management</button>
           <button class="nav-item" data-section="quiz">Quiz analytics</button>
+          <button class="nav-item" data-section="companies">Company performance</button>
+          <button class="nav-item" data-section="advertising">Advertising</button>
+          <button class="nav-item" data-section="system">System health</button>
+          <button class="nav-item" data-section="security">Security status</button>
+          <button class="nav-item" id="nav-administrators" data-section="administrators" hidden>Administrators</button>
           <button class="nav-item" data-section="seo">SEO</button>
           <button class="nav-item" data-section="feedback">Feedback</button>
           <button class="nav-item" data-section="settings">Website settings</button>
@@ -50,28 +59,411 @@
         <div class="content">
           <section class="panel active" id="section-overview">
             <div class="section-heading"><div><p class="eyebrow">Verified database counts</p><h2>Overview</h2></div><button class="secondary" data-refresh="overview">Refresh</button></div>
+            <form class="filter-form" id="overviewFilters">
+              <label>Period
+                <select id="overviewPeriod">
+                  <option value="today">Today</option>
+                  <option value="7" selected>Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label class="custom-date">From <input id="overviewFrom" type="date"></label>
+              <label class="custom-date">To <input id="overviewTo" type="date"></label>
+              <button class="primary" type="submit">Apply filters</button>
+            </form>
+            <p class="status" id="overviewStatus" role="status"></p>
             <div class="cards" id="overviewCards"></div>
-            <div class="chart-card"><h3>Analytics status</h3><canvas id="overviewChart" height="120"></canvas><p class="muted" id="overviewNote">No first-party analytics data loaded yet.</p></div>
+            <div class="chart-card"><h3>Activity trends</h3><canvas id="overviewChart" height="120"></canvas><p class="muted" id="overviewNote">Loading verified metrics...</p></div>
+            <div class="analytics-columns" style="margin-top: 24px;">
+              <div><h3>Most popular companies</h3><div id="overviewPopularCompanies" class="table-wrap"></div></div>
+              <div><h3>Most popular categories</h3><div id="overviewPopularCategories" class="table-wrap"></div></div>
+            </div>
+            <div class="analytics-columns" style="margin-top: 24px;">
+              <div><h3>Recent visitor activity</h3><div id="overviewRecentActivity" class="table-wrap"></div></div>
+              <div><h3>System health snapshot</h3><div id="overviewSystemHealth" class="table-wrap"></div></div>
+            </div>
+          </section>
+
+          <section class="panel" id="section-analytics">
+            <div class="section-heading"><div><p class="eyebrow">Real database events</p><h2>Analytics</h2></div><button class="secondary" id="refreshAnalytics">Refresh</button></div>
+            <form class="filter-form" id="analyticsFilters">
+              <label>Period <select id="analyticsPeriod"><option value="today">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="custom">Custom</option></select></label>
+              <label class="custom-date">From <input id="analyticsFrom" type="date"></label>
+              <label class="custom-date">To <input id="analyticsTo" type="date"></label>
+              <button class="primary" type="submit">Apply filters</button>
+            </form>
+            <p class="status" id="analyticsStatus" role="status"></p>
+            <div class="cards" id="analyticsCards"></div>
+            <div class="charts-grid"><div class="chart-card"><h3>Daily activity</h3><canvas id="dailyActivityChart" height="130"></canvas></div><div class="chart-card"><h3>Quiz activity</h3><canvas id="quizActivityChart" height="130"></canvas></div><div class="chart-card"><h3>Page popularity</h3><canvas id="pagePopularityChart" height="130"></canvas></div></div>
+            <div class="analytics-columns"><div><h3>Popular companies</h3><div id="popularCompanies" class="table-wrap"></div></div><div><h3>Popular categories</h3><div id="popularCategories" class="table-wrap"></div></div></div>
+          </section>
+
+          <section class="panel" id="section-visitors">
+            <div class="section-heading"><div><p class="eyebrow">Non-sensitive events</p><h2>Visitor activity</h2></div><button class="secondary" id="exportActivity">Export CSV</button></div>
+            <form class="filter-form" id="activityFilters"><label>Period <select id="activityPeriod"><option value="today">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="custom">Custom</option></select></label><label>Event <select id="activityEvent"><option value="">All events</option><option value="page_view">Page view</option><option value="company_view">Company view</option><option value="quiz_start">Quiz start</option><option value="quiz_complete">Quiz complete</option><option value="search">Search</option></select></label><label>Sort <select id="activitySort"><option value="timestamp_desc">Newest first</option><option value="timestamp_asc">Oldest first</option><option value="event_desc">Event type</option></select></label><label class="custom-date">From <input id="activityFrom" type="date"></label><label class="custom-date">To <input id="activityTo" type="date"></label><button class="primary" type="submit">Apply filters</button></form>
+            <p class="status" id="activityStatus" role="status"></p>
+            <div class="analytics-columns" style="margin-bottom: 20px;">
+              <div><h3>Top pages viewed</h3><div id="visitorPopularPages" class="table-wrap"></div></div>
+              <div><h3>Top companies viewed</h3><div id="visitorPopularCompanies" class="table-wrap"></div></div>
+            </div>
+            <div id="visitorActivityTable" class="table-wrap"></div><div class="pagination"><button class="secondary" id="activityPrevious">Previous</button><span id="activityPageLabel">Page 1</span><button class="secondary" id="activityNext">Next</button></div>
           </section>
 
           <section class="panel" id="section-content">
-            <div class="section-heading"><div><p class="eyebrow">Published content</p><h2>Content management</h2></div></div>
+            <div class="section-heading"><div><p class="eyebrow">Published content</p><h2>Content management</h2></div><button class="secondary" id="refreshContentSummary">Refresh summary</button></div>
+            <div class="cards" id="contentSummaryCards" style="margin-bottom: 20px;"></div>
+            <div class="publishing-notice" style="margin-bottom: 16px; padding: 12px 16px; background: rgba(79, 70, 229, 0.06); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; font-size: 0.875rem; color: #475569; line-height: 1.5;">
+              <strong style="color: #4f46e5;">Edge CDN Publishing Workflow:</strong> Modifications made in this panel update the Supabase database in real-time. Because public visitors are served directly from high-speed edge CDN caches, database changes are not live on public visitor pages until you click <em>Export JSON</em>, update the corresponding files in <code>data/</code>, and commit/deploy to Cloudflare Pages.
+            </div>
             <div class="resource-tabs" id="resourceTabs"></div>
-            <div class="toolbar"><input id="resourceSearch" placeholder="Search loaded records"><button class="primary" id="newRecordButton">New record</button></div>
+
+            <!-- Standard Resource Toolbar -->
+            <div class="toolbar" id="genericToolbar"><input id="resourceSearch" placeholder="Search loaded records"><button class="primary" id="newRecordButton">New record</button></div>
+
+            <!-- Dedicated Company Management Toolbar -->
+            <div class="question-toolbar" id="companyToolbar" hidden>
+              <input id="companySearchInput" placeholder="Search company name, slug, or industry...">
+              <select id="companyCategoryFilter">
+                <option value="">All Categories / Industries</option>
+                <option value="IT Services & Consulting">IT Services &amp; Consulting</option>
+                <option value="Cloud Computing & Enterprise Software">Enterprise Software</option>
+                <option value="Search & AI">Search &amp; AI</option>
+                <option value="Semiconductors">Semiconductors</option>
+                <option value="Fintech & Payments">Fintech</option>
+                <option value="E-Commerce">E-Commerce</option>
+              </select>
+              <button class="primary" id="newCompanyButton" type="button">New Company</button>
+              <button class="secondary" id="exportCompaniesButton" type="button">Export JSON</button>
+            </div>
+
+            <!-- Dedicated Question Management Toolbar -->
+            <div class="question-toolbar" id="questionToolbar" hidden>
+              <select id="questionCompanyFilter">
+                <option value="">All Companies</option>
+                <option value="tcs">TCS</option>
+                <option value="amazon">Amazon</option>
+                <option value="google">Google</option>
+                <option value="accenture">Accenture</option>
+                <option value="cognizant">Cognizant</option>
+                <option value="infosys">Infosys</option>
+                <option value="microsoft">Microsoft</option>
+                <option value="wipro">Wipro</option>
+                <option value="hcl">HCL</option>
+                <option value="ibm">IBM</option>
+                <option value="sap">SAP</option>
+                <option value="samsung">Samsung</option>
+                <option value="sony">Sony</option>
+                <option value="atlassian">Atlassian</option>
+                <option value="spotify">Spotify</option>
+                <option value="shopify">Shopify</option>
+                <option value="asml">ASML</option>
+                <option value="stripe">Stripe</option>
+                <option value="capgemini">Capgemini</option>
+                <option value="careem">Careem</option>
+                <option value="nubank">Nubank</option>
+                <option value="mercadolibre">MercadoLibre</option>
+              </select>
+              <select id="questionCategoryFilter">
+                <option value="">All Categories</option>
+                <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                <option value="Logical Reasoning">Logical Reasoning</option>
+                <option value="Verbal Ability">Verbal Ability</option>
+                <option value="Technical">Technical</option>
+              </select>
+              <select id="questionDifficultyFilter">
+                <option value="">All Difficulties</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Legend">Legend</option>
+              </select>
+              <select id="questionStatusFilter">
+                <option value="">All Review Statuses</option>
+                <option value="approved">Approved (1,086)</option>
+                <option value="under_review">Under Editorial Review (14)</option>
+              </select>
+              <input id="questionSearchInput" placeholder="Search question text or options...">
+              <button class="primary" id="newQuestionButton" type="button">New Question</button>
+              <button class="secondary" id="importQuestionsButton" type="button">Import JSON</button>
+              <button class="secondary" id="exportQuestionsButton" type="button">Export JSON</button>
+              <button class="secondary" id="validateDatasetButton" type="button">Validate Questions</button>
+            </div>
+
+            <!-- Dedicated Question Import Modal / Panel -->
+            <div id="questionImportModal" class="question-editor-card" hidden>
+              <h3>Import Questions Batch</h3>
+              <p class="muted">Upload a JSON file or paste an array of questions. Every question is validated for structure, 4 unique options, correct answer index, and clean explanations.</p>
+              <div id="importValidationBanner" class="validation-banner" hidden></div>
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label for="importFileInput">Select JSON File</label>
+                <input type="file" id="importFileInput" accept=".json,application/json">
+              </div>
+              <div class="form-group">
+                <label for="importJsonTextarea">Or Paste JSON Data</label>
+                <textarea id="importJsonTextarea" rows="8" placeholder='[ { "question": "...", "options": ["A","B","C","D"], "correctAnswer": 0, "explanation": "..." } ]'></textarea>
+              </div>
+              <div id="importPreviewSummary" class="preview-box" hidden></div>
+              <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="button" class="secondary" id="validateImportBtn">Validate Batch</button>
+                <button type="button" class="primary" id="confirmImportBtn" disabled>Confirm &amp; Import</button>
+                <button type="button" class="secondary" id="cancelImportBtn">Cancel</button>
+              </div>
+              <p class="status" id="importStatus"></p>
+            </div>
+
+            <!-- Dedicated Company Editor Form -->
+            <form id="companyEditorForm" class="question-editor-card" hidden>
+              <h3 id="companyEditorTitle">Edit Company</h3>
+              <div id="companyValidationBanner" class="validation-banner" hidden></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cName">Company Name *</label>
+                  <input id="cName" placeholder="e.g. Tata Consultancy Services" required>
+                </div>
+                <div class="form-group">
+                  <label for="cShortName">Short Name *</label>
+                  <input id="cShortName" placeholder="e.g. TCS" required>
+                </div>
+                <div class="form-group">
+                  <label for="cSlug">Slug (a-z, 0-9, hyphens) *</label>
+                  <input id="cSlug" placeholder="e.g. tcs" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cLogo">Logo / Icon</label>
+                  <input id="cLogo" placeholder="e.g. 🏢 or 🔵" value="🏢">
+                </div>
+                <div class="form-group">
+                  <label for="cLogoColor">Logo Color</label>
+                  <input id="cLogoColor" type="color" value="#2563eb">
+                </div>
+                <div class="form-group">
+                  <label for="cLogoBg">Logo Background</label>
+                  <input id="cLogoBg" type="color" value="#eff6ff">
+                </div>
+                <div class="form-group">
+                  <label for="cIndustry">Industry</label>
+                  <input id="cIndustry" placeholder="e.g. IT Services &amp; Consulting">
+                </div>
+                <div class="form-group">
+                  <label for="cFounded">Founded Year</label>
+                  <input id="cFounded" type="number" min="1800" max="2200" placeholder="e.g. 1968">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cHeadquarters">Headquarters</label>
+                  <input id="cHeadquarters" placeholder="e.g. Mumbai, India">
+                </div>
+                <div class="form-group">
+                  <label for="cCeo">CEO</label>
+                  <input id="cCeo" placeholder="e.g. K Krithivasan">
+                </div>
+                <div class="form-group">
+                  <label for="cEmployees">Employees</label>
+                  <input id="cEmployees" placeholder="e.g. 600,000+">
+                </div>
+                <div class="form-group">
+                  <label for="cWebsite">Website</label>
+                  <input id="cWebsite" type="url" placeholder="https://example.com">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label for="cDescription">Company Description</label>
+                <textarea id="cDescription" rows="3" placeholder="Brief overview of company business and reputation..."></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label for="cInterviewProcess">Interview Process</label>
+                <textarea id="cInterviewProcess" rows="3" placeholder="Interview rounds, test pattern, expectations..."></textarea>
+              </div>
+              <div>
+                <label>Live Card Preview</label>
+                <div id="companyPreviewCard" class="preview-box">Enter company details to preview badge.</div>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="submit" class="primary" id="saveCompanySubmit">Save Company</button>
+                <button type="button" class="secondary" id="cancelCompanyEditor">Cancel</button>
+              </div>
+              <p class="status" id="companyEditorStatus"></p>
+            </form>
+
             <div id="resourceTable" class="table-wrap"></div>
-            <form id="recordForm" class="record-form" hidden><h3 id="recordFormTitle">Edit record</h3><p class="muted">Use JSON for advanced fields. Validation is enforced by PostgreSQL constraints and RLS.</p><textarea id="recordJson" spellcheck="false"></textarea><div><button type="submit" class="primary">Save record</button><button type="button" class="secondary" id="cancelRecordButton">Cancel</button></div><p class="status" id="recordStatus"></p></form>
+
+            <!-- Generic Record Form (for non-question resources) -->
+            <form id="recordForm" class="record-form" hidden>
+              <h3 id="recordFormTitle">Edit record</h3>
+              <p class="muted">Use JSON for advanced fields. Validation is enforced by PostgreSQL constraints and RLS.</p>
+              <textarea id="recordJson" spellcheck="false"></textarea>
+              <div><button type="submit" class="primary">Save record</button><button type="button" class="secondary" id="cancelRecordButton">Cancel</button></div>
+              <p class="status" id="recordStatus"></p>
+            </form>
+
+            <!-- Dedicated Structured Question Editor -->
+            <form id="questionEditorForm" class="question-editor-card" hidden>
+              <h3 id="questionEditorTitle">Edit Question</h3>
+              <div id="questionValidationBanner" class="validation-banner" hidden></div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="qCompany">Company</label>
+                  <input id="qCompany" placeholder="e.g. tcs, amazon, google" required>
+                </div>
+                <div class="form-group">
+                  <label for="qCategory">Category</label>
+                  <select id="qCategory">
+                    <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                    <option value="Logical Reasoning">Logical Reasoning</option>
+                    <option value="Verbal Ability">Verbal Ability</option>
+                    <option value="Technical">Technical</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="qDifficulty">Difficulty</label>
+                  <select id="qDifficulty">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate" selected>Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Legend">Legend</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label for="qQuestionText">Question Text</label>
+                <textarea id="qQuestionText" rows="3" placeholder="Enter clear, unambiguous question text" required></textarea>
+              </div>
+
+              <label style="margin-bottom: 6px;">Answer Options (Select the correct option radio)</label>
+              <div class="options-editor-grid">
+                <div class="option-input-group" id="optGroup0">
+                  <input type="radio" name="correctOptionRadio" value="0" id="radioOpt0" checked>
+                  <strong>A</strong>
+                  <input type="text" id="qOption0" placeholder="Option A text" required>
+                </div>
+                <div class="option-input-group" id="optGroup1">
+                  <input type="radio" name="correctOptionRadio" value="1" id="radioOpt1">
+                  <strong>B</strong>
+                  <input type="text" id="qOption1" placeholder="Option B text" required>
+                </div>
+                <div class="option-input-group" id="optGroup2">
+                  <input type="radio" name="correctOptionRadio" value="2" id="radioOpt2">
+                  <strong>C</strong>
+                  <input type="text" id="qOption2" placeholder="Option C text" required>
+                </div>
+                <div class="option-input-group" id="optGroup3">
+                  <input type="radio" name="correctOptionRadio" value="3" id="radioOpt3">
+                  <strong>D</strong>
+                  <input type="text" id="qOption3" placeholder="Option D text" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="qExplanation">Explanation (4-Part: Given, Formula/Method, Step-by-Step, Final Answer)</label>
+                <textarea id="qExplanation" rows="6" placeholder="Structured step-by-step solution..." required></textarea>
+              </div>
+
+              <div>
+                <label>Explanation Formatted Preview</label>
+                <div id="qExplanationPreview" class="preview-box">Enter an explanation to preview formatted output.</div>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="submit" class="primary" id="saveQuestionSubmit">Save Question</button>
+                <button type="button" class="secondary" id="cancelQuestionEditor">Cancel</button>
+              </div>
+              <p class="status" id="questionEditorStatus"></p>
+            </form>
           </section>
 
-          <section class="panel" id="section-quiz"><div class="section-heading"><div><p class="eyebrow">First-party events</p><h2>Quiz analytics</h2></div><button class="secondary" data-refresh="quiz">Refresh</button></div><div class="cards" id="quizCards"></div><div class="empty-state">Detailed category and question difficulty charts will populate after quiz attempts are collected.</div></section>
+          <section class="panel" id="section-quiz">
+            <div class="section-heading"><div><p class="eyebrow">First-party events</p><h2>Quiz analytics</h2></div><button class="secondary" data-refresh="quiz" id="refreshQuiz">Refresh</button></div>
+            <form class="filter-form" id="quizFilters">
+              <label>Period
+                <select id="quizPeriod">
+                  <option value="today">Today</option>
+                  <option value="7" selected>Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label class="custom-date">From <input id="quizFrom" type="date"></label>
+              <label class="custom-date">To <input id="quizTo" type="date"></label>
+              <button class="primary" type="submit">Apply filters</button>
+            </form>
+            <p class="status" id="quizStatus" role="status"></p>
+            <div class="cards" id="quizCards"></div>
+            <div class="charts-grid">
+              <div class="chart-card"><h3>Score distribution</h3><canvas id="quizScoreChart" height="130"></canvas></div>
+              <div class="chart-card"><h3>Daily quiz trends</h3><canvas id="quizDailyChart" height="130"></canvas></div>
+              <div class="chart-card"><h3>Quiz events</h3><canvas id="quizEventsChart" height="130"></canvas></div>
+            </div>
+            <div class="analytics-columns">
+              <div><h3>Popular quiz categories</h3><div id="quizCategoriesTable" class="table-wrap"></div></div>
+              <div><h3>Popular quiz companies</h3><div id="quizCompaniesTable" class="table-wrap"></div></div>
+            </div>
+          </section>
+          <section class="panel" id="section-companies"><div class="section-heading"><div><p class="eyebrow">Company page events</p><h2>Company performance</h2></div><button class="secondary" data-refresh="analytics">Refresh</button></div><p class="muted">Rankings below are based only on recorded company_view events for the selected analytics period.</p><div id="companyPerformance" class="table-wrap"></div></section>
+          <section class="panel" id="section-advertising">
+            <div class="section-heading"><div><p class="eyebrow">Future monetization</p><h2>Advertising placements</h2></div></div>
+            <p class="muted">Placements are registered but disabled. Network activation, policy review, consent, and server-side controls are required before any unit can be enabled.</p>
+            <div class="cards" id="advertisingSummaryCards">
+              <article class="stat-card"><span class="muted">Total Placements</span><span class="number">13</span></article>
+              <article class="stat-card"><span class="muted">Status</span><span class="number">All Disabled</span></article>
+              <article class="stat-card"><span class="muted">Ad Provider</span><span class="number">Not Configured</span></article>
+              <article class="stat-card"><span class="muted">Monetization Mode</span><span class="number">Locked</span></article>
+            </div>
+            <div id="advertisingPlacements" class="table-wrap"></div>
+          </section>
           <section class="panel" id="section-seo"><div class="section-heading"><div><p class="eyebrow">Search visibility</p><h2>SEO dashboard</h2></div></div><div class="empty-state"><h3>Search Console is not connected</h3><p>Configure server-only Google Search Console OAuth values before showing impressions, clicks, position, or indexed-page data. No metrics are fabricated here.</p></div></section>
           <section class="panel" id="section-feedback"><div class="section-heading"><div><p class="eyebrow">Reports from visitors</p><h2>Feedback</h2></div><button class="secondary" data-refresh="feedback">Refresh</button></div><div id="feedbackTable" class="table-wrap"></div></section>
           <section class="panel" id="section-settings"><div class="section-heading"><div><p class="eyebrow">Public configuration</p><h2>Website settings</h2></div><button class="secondary" data-refresh="settings">Refresh</button></div><div id="settingsTable" class="table-wrap"></div></section>
           <section class="panel" id="section-activity"><div class="section-heading"><div><p class="eyebrow">Audit trail</p><h2>Activity logs</h2></div><button class="secondary" data-refresh="activity">Refresh</button></div><div id="activityTable" class="table-wrap"></div></section>
+          <section class="panel" id="section-system"><div class="section-heading"><div><p class="eyebrow">Operational checks</p><h2>System health</h2></div><button class="secondary" id="refreshHealth">Refresh</button></div><div class="cards" id="healthCards"><div class="empty-state">Health checks have not run.</div></div></section>
+          <section class="panel" id="section-security"><div class="section-heading"><div><p class="eyebrow">Owner-only access</p><h2>Security status</h2></div></div><div class="cards" id="securityCards"></div><p class="muted">Secrets, owner UUIDs, and service-role credentials are never sent to this page. Access is rejected unless the Auth token, configured owner UUID, active profile, and owner role all match.</p></section>
+          <section class="panel" id="section-administrators" hidden>
+            <div class="section-heading">
+              <div><p class="eyebrow">Owner Security Control</p><h2>Administrator management</h2></div>
+              <button class="primary" id="newAdminButton" type="button">New administrator</button>
+            </div>
+            <div class="publishing-notice" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(79, 70, 229, 0.06); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; font-size: 0.875rem; color: #475569; line-height: 1.5;">
+              <strong style="color: #4f46e5;">Access Delegation Model:</strong> As Owner, you maintain exclusive security control. Full Admins have broad operational permissions across companies, questions, analytics, and content management, but cannot create or modify administrator accounts.
+            </div>
+
+            <!-- Add Administrator Form Panel -->
+            <div class="card" id="adminEditorForm" style="margin-bottom: 24px; padding: 20px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border);" hidden>
+              <h3 id="adminFormTitle" style="margin-top: 0; margin-bottom: 12px;">Add new administrator</h3>
+              <p class="text-sm text-muted" style="margin-bottom: 16px; font-size: 0.875rem; color: var(--muted);">The user must already have a valid Supabase Auth account created in Supabase Dashboard &gt; Authentication &gt; Users.</p>
+              <form id="adminProfileForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                  <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin: 0;">
+                    User UID (from Supabase Auth)
+                    <input id="adminUserIdInput" placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000" required style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                  </label>
+                  <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin: 0;">
+                    Display Name
+                    <input id="adminDisplayNameInput" placeholder="e.g. Collaborator Name" required maxlength="120" style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                  </label>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <button class="primary" id="saveAdminButton" type="submit">Grant Admin Access</button>
+                  <button class="secondary" id="cancelAdminButton" type="button">Cancel</button>
+                  <span id="adminFormStatus" class="status" role="status"></span>
+                </div>
+              </form>
+            </div>
+
+            <div id="administratorsTable" class="table-wrap"></div>
+          </section>
         </div>
       </div>
     </section>
   </main>
   <script src="config.js"></script>
+  <script src="../js/ad-registry.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>
 </body>

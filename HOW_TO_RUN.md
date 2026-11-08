@@ -45,7 +45,9 @@ The `functions/` directory contains Cloudflare Pages Functions and is not execut
 
 The browser-safe fallback lives in [`js/public-config.js`](./js/public-config.js). On Cloudflare Pages, `/api/config` supplies the Supabase URL, publishable key, site URL, and optional GA4 Measurement ID from server bindings. Never put `SUPABASE_SECRET_KEY`, `SUPABASE_OWNER_USER_ID`, or Google Search Console credentials in browser files.
 
-The former demo advertising runtime is disabled and is not loaded by any public page.
+The former demo advertising runtime is disabled and is not loaded by any public page. Empty future ad slots are preserved for leaderboard, in-content, sidebar, quiz-flow, results, sticky, interstitial, and exit-intent formats; they remain collapsed until a real ad integration is deliberately enabled. See [`ADVERTISING_PLACEMENTS.md`](./ADVERTISING_PLACEMENTS.md) for the complete inventory and trigger requirements.
+
+The advertising infrastructure is provider-independent. [`js/ad-registry.js`](./js/ad-registry.js) stores the disabled placement registry and [`js/ad-loader.js`](./js/ad-loader.js) exposes future provider/lazy-loading hooks without making ad requests. Review the selected network's publisher, consent, frequency, and format policies before activation.
 
 ## Deployment preparation
 
@@ -91,6 +93,14 @@ The current scripts may rewrite large JSON files. Do not run them casually on a 
 Press `Ctrl+C` in the terminal running `python -m http.server`.
 
 ## Release checklist
+
+### Admin analytics
+
+Open `/admin/` and sign in with the configured owner account. Analytics and
+Visitor activity support Today, 7/30/90-day, and custom date ranges. Visitor
+exports are bounded and contain only non-sensitive event metadata. Advertising
+remains disabled until provider, consent, and publisher-policy review is
+complete.
 
 - Start the server from the repository root.
 - Open the homepage and one company profile.

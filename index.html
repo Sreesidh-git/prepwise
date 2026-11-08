@@ -9,6 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PrepWise — Free Company Interview Prep & Aptitude Tests">
+  <meta property="og:description" content="Free company-specific interview preparation and aptitude tests for engineering and science graduates. No login required. Practice MCQs with step-by-step solutions for TCS, Infosys, Google, Microsoft, Amazon, and more.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -39,6 +44,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Reserved for a future responsive ad integration. Kept empty until enabled. -->
+  <div class="ad-slot ad-slot-leaderboard" id="ad-homepage-leaderboard" data-ad-slot="homepage-leaderboard" data-ad-trigger="after-page-load" aria-label="Advertisement"></div>
 
   <!-- ========== HERO (FRESHER OPTIMIZED) ========== -->
   <section class="hero">
@@ -122,6 +130,8 @@
     </div>
   </section>
 
+  <div class="ad-slot ad-slot-inline" id="ad-homepage-inline-secondary" data-ad-slot="homepage-inline-secondary" data-ad-trigger="after-company-grid" aria-label="Advertisement"></div>
+
   <!-- ========== MNC LIVE HIRING NEWS SECTION (AUTO-UPDATING) ========== -->
   <section class="mnc-news-section" id="mncNewsSection">
     <div class="container">
@@ -159,6 +169,8 @@
     </div>
   </section>
 
+  <div class="ad-slot ad-slot-inline" id="ad-homepage-inline-tertiary" data-ad-slot="homepage-inline-tertiary" data-ad-trigger="before-how-it-works" aria-label="Advertisement"></div>
+
   <!-- ========== HOW IT WORKS ========== -->
   <section class="how-it-works" id="how-it-works">
     <div class="container">
@@ -187,6 +199,20 @@
       </div>
     </div>
   </section>
+
+  <div class="ad-slot ad-slot-sticky ad-slot-sticky-desktop" id="ad-sticky-bottom-desktop" data-ad-slot="sticky-bottom-desktop" data-ad-trigger="after-page-load" data-ad-dismissible="true" aria-label="Advertisement">
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+  <div class="ad-slot ad-slot-sticky ad-slot-sticky-mobile" id="ad-sticky-bottom-mobile" data-ad-slot="sticky-bottom-mobile" data-ad-trigger="after-page-load" data-ad-dismissible="true" aria-label="Advertisement">
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+
+  <div class="ad-slot ad-slot-overlay" id="ad-interstitial" data-ad-slot="interstitial" data-ad-trigger="future-page-transition" data-ad-dismissible="true" role="dialog" aria-modal="true" aria-label="Advertisement" hidden>
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
+  <div class="ad-slot ad-slot-overlay" id="ad-exit-intent" data-ad-slot="exit-intent" data-ad-trigger="future-exit-intent" data-ad-dismissible="true" role="dialog" aria-modal="true" aria-label="Advertisement" hidden>
+    <button class="ad-slot-close" type="button" aria-label="Close advertisement" hidden>×</button>
+  </div>
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
@@ -228,6 +254,8 @@
 
   <script src="js/public-config.js"></script>
   <script src="js/analytics.js"></script>
+  <script src="js/ad-registry.js"></script>
+  <script src="js/ad-loader.js"></script>
   <script src="js/app.js"></script>
   <script src="js/news.js"></script>
 </body>

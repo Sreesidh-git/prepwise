@@ -36,8 +36,11 @@ A zero-login, frictionless platform providing verified company-specific intervie
    - Clean, standard alphabetical dropdown with flag icons.
    - Strict matching: shows only companies actively operating in the chosen country.
 
-6. **📢 High-Impact Stealth Advertising System:**
-   - In-feed native company cards, sponsored fresher job listings, in-question study tools, sticky bottom anchor bar, desktop wallpaper gutters, and floating corner outstream video player.
+6. **📢 Future Advertisement Placement Slots:**
+   - Empty, collapsed responsive containers are reserved for leaderboard, in-content, sidebar, quiz-flow, results, sticky, interstitial, and exit-intent formats.
+   - Real advertising remains disabled until a deliberate future integration.
+   - A provider-independent registry/loader and private admin preparation view
+     are included; no network requests occur while placements are disabled.
 
 ---
 
@@ -74,6 +77,16 @@ Start with the guides below:
 - [Master Project Summary](./PROJECT_SUMMARY.md) — architecture, pages, data flow, and maintenance notes
 - [Beginner Guide](./BEGINNER_GUIDE.md) — first steps, folder tour, and common debugging
 - [How To Run and Work on PrepWise](./HOW_TO_RUN.md) — local server, URLs, validation, and release checklist
+
+The owner-only `/admin/` dashboard includes date-filtered analytics,
+non-sensitive visitor activity with pagination and CSV export, quiz/company
+rankings, advertising placement status, and protected system health checks.
+Metrics are calculated from recorded Supabase rows only; unavailable values are
+not estimated.
+
+For continuation in another editor, read
+[CURSOR_HANDOVER.md](./CURSOR_HANDOVER.md) and
+[agent-readme.md](./agent-readme.md) before changing files.
 - [Data and Content Guide](./DATA_AND_CONTENT.md) — JSON shapes, relationships, and generator scripts
 - [Phase 1 Audit](./PHASE1_AUDIT.md) — current architecture, migration boundaries, and risks
 - [Supabase Setup](./supabase/README.md) — schema application, environment values, and owner setup

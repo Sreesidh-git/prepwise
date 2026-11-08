@@ -85,37 +85,96 @@ export async function requireAdmin(request, env) {
     return { response: json({ error: 'Authentication required' }, 401) };
   }
 
-  const supabaseUrl = envValue(env, 'SUPABASE_URL').replace(/\/$/, '');
-  const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: {
-      apikey: envValue(env, 'SUPABASE_PUBLISHABLE_KEY'),
-      Authorization: `Bearer ${token}`
+  try {
+    const supabaseUrl = envValue(env, 'SUPABASE_URL').replace(/\/$/, '');
+    const publishableKey = envValue(env, 'SUPABASE_PUBLISHABLE_KEY');
+
+    let userResponse;
+    try {
+      userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+        headers: {
+          apikey: publishableKey,
+          Authorization: `Bearer ${token}`
+        }
+      });
+    } catch {
+      return { response: json({ error: 'Authentication service unavailable' }, 503) };
     }
-  });
-  if (!userResponse.ok) {
-    return { response: json({ error: 'Invalid authentication session' }, 401) };
+
+    if (!userResponse.ok) {
+      return { response: json({ error: 'Invalid authentication session' }, 401) };
+    }
+
+    const user = await userResponse.json().catch(() => null);
+    const userId = user?.id;
+    if (!userId) {
+      return { response: json({ error: 'Invalid authentication subject' }, 401) };
+    }
+
+    const ownerUserId = envValue(env, 'SUPABASE_OWNER_USER_ID');
+    // Ensure SUPABASE_SECRET_KEY is also present for server mutations
+    envValue(env, 'SUPABASE_SECRET_KEY');
+
+    const encodedUserId = encodeURIComponent(userId);
+    let profiles;
+    try {
+      profiles = await supabaseRequest(
+        env,
+        `/rest/v1/admin_profiles?select=user_id,role,display_name,is_active&user_id=eq.${encodedUserId}`,
+        { accessToken: token }
+      );
+    } catch {
+      return { response: json({ error: 'Administrator authorization check failed' }, 403) };
+    }
+
+    if (!Array.isArray(profiles) || profiles.length !== 1) {
+      return { response: json({ error: 'Administrator access required' }, 403) };
+    }
+
+    const profile = profiles[0];
+
+    // Profile must be active
+    if (!profile.is_active) {
+      return { response: json({ error: 'Account is deactivated' }, 403) };
+    }
+
+    // Role must be owner or admin
+    if (profile.role !== 'owner' && profile.role !== 'admin') {
+      return { response: json({ error: 'Administrator access required' }, 403) };
+    }
+
+    // If profile role claims to be owner, verify UID matches SUPABASE_OWNER_USER_ID
+    const isOwner = (profile.role === 'owner' && userId === ownerUserId);
+    if (profile.role === 'owner' && !isOwner) {
+      return { response: json({ error: 'Owner access validation failed' }, 403) };
+    }
+
+    const verifiedRole = isOwner ? 'owner' : 'admin';
+
+    return {
+      token,
+      user,
+      profile,
+      role: verifiedRole,
+      isOwner
+    };
+  } catch (error) {
+    return { response: json({ error: error.message || 'Server configuration is incomplete' }, 500) };
+  }
+}
+
+export async function requireOwner(request, env) {
+  const auth = await requireAdmin(request, env);
+  if (auth.response) {
+    return auth;
   }
 
-  const user = await userResponse.json();
-  const userId = user?.id;
-  if (!userId) {
-    return { response: json({ error: 'Invalid authentication subject' }, 401) };
-  }
-  if (userId !== envValue(env, 'SUPABASE_OWNER_USER_ID')) {
+  const ownerUserId = envValue(env, 'SUPABASE_OWNER_USER_ID');
+  if (!auth.isOwner || auth.role !== 'owner' || auth.user.id !== ownerUserId) {
     return { response: json({ error: 'Owner access required' }, 403) };
   }
 
-  const encodedUserId = encodeURIComponent(userId);
-  const profiles = await supabaseRequest(
-    env,
-    `/rest/v1/admin_profiles?select=user_id,role,display_name&user_id=eq.${encodedUserId}&is_active=eq.true`,
-    { accessToken: token }
-  );
-  if (!Array.isArray(profiles) || profiles.length !== 1) {
-    return { response: json({ error: 'Administrator access required' }, 403) };
-  }
-
-  return { token, user, profile: profiles[0] };
+  return auth;
 }
 
 export async function writeActivityLog(env, token, userId, action, entityType, entityId, metadata = {}) {

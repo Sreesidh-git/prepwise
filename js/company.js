@@ -50,8 +50,9 @@
       ]);
 
       if (!companiesRes.ok) throw new Error('Failed to load companies data');
-      const companies = await companiesRes.json();
-      const company = companies.find(c => c.id.toLowerCase() === companyId.toLowerCase());
+      const rawCompanies = await companiesRes.json();
+      const companies = Array.isArray(rawCompanies) ? rawCompanies : (rawCompanies.companies || []);
+      const company = companies.find(c => (c.id && c.id.toLowerCase() === companyId.toLowerCase()) || (c.slug && c.slug.toLowerCase() === companyId.toLowerCase()));
 
       if (!company) {
         showError('Company not found');
@@ -161,6 +162,9 @@
       <h3>Hiring & Interview Process Overview</h3>
       <p>${company.interviewProcess}</p>
 
+      <!-- Reserved for a future responsive ad integration. Kept empty until enabled. -->
+      <div class="ad-slot ad-slot-inline" id="ad-company-inline" data-ad-slot="company-inline" data-ad-trigger="overview-render" aria-label="Advertisement"></div>
+
       <h3>Key Milestones</h3>
       <div class="milestone-list">
         ${milestonesHtml}
@@ -190,6 +194,9 @@
           View Roles & Salaries →
         </button>
       </div>
+
+      <!-- Reserved for a future responsive ad integration. Kept empty until enabled. -->
+      <div class="ad-slot ad-slot-sidebar" id="ad-company-sidebar" data-ad-slot="company-sidebar" data-ad-trigger="overview-render" aria-label="Advertisement"></div>
 
     `;
   }
@@ -305,49 +312,6 @@
         </div>
       `;
     }).join('');
-
-    // Stealth Native Sponsored Job Card (blended seamlessly into hiring roles)
-    const stealthRoleSponsor = `
-      <div class="role-card" style="border: 1.5px solid rgba(16, 185, 129, 0.4); background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);">
-        <div class="role-card-top">
-          <div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <h4 style="color:#059669;">Remote AI & Software Fellow</h4>
-              <span class="ad-badge" style="background:#d1fae5;color:#047857;margin:0;">Featured Partner</span>
-            </div>
-            <div style="font-size:0.75rem; color:var(--color-text-muted); margin-top:2px;">Global Distributed Hiring Network</div>
-          </div>
-          <span class="salary-tag" style="background:linear-gradient(135deg, #059669, #047857);">$125,000 / yr</span>
-        </div>
-
-        <div class="role-experience">
-          🕒 Experience: 0 - 2 Years · Level: <span class="tag level-intermediate">Intermediate</span>
-        </div>
-
-        <div style="margin-bottom: var(--space-sm);">
-          <strong style="font-size:0.75rem; text-transform:uppercase; color:var(--color-text-muted); letter-spacing:0.04em;">Required Competencies:</strong>
-          <div class="skills-chips" style="margin-top:4px;">
-            <span class="skill-chip">Python / JavaScript</span>
-            <span class="skill-chip">Prompt Engineering</span>
-            <span class="skill-chip">API Integrations</span>
-            <span class="skill-chip">Fast Problem Solving</span>
-          </div>
-        </div>
-
-        <div class="role-prep-box" style="background:rgba(255,255,255,0.8);">
-          <strong>🎯 Program Highlights:</strong>
-          <ul>
-            <li>Guaranteed 1-on-1 resume review with Silicon Valley hiring managers</li>
-            <li>Fast-track interview pipeline with 150+ funded tech startups</li>
-            <li>Full compensation benchmark and salary negotiation assistance</li>
-          </ul>
-        </div>
-
-        <a href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener" class="prepare-role-btn" style="background:linear-gradient(135deg, #059669, #10b981);">
-          ⭐ Fast-Track Candidate Application (Free) →
-        </a>
-      </div>
-    `;
 
     // Dedicated Student Internship Card with Direct Official Application Link
     const careerUrl = company.careersUrl || company.website || 'https://careers.google.com/';

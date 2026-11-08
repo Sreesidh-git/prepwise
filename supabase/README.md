@@ -1,6 +1,6 @@
 # Supabase setup
 
-The SQL migrations in [`migrations/`](./migrations/) define the production data model and Row Level Security policies. They do not contain credentials or seed content.
+The SQL migrations in [`migrations/`](./migrations/) define the production data model and Row Level Security policies. They do not contain credentials or seed content. Migration `0004_admin_profiles_auth_fk.sql` is a non-destructive repair for deployments where the Auth foreign key on `admin_profiles.user_id` is missing; it fails explicitly if orphaned profile rows exist.
 
 ## Required project values
 
@@ -50,8 +50,18 @@ After the schema is applied:
 
 The schema intentionally does not create an owner automatically because doing so would require committing or transmitting credentials.
 
+Before creating the owner, inspect the linked project for orphaned
+`admin_profiles` rows and confirm migration `0004` is approved. After the
+profile is inserted, set `SUPABASE_OWNER_USER_ID` to the same UUID in the
+server environment, then test anonymous, non-owner, inactive-owner, and owner
+requests separately. Never paste the UUID or tokens into chat.
+
 ## Admin dashboard
 
 The private dashboard is at `/admin/`. Copy [`admin/config.example.js`](../admin/config.example.js) to `admin/config.js` for local connected testing and add the public Supabase URL and publishable key. The owner must authenticate through Supabase Auth, have an active `role = 'owner'` row in `admin_profiles`, and match `SUPABASE_OWNER_USER_ID`; the browser key does not grant owner access.
 
 Cloudflare Pages must receive `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, and `SUPABASE_OWNER_USER_ID` as encrypted environment variables for the Pages Functions under [`functions/`](../functions/) to serve owner operations.
+
+Public signup status must be checked manually in Supabase Dashboard:
+Authentication -> Providers -> Email -> disable public sign-ups if visitors
+must remain anonymous. No public registration route exists in this repository.

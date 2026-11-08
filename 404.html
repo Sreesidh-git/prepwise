@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Page not found — PrepWise interview preparation and aptitude practice.">
+  <title>Page Not Found (404) — PrepWise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" role="navigation">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo-icon">P</span>
+        Prep<span class="logo-text-wise">Wise</span>
+      </a>
+      <div class="navbar-nav" id="navMenu">
+        <a href="index.html">Companies</a>
+        <a href="index.html#mncNewsSection">📰 MNC News</a>
+        <a href="about.html">About</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ========== 404 CONTENT ========== -->
+  <main class="container" style="padding: var(--space-3xl) var(--space-md); text-align: center; min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <div style="font-size: 4rem; line-height: 1; margin-bottom: var(--space-md);">🔍</div>
+    <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: var(--space-sm); color: var(--color-text);">Page Not Found</h1>
+    <p style="font-size: 1.1rem; color: var(--color-text-secondary); max-width: 540px; margin-bottom: var(--space-xl);">
+      The page or interview quiz you are looking for does not exist or may have been moved.
+    </p>
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap; justify-content: center;">
+      <a href="index.html" class="btn btn-primary" style="padding: 12px 24px; font-weight: 600;">← Explore 22 MNCs</a>
+      <a href="about.html" class="btn btn-secondary" style="padding: 12px 24px; font-weight: 600;">About PrepWise</a>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="text-align: center; padding: var(--space-xl) 0;">
+        <p>&copy; 2026 PrepWise. 100% Free Placement Preparation for Engineers &amp; Science Graduates. Zero login required.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+    if (mobileMenuBtn && navMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('open');
+      });
+    }
+  </script>
+</body>
+</html>
+

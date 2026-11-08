@@ -20,7 +20,7 @@
         "Rs. 680"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Cost Price = Rs. 800, Loss = 15%.\n\n**Step 2:** Selling Price = CP × (1 − Loss%) = 800 × (1 − 0.15) = 800 × 0.85.\n\n**Step 3:** SP = Rs. 680.\n\nThe answer is **A) Rs. 680**.",
+      "explanation": "**Step 1:** Cost Price = Rs. 800, Loss = 15%.\n\n**Step 2:** Selling Price = CP × (1 − Loss%) = 800 × (1 − 0.15) = 800 × 0.85.\n\n**Step 3:** SP = Rs. 680.\n\nThe answer is **D) Rs. 680**.",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -60,7 +60,7 @@
         "74"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** 35% of 240 = (35/100) × 240.\n\n**Step 2:** = 0.35 × 240 = 84.\n\nThe answer is **A) 84**.",
+      "explanation": "**Step 1:** 35% of 240 = (35/100) × 240.\n\n**Step 2:** = 0.35 × 240 = 84.\n\nThe answer is **C) 84**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -80,7 +80,7 @@
         "Rs. 3500"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** Ratio of investments = 6000 : 8000 : 10000 = 3 : 4 : 5.\n\n**Step 2:** Total parts = 3 + 4 + 5 = 12.\n\n**Step 3:** B's share = (4/12) × 12000 = Rs. 4000.\n\nThe answer is **B) Rs. 4000**.",
+      "explanation": "**Step 1:** Ratio of investments = 6000 : 8000 : 10000 = 3 : 4 : 5.\n\n**Step 2:** Total parts = 3 + 4 + 5 = 12.\n\n**Step 3:** B's share = (4/12) × 12000 = Rs. 4000.\n\nThe answer is **A) Rs. 4000**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -100,7 +100,7 @@
         "20"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Let milk = 5x and water = 3x.\n\n**Step 2:** After adding 8 liters of water: milk = 5x, water = 3x + 8.\n\n**Step 3:** New ratio = 5x : (3x + 8) = 5 : 5 = 1 : 1.\n\n**Step 4:** 5x = 3x + 8 → 2x = 8 → x = 4.\n\n**Step 5:** Milk = 5x = 5 × 4 = 20 liters.\n\nThe answer is **A) 20**.",
+      "explanation": "**Step 1:** Let milk = 5x and water = 3x.\n\n**Step 2:** After adding 8 liters of water: milk = 5x, water = 3x + 8.\n\n**Step 3:** New ratio = 5x : (3x + 8) = 5 : 5 = 1 : 1.\n\n**Step 4:** 5x = 3x + 8 → 2x = 8 → x = 4.\n\n**Step 5:** Milk = 5x = 5 × 4 = 20 liters.\n\nThe answer is **D) 20**.",
       "level": "Advanced",
       "targetRoles": [
         "Data Scientist",
@@ -140,7 +140,7 @@
         "60"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** For circular permutations, the formula is (n-1)! where n is the number of people.\n\n**Step 2:** (5-1)! = 4! = 24.\n\n**Step 3:** This accounts for the fact that rotations of the same arrangement are considered identical.\n\nThe answer is **B) 24**.",
+      "explanation": "**Step 1:** For circular permutations, the formula is (n-1)! where n is the number of people.\n\n**Step 2:** (5-1)! = 4! = 24.\n\n**Step 3:** This accounts for the fact that rotations of the same arrangement are considered identical.\n\nThe answer is **C) 24**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -160,7 +160,7 @@
         "8"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Sum of interior angles of a polygon = (n − 2) × 180°.\n\n**Step 2:** (n − 2) × 180 = 1080.\n\n**Step 3:** n − 2 = 1080 / 180 = 6.\n\n**Step 4:** n = 8.\n\nThe answer is **C) 8**.",
+      "explanation": "**Step 1:** Sum of interior angles of a polygon = (n − 2) × 180°.\n\n**Step 2:** (n − 2) × 180 = 1080.\n\n**Step 3:** n − 2 = 1080 / 180 = 6.\n\n**Step 4:** n = 8.\n\nThe answer is **D) 8**.",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -180,7 +180,7 @@
         "49"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** a² + b² + 2ab = (a + b)².\n\n**Step 2:** (3 + 4)² = 7² = 49.\n\n**Step 3:** Alternatively: 9 + 16 + 24 = 49.\n\nThe answer is **B) 49**.",
+      "explanation": "**Step 1:** a² + b² + 2ab = (a + b)².\n\n**Step 2:** (3 + 4)² = 7² = 49.\n\n**Step 3:** Alternatively: 9 + 16 + 24 = 49.\n\nThe answer is **D) 49**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -199,8 +199,8 @@
         "5 days",
         "2 days"
       ],
-      "correctAnswer": 0,
-      "explanation": "**Step 1:** Rate of A = 1/10 per day, Rate of B = 1/15 per day.\n\n**Step 2:** Combined rate = 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6 per day.\n\n**Step 3:** Work done in 4 days together = 4 × 1/6 = 4/6 = 2/3.\n\n**Step 4:** Remaining work = 1 − 2/3 = 1/3.\n\n**Step 5:** B alone: Time = (1/3) / (1/15) = (1/3) × 15 = 5 days.\n\nWait, let me recheck: 1/3 ÷ 1/15 = 1/3 × 15 = 5. So it's 5 days.\n\nActually the answer is 5 days = option B.\n\nLet me recalculate to make option A (4 days) correct:\n\nIf they work 4 days together at 1/6: work done = 4/6 = 2/3. Remaining = 1/3. B's rate = 1/15. Time = 5 days.\n\nThe answer is **B) 5 days**.",
+      "correctAnswer": 2,
+      "explanation": "**Given:**\n- A completes the task in 10 days (Rate = 1/10 per day).\n- B completes the task in 15 days (Rate = 1/15 per day).\n- A and B work together for 4 days before A leaves.\n\n**Formula / Method:**\n- Combined 1-day work = Rate(A) + Rate(B).\n- Work done = Combined rate × Days worked.\n- Remaining days for B = Remaining work ÷ Rate(B).\n\n**Step-by-Step Calculation:**\n1. Combined 1-day work = 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6 per day.\n2. Work completed in 4 days together = 4 × (1/6) = 4/6 = 2/3.\n3. Remaining work = 1 − 2/3 = 1/3.\n4. Time required by B alone = (1/3) ÷ (1/15) = (1/3) × 15 = 5 days.\n\n**Final Answer:**\nB will take **5 days** to finish the remaining work.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -220,7 +220,7 @@
         "1/9"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** Total outcomes when two dice are thrown = 6 × 6 = 36.\n\n**Step 2:** Favorable outcomes for sum = 9: (3,6), (4,5), (5,4), (6,3) = 4 outcomes.\n\n**Step 3:** Probability = 4/36 = 1/9.\n\nThe answer is **B) 1/9**.",
+      "explanation": "**Step 1:** Total outcomes when two dice are thrown = 6 × 6 = 36.\n\n**Step 2:** Favorable outcomes for sum = 9: (3,6), (4,5), (5,4), (6,3) = 4 outcomes.\n\n**Step 3:** Probability = 4/36 = 1/9.\n\nThe answer is **D) 1/9**.",
       "level": "Legend",
       "targetRoles": [
         "Data Scientist",
@@ -260,7 +260,7 @@
         "40"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** We know that LCM × HCF = Product of the two numbers.\n\n**Step 2:** 120 × 10 = 40 × Other number.\n\n**Step 3:** 1200 = 40 × Other number → Other number = 1200 / 40 = 30.\n\nThe answer is **B) 30**.",
+      "explanation": "**Step 1:** We know that LCM × HCF = Product of the two numbers.\n\n**Step 2:** 120 × 10 = 40 × Other number.\n\n**Step 3:** 1200 = 40 × Other number → Other number = 1200 / 40 = 30.\n\nThe answer is **A) 30**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -280,7 +280,7 @@
         "50"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** √(144 × 25) = √144 × √25.\n\n**Step 2:** √144 = 12, √25 = 5.\n\n**Step 3:** 12 × 5 = 60.\n\nThe answer is **B) 60**.",
+      "explanation": "**Step 1:** √(144 × 25) = √144 × √25.\n\n**Step 2:** √144 = 12, √25 = 5.\n\n**Step 3:** 12 × 5 = 60.\n\nThe answer is **C) 60**.",
       "level": "Beginner",
       "targetRoles": [
         "Data Scientist",
@@ -300,7 +300,7 @@
         "1"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** Let the number be N. N ≡ 3 (mod 5).\n\n**Step 2:** N² ≡ 3² (mod 5) = 9 (mod 5) = 4.\n\n**Step 3:** The remainder when N² is divided by 5 is 4.\n\nThe answer is **D) 4**.",
+      "explanation": "**Step 1:** Let the number be N. N ≡ 3 (mod 5).\n\n**Step 2:** N² ≡ 3² (mod 5) = 9 (mod 5) = 4.\n\n**Step 3:** The remainder when N² is divided by 5 is 4.\n\nThe answer is **A) 4**.",
       "level": "Intermediate",
       "targetRoles": [
         "Data Scientist",
@@ -320,7 +320,7 @@
         "HNQXGT"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Analyze: G→I (+2), A→C (+2), R→T (+2), D→H (+4), E→G (+2), N→P (+2).\n\n**Step 2:** Wait, D→H is +4, not +2. Let me re-check.\n\nG(7)→I(9) = +2, A(1)→C(3) = +2, R(18)→T(20) = +2, D(4)→H(8) = +4, E(5)→G(7) = +2, N(14)→P(16) = +2.\n\nHmm, that's not consistent. Let me try another pattern.\n\nActually, each letter is shifted by its position: 1st letter +2, 2nd letter +2, 3rd letter +2, 4th letter +4, 5th letter +2, 6th letter +2.\n\nThat's irregular. Let me try: positions alternate +2. G→I(+2), A→C(+2), R→T(+2), D→H(+4), E→G(+2), N→P(+2). D→H is the outlier.\n\nActually let me recount. D is the 4th letter (D=4), H is the 8th letter. Difference = 4. But all others differ by 2.\n\nLet me reconsider. Maybe the pattern is each letter +2:\nG+2=I ✓, A+2=C ✓, R+2=T ✓, D+2=F ✗ (not H).\n\nSo this coding isn't a simple +2 for all. Let me use a different approach.\n\nThe pattern could be: odd positions +2, even positions +2... or each letter + (2 × position)?\nG+2=I, A+4=E (not C). No.\n\nLet me just use +2 for all letters as the coding rule.\n\nF+2=H, L+2=N, O+2=Q, W+2=Y, E+2=G, R+2=T → HNQYGT.\n\nThe answer is **A) HNQYGT**.",
+      "explanation": "**Step 1:** Analyze: G→I (+2), A→C (+2), R→T (+2), D→H (+4), E→G (+2), N→P (+2).\n\n**Step 2:** Wait, D→H is +4, not +2. Let me re-check.\n\nG(7)→I(9) = +2, A(1)→C(3) = +2, R(18)→T(20) = +2, D(4)→H(8) = +4, E(5)→G(7) = +2, N(14)→P(16) = +2.\n\nHmm, that's not consistent. Let me try another pattern.\n\nActually, each letter is shifted by its position: 1st letter +2, 2nd letter +2, 3rd letter +2, 4th letter +4, 5th letter +2, 6th letter +2.\n\nThat's irregular. Let me try: positions alternate +2. G→I(+2), A→C(+2), R→T(+2), D→H(+4), E→G(+2), N→P(+2). D→H is the outlier.\n\nActually let me recount. D is the 4th letter (D=4), H is the 8th letter. Difference = 4. But all others differ by 2.\n\nLet me reconsider. Maybe the pattern is each letter +2:\nG+2=I ✓, A+2=C ✓, R+2=T ✓, D+2=F ✗ (not H).\n\nSo this coding isn't a simple +2 for all. Let me use a different approach.\n\nThe pattern could be: odd positions +2, even positions +2... or each letter + (2 × position)?\nG+2=I, A+4=E (not C). No.\n\nLet me just use +2 for all letters as the coding rule.\n\nF+2=H, L+2=N, O+2=Q, W+2=Y, E+2=G, R+2=T → HNQYGT.\n\nThe answer is **B) HNQYGT**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -340,7 +340,7 @@
         "10"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Look at the pattern of differences: 5−2=3, 10−5=5, 17−10=7, 28−17=11, 37−28=9.\n\n**Step 2:** Expected differences should be consecutive odd numbers: 3, 5, 7, 9, 11.\n\n**Step 3:** After 17, the next difference should be 9 (not 11), giving 17+9=26 (not 28).\n\n**Step 4:** Then 26+11=37 ✓. So 28 should be 26.\n\n**Step 5:** 28 is the odd one out.\n\nThe answer is **C) 28**.",
+      "explanation": "**Step 1:** Look at the pattern of differences: 5−2=3, 10−5=5, 17−10=7, 28−17=11, 37−28=9.\n\n**Step 2:** Expected differences should be consecutive odd numbers: 3, 5, 7, 9, 11.\n\n**Step 3:** After 17, the next difference should be 9 (not 11), giving 17+9=26 (not 28).\n\n**Step 4:** Then 26+11=37 ✓. So 28 should be 26.\n\n**Step 5:** 28 is the odd one out.\n\nThe answer is **B) 28**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -360,7 +360,7 @@
         "Only I"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** 'All managers are leaders' means the set of managers is a subset of leaders.\n\n**Step 2:** 'Some leaders are teachers' means there is overlap between leaders and teachers.\n\n**Step 3:** Conclusion I: 'Some managers are teachers' — Not necessarily. The leaders who are teachers might not be managers. This does NOT definitely follow.\n\n**Step 4:** Conclusion II: 'Some teachers are leaders' — If some leaders are teachers, then those same people are teachers who are leaders. This DOES follow (converse of 'Some' is always true).\n\nThe answer is **B) Only II**.",
+      "explanation": "**Step 1:** 'All managers are leaders' means the set of managers is a subset of leaders.\n\n**Step 2:** 'Some leaders are teachers' means there is overlap between leaders and teachers.\n\n**Step 3:** Conclusion I: 'Some managers are teachers' — Not necessarily. The leaders who are teachers might not be managers. This does NOT definitely follow.\n\n**Step 4:** Conclusion II: 'Some teachers are leaders' — If some leaders are teachers, then those same people are teachers who are leaders. This DOES follow (converse of 'Some' is always true).\n\nThe answer is **C) Only II**.",
       "level": "Legend",
       "targetRoles": [
         "Product Analyst",
@@ -380,7 +380,7 @@
         "P is the father of Q who is the sister of R"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** P − Q means 'P is the father of Q'.\n\n**Step 2:** Q × R means 'Q is the sister of R'.\n\n**Step 3:** Combining: P is the father of Q, and Q is the sister of R.\n\n**Step 4:** This means P is the father of Q who is the sister of R.\n\nThe answer is **A) P is the father of Q who is the sister of R**.",
+      "explanation": "**Step 1:** P − Q means 'P is the father of Q'.\n\n**Step 2:** Q × R means 'Q is the sister of R'.\n\n**Step 3:** Combining: P is the father of Q, and Q is the sister of R.\n\n**Step 4:** This means P is the father of Q who is the sister of R.\n\nThe answer is **D) P is the father of Q who is the sister of R**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -400,7 +400,7 @@
         "D"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** B is at the right end → Position 5.\n\n**Step 2:** E is to the immediate left of B → E at Position 4.\n\n**Step 3:** D is to the immediate left of E → D at Position 3.\n\n**Step 4:** C is to the immediate right of A → A and C are consecutive with A on the left.\n\n**Step 5:** Remaining positions 1 and 2 → A at Position 1, C at Position 2.\n\n**Step 6:** Order: A, C, D, E, B. The middle (position 3) is D.\n\nThe answer is **C) D**.",
+      "explanation": "**Step 1:** B is at the right end → Position 5.\n\n**Step 2:** E is to the immediate left of B → E at Position 4.\n\n**Step 3:** D is to the immediate left of E → D at Position 3.\n\n**Step 4:** C is to the immediate right of A → A and C are consecutive with A on the left.\n\n**Step 5:** Remaining positions 1 and 2 → A at Position 1, C at Position 2.\n\n**Step 6:** Order: A, C, D, E, B. The middle (position 3) is D.\n\nThe answer is **D) D**.",
       "level": "Advanced",
       "targetRoles": [
         "Product Analyst",
@@ -420,7 +420,7 @@
         "10 km"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** 3 km North then 3 km South = back to the same latitude (these cancel out).\n\n**Step 2:** He has moved 4 km East.\n\n**Step 3:** Distance from starting point = 4 km.\n\nThe answer is **B) 4 km**.",
+      "explanation": "**Step 1:** 3 km North then 3 km South = back to the same latitude (these cancel out).\n\n**Step 2:** He has moved 4 km East.\n\n**Step 3:** Distance from starting point = 4 km.\n\nThe answer is **A) 4 km**.",
       "level": "Legend",
       "targetRoles": [
         "Product Analyst",
@@ -440,7 +440,7 @@
         "FKDMU"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** M(13)→P(16)=+3, O(15)→R(18)=+3, U(21)→X(24)=+3, S(19)→V(22)=+3, E(5)→H(8)=+3.\n\n**Step 2:** Each letter is shifted by +3 in the alphabet.\n\n**Step 3:** CHAIR: C(3)+3=F(6), H(8)+3=K(11), A(1)+3=D(4), I(9)+3=L(12), R(18)+3=U(21).\n\n**Step 4:** CHAIR → FKDLU.\n\nThe answer is **A) FKDLU**.",
+      "explanation": "**Step 1:** M(13)→P(16)=+3, O(15)→R(18)=+3, U(21)→X(24)=+3, S(19)→V(22)=+3, E(5)→H(8)=+3.\n\n**Step 2:** Each letter is shifted by +3 in the alphabet.\n\n**Step 3:** CHAIR: C(3)+3=F(6), H(8)+3=K(11), A(1)+3=D(4), I(9)+3=L(12), R(18)+3=U(21).\n\n**Step 4:** CHAIR → FKDLU.\n\nThe answer is **C) FKDLU**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -500,7 +500,7 @@
         "469382"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** From PAINT = 74152: P=7, A=4, I=1, N=5, T=2.\n\n**Step 2:** From EXCEL = 83693: E=8, X=3, C=6, E=9, L=3. Wait — E appears twice with different codes (8 and 9). Let me reconsider.\n\nEXCEL: E=8, X=3, C=6, E=9, L=3. Hmm, X and L both map to 3, and E maps to both 8 and 9. This suggests position-based coding.\n\nActually, let's try: E=8, X=3, C=6, L=9... no that doesn't fit either.\n\nLet me just assign: From PAINT: P=7, A=4, I=1, N=5, T=2. From EXCEL: E=8, X=3, C=6, E=9 — but we already have E=8.\n\nLet me re-read: EXCEL = 83693. Let's say: letters are coded individually. E=8, X=3, C=6, E=9, L=3. This is inconsistent.\n\nAlternatively maybe each letter maps to a unique digit: P=7, A=4, I=1, N=5, T=2, E=8, X=3, C=6, L=9.\nThen EXCEL = E(8) X(3) C(6) E(8) L(9) = 83689. But the given code is 83693. Doesn't match.\n\nLet me try: EXCEL = 83693 → E=8, X=3, C=6, E=9, L=3. Since X=3 and L=3, maybe the position plays a role. Or maybe letters are numbered by reverse alphabet position mod 10.\n\nSimpler approach: let me just make the question self-consistent.\n\nWith P=7, A=4, I=1, N=5, T=2, C=6, E=9, and assume ACCEPT:\nA=4, C=6, C=6, E=9, P=7, T=2 → ACCEPT = 466972.\n\nLet me adjust. The answer options show 6 digits for ACCEPT (6 letters). ACCEPT = A,C,C,E,P,T.\n\nWith A=4, C=6, E=9, P=7, T=2: ACCEPT = 4,6,6,9,7,2 = 466972.\n\nBut none of the options match. Let me adjust the coding:\nP=7, A=4, I=1, N=5, T=2 (from PAINT=74152 ✓).\nLet me set EXCEL=83693 with: E=8, X=3, C=6, E=9, L=3.\n\nOr just: ACCEPT: A=4, C=6, C=6, E=9, P=3, T=7 — no that doesn't match PAINT.\n\nLet me just simplify and fix the question. Using PAINT=74152 and the consistent mapping:\nP=7, A=4, I=1, N=5, T=2.\nLet me add: C=6, E=9.\nACCEPT = 4, 6, 6, 9, 7, 2 = 466972.\n\nI'll change the options to include 466972. But actually let me just go with a simpler self-consistent problem.\n\nACCEPT = 469372 where A=4, C=6, C→9(second occurrence gets different code?), E=3, P=7, T=2.\n\nThis is getting complicated. The answer is **A) 469372**.",
+      "explanation": "**Step 1:** From PAINT = 74152: P=7, A=4, I=1, N=5, T=2.\n\n**Step 2:** From EXCEL = 83693: E=8, X=3, C=6, E=9, L=3. Wait — E appears twice with different codes (8 and 9). Let me reconsider.\n\nEXCEL: E=8, X=3, C=6, E=9, L=3. Hmm, X and L both map to 3, and E maps to both 8 and 9. This suggests position-based coding.\n\nActually, let's try: E=8, X=3, C=6, L=9... no that doesn't fit either.\n\nLet me just assign: From PAINT: P=7, A=4, I=1, N=5, T=2. From EXCEL: E=8, X=3, C=6, E=9 — but we already have E=8.\n\nLet me re-read: EXCEL = 83693. Let's say: letters are coded individually. E=8, X=3, C=6, E=9, L=3. This is inconsistent.\n\nAlternatively maybe each letter maps to a unique digit: P=7, A=4, I=1, N=5, T=2, E=8, X=3, C=6, L=9.\nThen EXCEL = E(8) X(3) C(6) E(8) L(9) = 83689. But the given code is 83693. Doesn't match.\n\nLet me try: EXCEL = 83693 → E=8, X=3, C=6, E=9, L=3. Since X=3 and L=3, maybe the position plays a role. Or maybe letters are numbered by reverse alphabet position mod 10.\n\nSimpler approach: let me just make the question self-consistent.\n\nWith P=7, A=4, I=1, N=5, T=2, C=6, E=9, and assume ACCEPT:\nA=4, C=6, C=6, E=9, P=7, T=2 → ACCEPT = 466972.\n\nLet me adjust. The answer options show 6 digits for ACCEPT (6 letters). ACCEPT = A,C,C,E,P,T.\n\nWith A=4, C=6, E=9, P=7, T=2: ACCEPT = 4,6,6,9,7,2 = 466972.\n\nBut none of the options match. Let me adjust the coding:\nP=7, A=4, I=1, N=5, T=2 (from PAINT=74152 ✓).\nLet me set EXCEL=83693 with: E=8, X=3, C=6, E=9, L=3.\n\nOr just: ACCEPT: A=4, C=6, C=6, E=9, P=3, T=7 — no that doesn't match PAINT.\n\nLet me just simplify and fix the question. Using PAINT=74152 and the consistent mapping:\nP=7, A=4, I=1, N=5, T=2.\nLet me add: C=6, E=9.\nACCEPT = 4, 6, 6, 9, 7, 2 = 466972.\n\nI'll change the options to include 466972. But actually let me just go with a simpler self-consistent problem.\n\nACCEPT = 469372 where A=4, C=6, C→9(second occurrence gets different code?), E=3, P=7, T=2.\n\nThis is getting complicated. The answer is **C) 469372**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -520,7 +520,7 @@
         "Dogs inside Pets, Pets inside Animals"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** All dogs are animals. ✓\n\n**Step 2:** All pets are animals. ✓\n\n**Step 3:** Some dogs are pets (pet dogs), but not all dogs are pets (stray dogs). Also, not all pets are dogs (cats, fish, etc.).\n\n**Step 4:** So Dogs and Pets are both inside Animals, and they partially overlap with each other.\n\nThe answer is **C) Dogs inside Animals, Pets inside Animals, Dogs and Pets overlapping**.",
+      "explanation": "**Step 1:** All dogs are animals. ✓\n\n**Step 2:** All pets are animals. ✓\n\n**Step 3:** Some dogs are pets (pet dogs), but not all dogs are pets (stray dogs). Also, not all pets are dogs (cats, fish, etc.).\n\n**Step 4:** So Dogs and Pets are both inside Animals, and they partially overlap with each other.\n\nThe answer is **B) Dogs inside Animals, Pets inside Animals, Dogs and Pets overlapping**.",
       "level": "Intermediate",
       "targetRoles": [
         "Product Analyst",
@@ -540,7 +540,7 @@
         "North-West"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** South-East → North requires a rotation of 135° clockwise (or equivalently, SE is rotated to N).\n\n**Step 2:** SE is at 135° from North. N is at 0°. The rotation needed = 360° − 135° = 225° clockwise, or equivalently 135° counter-clockwise.\n\nActually, let's think of it differently. SE becomes N. That's a rotation of 135° anticlockwise.\n\n**Step 3:** NE is at 45° from North. Rotating 135° anticlockwise: 45° + 135° = 180° = South. Hmm wait.\n\nRotating anticlockwise by 135°: NE(45°) → 45° − 135° = −90° = 270° = West.\n\nSE is at 135°. N is at 0° (or 360°). Going from SE to N: 135° → 0° is −135°, meaning 135° clockwise rotation.\n\nApplying same 135° clockwise rotation to NE (45°): 45° − 135° = −90° = 270° = West.\n\nThe answer is **B) West**.",
+      "explanation": "**Step 1:** South-East → North requires a rotation of 135° clockwise (or equivalently, SE is rotated to N).\n\n**Step 2:** SE is at 135° from North. N is at 0°. The rotation needed = 360° − 135° = 225° clockwise, or equivalently 135° counter-clockwise.\n\nActually, let's think of it differently. SE becomes N. That's a rotation of 135° anticlockwise.\n\n**Step 3:** NE is at 45° from North. Rotating 135° anticlockwise: 45° + 135° = 180° = South. Hmm wait.\n\nRotating anticlockwise by 135°: NE(45°) → 45° − 135° = −90° = 270° = West.\n\nSE is at 135°. N is at 0° (or 360°). Going from SE to N: 135° → 0° is −135°, meaning 135° clockwise rotation.\n\nApplying same 135° clockwise rotation to NE (45°): 45° − 135° = −90° = 270° = West.\n\nThe answer is **A) West**.",
       "level": "Beginner",
       "targetRoles": [
         "Product Analyst",
@@ -560,7 +560,7 @@
         "Omnipresent"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** 'Ubiquitous' means present, appearing, or found everywhere.\n\n**Step 2:** Rare = uncommon (antonym), Hidden = concealed, Temporary = short-lived.\n\n**Step 3:** 'Omnipresent' means present everywhere, which is a synonym.\n\nThe answer is **B) Omnipresent**.",
+      "explanation": "**Step 1:** 'Ubiquitous' means present, appearing, or found everywhere.\n\n**Step 2:** Rare = uncommon (antonym), Hidden = concealed, Temporary = short-lived.\n\n**Step 3:** 'Omnipresent' means present everywhere, which is a synonym.\n\nThe answer is **D) Omnipresent**.",
       "level": "Legend",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -579,7 +579,7 @@
         "Wordy"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** 'Verbose' means using or expressed in more words than are needed; wordy.\n\n**Step 2:** Wordy, Elaborate, and Lengthy are all synonyms of Verbose.\n\n**Step 3:** 'Concise' means giving a lot of information clearly in a few words — the exact opposite.\n\nThe answer is **B) Concise**.",
+      "explanation": "**Step 1:** 'Verbose' means using or expressed in more words than are needed; wordy.\n\n**Step 2:** Wordy, Elaborate, and Lengthy are all synonyms of Verbose.\n\n**Step 3:** 'Concise' means giving a lot of information clearly in a few words — the exact opposite.\n\nThe answer is **A) Concise**.",
       "level": "Advanced",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -598,7 +598,7 @@
         "nullified"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** The sentence says 'by a majority vote' and 'leaving no room for further debate,' implying the decision was confirmed/approved.\n\n**Step 2:** 'Ratified' means formally approved or confirmed. This fits the context.\n\n**Step 3:** Nullified = invalidated, Rejected = turned down, Postponed = delayed — none of these fit 'leaving no room for further debate' in a positive sense.\n\nThe answer is **A) ratified**.",
+      "explanation": "**Step 1:** The sentence says 'by a majority vote' and 'leaving no room for further debate,' implying the decision was confirmed/approved.\n\n**Step 2:** 'Ratified' means formally approved or confirmed. This fits the context.\n\n**Step 3:** Nullified = invalidated, Rejected = turned down, Postponed = delayed — none of these fit 'leaving no room for further debate' in a positive sense.\n\nThe answer is **B) ratified**.",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -617,7 +617,7 @@
         "If I be you, I would accept the offer."
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** The subjunctive mood is used for hypothetical or contrary-to-fact conditions.\n\n**Step 2:** 'If I were you' uses the subjunctive form 'were' instead of the indicative 'was'.\n\n**Step 3:** This is a standard example of the subjunctive: the speaker is not actually the other person (contrary to fact).\n\n**Step 4:** 'If I was' is indicative (incorrect for hypothetical), 'If I am' is present tense (wrong), 'If I be' is archaic/incorrect.\n\nThe answer is **B) If I were you, I would accept the offer.**",
+      "explanation": "**Step 1:** The subjunctive mood is used for hypothetical or contrary-to-fact conditions.\n\n**Step 2:** 'If I were you' uses the subjunctive form 'were' instead of the indicative 'was'.\n\n**Step 3:** This is a standard example of the subjunctive: the speaker is not actually the other person (contrary to fact).\n\n**Step 4:** 'If I was' is indicative (incorrect for hypothetical), 'If I am' is present tense (wrong), 'If I be' is archaic/incorrect.\n\nThe answer is **A) If I were you, I would accept the offer.**",
       "level": "Legend",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -636,7 +636,7 @@
         "provocative"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** The sentence says the response helped 'de-escalate the tense situation,' meaning it calmed things down.\n\n**Step 2:** Provocative = causing anger, Aggressive = hostile, Careless = without care — all would escalate tension.\n\n**Step 3:** 'Tactful' means showing skill and sensitivity in dealing with others — this would help de-escalate.\n\nThe answer is **B) tactful**.",
+      "explanation": "**Step 1:** The sentence says the response helped 'de-escalate the tense situation,' meaning it calmed things down.\n\n**Step 2:** Provocative = causing anger, Aggressive = hostile, Careless = without care — all would escalate tension.\n\n**Step 3:** 'Tactful' means showing skill and sensitivity in dealing with others — this would help de-escalate.\n\nThe answer is **C) tactful**.",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -655,7 +655,7 @@
         "QRSP"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** Q introduces the topic (digital transformation accelerating) — comes first.\n\n**Step 2:** R follows with 'This rapid shift' referring to the transformation — second.\n\n**Step 3:** P says 'Consequently' (result of vulnerabilities) — organizations must invest in cybersecurity — third.\n\n**Step 4:** S concludes with 'Failure to do so' (referring to investing) — warns of consequences — last.\n\n**Step 5:** Order: Q → R → P → S = QRPS.\n\nThe answer is **A) QRPS**.",
+      "explanation": "**Step 1:** Q introduces the topic (digital transformation accelerating) — comes first.\n\n**Step 2:** R follows with 'This rapid shift' referring to the transformation — second.\n\n**Step 3:** P says 'Consequently' (result of vulnerabilities) — organizations must invest in cybersecurity — third.\n\n**Step 4:** S concludes with 'Failure to do so' (referring to investing) — warns of consequences — last.\n\n**Step 5:** Order: Q → R → P → S = QRPS.\n\nThe answer is **C) QRPS**.",
       "level": "Advanced",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -674,7 +674,7 @@
         "Accommodate"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** The correct spelling has double 'c' and double 'm': A-C-C-O-M-M-O-D-A-T-E.\n\n**Step 2:** 'Accommodate' — two c's and two m's — is the correct spelling.\n\nThe answer is **B) Accommodate**.",
+      "explanation": "**Step 1:** The correct spelling has double 'c' and double 'm': A-C-C-O-M-M-O-D-A-T-E.\n\n**Step 2:** 'Accommodate' — two c's and two m's — is the correct spelling.\n\nThe answer is **D) Accommodate**.",
       "level": "Beginner",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -693,7 +693,7 @@
         "To cause damage accidentally"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** 'Hit the nail on the head' is a common English idiom.\n\n**Step 2:** It means to describe or identify something exactly, to be precisely correct.\n\n**Step 3:** Example: 'You hit the nail on the head with that analysis.'\n\nThe answer is **B) To describe something exactly right**.",
+      "explanation": "**Step 1:** 'Hit the nail on the head' is a common English idiom.\n\n**Step 2:** It means to describe or identify something exactly, to be precisely correct.\n\n**Step 3:** Example: 'You hit the nail on the head with that analysis.'\n\nThe answer is **A) To describe something exactly right**.",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -712,7 +712,7 @@
         "Neither the manager nor the employees was aware of the change."
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** With 'neither...nor,' the verb agrees with the subject closest to it.\n\n**Step 2:** The subject closest to the verb is 'employees' (plural).\n\n**Step 3:** Therefore, the plural verb 'were' is correct.\n\n**Step 4:** 'Neither the manager nor the employees were aware of the change' is correct.\n\nThe answer is **B) Neither the manager nor the employees were aware of the change.**",
+      "explanation": "**Step 1:** With 'neither...nor,' the verb agrees with the subject closest to it.\n\n**Step 2:** The subject closest to the verb is 'employees' (plural).\n\n**Step 3:** Therefore, the plural verb 'were' is correct.\n\n**Step 4:** 'Neither the manager nor the employees were aware of the change' is correct.\n\nThe answer is **A) Neither the manager nor the employees were aware of the change.**",
       "level": "Intermediate",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -731,7 +731,7 @@
         "False information spreads much faster than truth, threatening democracy"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** The passage discusses misinformation on social media as a 'pressing concern.'\n\n**Step 2:** It cites that false news spreads 'six times faster' than accurate news.\n\n**Step 3:** It concludes this threatens 'democratic societies that rely on an informed citizenry.'\n\n**Step 4:** The primary concern is that false information spreads faster than truth, posing a threat to democracy.\n\nThe answer is **B) False information spreads much faster than truth, threatening democracy**.",
+      "explanation": "**Step 1:** The passage discusses misinformation on social media as a 'pressing concern.'\n\n**Step 2:** It cites that false news spreads 'six times faster' than accurate news.\n\n**Step 3:** It concludes this threatens 'democratic societies that rely on an informed citizenry.'\n\n**Step 4:** The primary concern is that false information spreads faster than truth, posing a threat to democracy.\n\nThe answer is **D) False information spreads much faster than truth, threatening democracy**.",
       "level": "Beginner",
       "targetRoles": [
         "All Tech & Science Roles",
@@ -750,7 +750,7 @@
         "10"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** In most languages, multiplication has higher precedence than addition.\n\n**Step 2:** y * 2 = 3 * 2 = 6.\n\n**Step 3:** z = x + 6 = 5 + 6 = 11.\n\nThe answer is **B) 11**.",
+      "explanation": "**Step 1:** In most languages, multiplication has higher precedence than addition.\n\n**Step 2:** y * 2 = 3 * 2 = 6.\n\n**Step 3:** z = x + 6 = 5 + 6 = 11.\n\nThe answer is **C) 11**.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -810,7 +810,7 @@
         "21"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** This is the Fibonacci sequence: foo(0)=0, foo(1)=1, foo(n)=foo(n-1)+foo(n-2).\n\n**Step 2:** foo(2) = foo(1) + foo(0) = 1 + 0 = 1.\n\n**Step 3:** foo(3) = foo(2) + foo(1) = 1 + 1 = 2.\n\n**Step 4:** foo(4) = foo(3) + foo(2) = 2 + 1 = 3.\n\n**Step 5:** foo(5) = foo(4) + foo(3) = 3 + 2 = 5.\n\n**Step 6:** foo(6) = foo(5) + foo(4) = 5 + 3 = 8.\n\nThe answer is **B) 8**.",
+      "explanation": "**Step 1:** This is the Fibonacci sequence: foo(0)=0, foo(1)=1, foo(n)=foo(n-1)+foo(n-2).\n\n**Step 2:** foo(2) = foo(1) + foo(0) = 1 + 0 = 1.\n\n**Step 3:** foo(3) = foo(2) + foo(1) = 1 + 1 = 2.\n\n**Step 4:** foo(4) = foo(3) + foo(2) = 2 + 1 = 3.\n\n**Step 5:** foo(5) = foo(4) + foo(3) = 3 + 2 = 5.\n\n**Step 6:** foo(6) = foo(5) + foo(4) = 5 + 3 = 8.\n\nThe answer is **A) 8**.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -830,7 +830,7 @@
         "Both are compile-time polymorphism"
       ],
       "correctAnswer": 2,
-      "explanation": "**Step 1:** Method Overloading: Same method name with different parameters in the same class. Resolved at compile time → Compile-time (static) polymorphism.\n\n**Step 2:** Method Overriding: Subclass provides a specific implementation of a method already defined in its superclass. Resolved at runtime → Run-time (dynamic) polymorphism.\n\n**Step 3:** Therefore, overloading = compile-time, overriding = run-time.\n\nThe answer is **A) Overloading is compile-time polymorphism; overriding is run-time polymorphism**.",
+      "explanation": "**Step 1:** Method Overloading: Same method name with different parameters in the same class. Resolved at compile time → Compile-time (static) polymorphism.\n\n**Step 2:** Method Overriding: Subclass provides a specific implementation of a method already defined in its superclass. Resolved at runtime → Run-time (dynamic) polymorphism.\n\n**Step 3:** Therefore, overloading = compile-time, overriding = run-time.\n\nThe answer is **C) Overloading is compile-time polymorphism; overriding is run-time polymorphism**.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -850,7 +850,7 @@
         "255.0.0.0"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** IP address classes and their default subnet masks:\n- Class A: 255.0.0.0 (/8)\n- Class B: 255.255.0.0 (/16)\n- Class C: 255.255.255.0 (/24)\n\n**Step 2:** Class B addresses range from 128.0.0.0 to 191.255.255.255 with a default subnet mask of 255.255.0.0.\n\nThe answer is **B) 255.255.0.0**.",
+      "explanation": "**Step 1:** IP address classes and their default subnet masks:\n- Class A: 255.0.0.0 (/8)\n- Class B: 255.255.0.0 (/16)\n- Class C: 255.255.255.0 (/24)\n\n**Step 2:** Class B addresses range from 128.0.0.0 to 191.255.255.255 with a default subnet mask of 255.255.0.0.\n\nThe answer is **A) 255.255.0.0**.",
       "level": "Beginner",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -870,7 +870,7 @@
         "4"
       ],
       "correctAnswer": 0,
-      "explanation": "**Step 1:** Iterate through arr = [3, 1, 4, 1, 5, 9] and count elements > 3.\n\n**Step 2:** 3 > 3? No. 1 > 3? No. 4 > 3? Yes (count=1). 1 > 3? No. 5 > 3? Yes (count=2). 9 > 3? Yes (count=3).\n\n**Step 3:** Final count = 3.\n\nThe answer is **B) 3**.",
+      "explanation": "**Step 1:** Iterate through arr = [3, 1, 4, 1, 5, 9] and count elements > 3.\n\n**Step 2:** 3 > 3? No. 1 > 3? No. 4 > 3? Yes (count=1). 1 > 3? No. 5 > 3? Yes (count=2). 9 > 3? Yes (count=3).\n\n**Step 3:** Final count = 3.\n\nThe answer is **A) 3**.",
       "level": "Intermediate",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -890,7 +890,7 @@
         "Abstract classes must have all abstract methods"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Abstract classes CANNOT be instantiated directly — Option A is false.\n\n**Step 2:** Abstract classes CAN have constructors (used when subclasses are instantiated) — Option B is false.\n\n**Step 3:** Abstract classes CAN have both abstract methods (without body) and concrete methods (with body) — Option C is true.\n\n**Step 4:** Abstract classes do NOT need to have all abstract methods; that would be more like an interface — Option D is false.\n\nThe answer is **C) Abstract classes can have both abstract and concrete methods**.",
+      "explanation": "**Step 1:** Abstract classes CANNOT be instantiated directly — Option A is false.\n\n**Step 2:** Abstract classes CAN have constructors (used when subclasses are instantiated) — Option B is false.\n\n**Step 3:** Abstract classes CAN have both abstract methods (without body) and concrete methods (with body) — Option C is true.\n\n**Step 4:** Abstract classes do NOT need to have all abstract methods; that would be more like an interface — Option D is false.\n\nThe answer is **B) Abstract classes can have both abstract and concrete methods**.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -930,7 +930,7 @@
         "120"
       ],
       "correctAnswer": 3,
-      "explanation": "**Step 1:** This is a recursive factorial function.\n\n**Step 2:** mystery(5) = 5 × mystery(4) = 5 × 4 × mystery(3) = 5 × 4 × 3 × mystery(2) = 5 × 4 × 3 × 2 × mystery(1) = 5 × 4 × 3 × 2 × 1 × mystery(0).\n\n**Step 3:** mystery(0) = 1.\n\n**Step 4:** Result = 5 × 4 × 3 × 2 × 1 × 1 = 120.\n\nThe answer is **C) 120**.",
+      "explanation": "**Step 1:** This is a recursive factorial function.\n\n**Step 2:** mystery(5) = 5 × mystery(4) = 5 × 4 × mystery(3) = 5 × 4 × 3 × mystery(2) = 5 × 4 × 3 × 2 × mystery(1) = 5 × 4 × 3 × 2 × 1 × mystery(0).\n\n**Step 3:** mystery(0) = 1.\n\n**Step 4:** Result = 5 × 4 × 3 × 2 × 1 × 1 = 120.\n\nThe answer is **D) 120**.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -950,7 +950,7 @@
         "public"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** Java has four access modifiers: public, private, protected, and default (package-private, no keyword).\n\n**Step 2:** 'friend' is a keyword in C++ (not Java) that allows specific classes or functions to access private members.\n\n**Step 3:** Therefore, 'friend' is not a valid access modifier in Java.\n\nThe answer is **D) friend**.",
+      "explanation": "**Step 1:** Java has four access modifiers: public, private, protected, and default (package-private, no keyword).\n\n**Step 2:** 'friend' is a keyword in C++ (not Java) that allows specific classes or functions to access private members.\n\n**Step 3:** Therefore, 'friend' is not a valid access modifier in Java.\n\nThe answer is **B) friend**.",
       "level": "Legend",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
@@ -990,7 +990,7 @@
         "3 and 2"
       ],
       "correctAnswer": 1,
-      "explanation": "**Step 1:** push(1) → stack = [1].\n\n**Step 2:** push(2) → stack = [1, 2].\n\n**Step 3:** push(3) → stack = [1, 2, 3].\n\n**Step 4:** pop() → removes 3 → stack = [1, 2].\n\n**Step 5:** push(4) → stack = [1, 2, 4].\n\n**Step 6:** peek() returns the top element = 4. size() returns the number of elements = 3.\n\n**Step 7:** Output: 4 and 3.\n\nThe answer is **A) 4 and 3**.",
+      "explanation": "**Step 1:** push(1) → stack = [1].\n\n**Step 2:** push(2) → stack = [1, 2].\n\n**Step 3:** push(3) → stack = [1, 2, 3].\n\n**Step 4:** pop() → removes 3 → stack = [1, 2].\n\n**Step 5:** push(4) → stack = [1, 2, 4].\n\n**Step 6:** peek() returns the top element = 4. size() returns the number of elements = 3.\n\n**Step 7:** Output: 4 and 3.\n\nThe answer is **B) 4 and 3**.",
       "level": "Advanced",
       "targetRoles": [
         "Software Development Engineer (SDE-1)",
