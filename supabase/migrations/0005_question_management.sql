@@ -14,7 +14,9 @@ create index if not exists interview_questions_review_status_idx
   on public.interview_questions(review_status);
 
 -- 3. Administrative view for unified question searching, joining company and category metadata
-create or replace view public.admin_questions_view as
+-- Hardened with security_invoker = true and WHERE public.is_admin() to prevent unauthorized reads of draft questions or review notes
+create or replace view public.admin_questions_view
+with (security_invoker = true) as
 select
   q.id,
   q.company_id,
@@ -39,8 +41,9 @@ select
   q.updated_at
 from public.interview_questions q
 left join public.companies c on q.company_id = c.id
-left join public.question_categories cat on q.category_id = cat.id;
+left join public.question_categories cat on q.category_id = cat.id
+where public.is_admin();
 
--- 4. Permissions: View access restricted to owner/admin
+-- 4. Permissions: View access restricted to authenticated administrators
+revoke all on public.admin_questions_view from public;
 grant select on public.admin_questions_view to authenticated;
-
