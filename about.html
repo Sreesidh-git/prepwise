@@ -15,7 +15,7 @@
 <body>
 
   <!-- ========== NAVBAR ========== -->
-  <nav class="navbar" role="navigation">
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="container">
       <a href="index.html" class="navbar-brand">
         <span class="logo-icon">P</span>
@@ -26,6 +26,7 @@
         <a href="index.html#mncNewsSection">📰 MNC News</a>
         <a href="index.html#how-it-works">How It Works</a>
         <a href="about.html" class="active">About</a>
+        <a href="contact.html">Contact</a>
       </div>
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
     </div>
@@ -34,11 +35,11 @@
   <!-- ========== HERO ========== -->
   <section class="hero">
     <div class="container">
-      <div class="hero-badge">💡 Our Mission</div>
+      <div class="hero-badge">💡 Independent Educational Mission</div>
       <h1>Democratizing Placement Preparation</h1>
       <p>
         Zero friction. Zero login. Zero paywalls.<br>
-        Instant, verified preparation materials for students and graduates worldwide.
+        Instant, verified preparation materials for students and graduates across India, UAE, and worldwide.
       </p>
     </div>
   </section>
@@ -48,30 +49,40 @@
     <article class="question-card" style="padding: var(--space-2xl);">
       <h2 style="font-size:1.6rem; font-weight:800; margin-bottom:var(--space-md); color:var(--color-text);">Why We Built PrepWise</h2>
       <p style="font-size:1rem; color:var(--color-text-secondary); line-height:1.8; margin-bottom:var(--space-lg);">
-        Every placement season, millions of engineering and science students waste hours navigating clunky, outdated websites. They hit forced registration gates, aggressive paywalls, and spammy popups just to practice 10 aptitude questions or find out what a company's test pattern actually looks like.
+        Every placement season, millions of engineering and science students waste hours navigating clunky, outdated websites. They hit forced registration gates, aggressive paywalls, spammy popups, and email harvesting forms just to practice 10 aptitude questions or find out what a company's recruitment pattern actually looks like.
       </p>
       <p style="font-size:1rem; color:var(--color-text-secondary); line-height:1.8; margin-bottom:var(--space-lg);">
         <strong>PrepWise fixes this.</strong> We believe high-quality interview preparation should be as accessible as reading Wikipedia. You click on a company, see their recruitment patterns, and instantly start practicing high-yield MCQs with step-by-step explanations.
       </p>
+
+      <!-- Independent Status Advisory -->
+      <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid var(--color-border); border-left: 4px solid var(--color-primary); border-radius: var(--radius-md); padding: var(--space-lg); margin: var(--space-xl) 0;">
+        <h3 style="font-size:1.05rem; font-weight:700; color:var(--color-text); margin-bottom:var(--space-xs); display:flex; align-items:center; gap:var(--space-xs);">
+          <span>ℹ️</span> Independent Platform &amp; Trademark Notice
+        </h3>
+        <p style="font-size:0.9rem; color:var(--color-text-secondary); line-height:1.6; margin:0;">
+          PrepWise is an independent student initiative maintained by Mohammed Rayyan. PrepWise is not affiliated with, endorsed by, sponsored by, or partnered with any company, testing agency, or employer named on this website. All trademarks, company names, and logos belong to their respective owners. See our full <a href="disclaimer.html" style="color:var(--color-primary); font-weight:600;">Disclaimer</a>.
+        </p>
+      </div>
 
       <div id="faq" style="margin: var(--space-2xl) 0; border-top: 1px solid var(--color-border); padding-top: var(--space-xl);">
         <h3 style="font-size:1.3rem; font-weight:700; margin-bottom:var(--space-md);">Our Core Principles</h3>
         <ul class="tips-list">
           <li>
             <span class="tip-icon">✨</span>
-            <div><strong>Zero Friction:</strong> No signups, email verifications, passwords, or paywalls. Ever.</div>
+            <div><strong>Zero Friction:</strong> No signups, email verifications, passwords, or paywalls. Ever. Public students practice 100% anonymously.</div>
           </li>
           <li>
             <span class="tip-icon">🎯</span>
-            <div><strong>Company-Centric Focus:</strong> Realistic difficulty and question distributions mirroring actual hiring tests (TCS NQT, Infosys InfyTQ, Amazon SDE, Google, etc.).</div>
+            <div><strong>Company-Centric Focus:</strong> Realistic difficulty and question distributions mirroring actual hiring patterns (TCS NQT, Infosys InfyTQ, Amazon SDE, Google, etc.).</div>
           </li>
           <li>
             <span class="tip-icon">🧠</span>
-            <div><strong>Step-by-Step Solutions:</strong> Don't just memorize the correct letter. Understand the exact problem-solving methodology with breakdown steps.</div>
+            <div><strong>Step-by-Step Solutions:</strong> Don't just memorize the correct letter. Understand the exact problem-solving methodology with structured 4-step breakdown steps.</div>
           </li>
           <li>
-            <span class="tip-icon">⚖️</span>
-            <div><strong>Sustainable & Respectful Ad Placements:</strong> Monetized solely through clean, non-intrusive standard display banners. No popups or redirects that break study focus.</div>
+            <span class="tip-icon">🛡️</span>
+            <div><strong>Strict Data Minimization:</strong> No third-party tracking cookies or ad network trackers. Search queries log only length, never raw student search text.</div>
           </li>
         </ul>
       </div>
@@ -86,12 +97,17 @@
 
         <div style="margin-bottom: var(--space-lg);">
           <h4 style="font-size:1.05rem; font-weight:700; margin-bottom:var(--space-xs);">How are the questions curated?</h4>
-          <p class="text-muted" style="line-height:1.6;">Our questions are crafted and calibrated based on recent recruitment patterns, syllabus specifications, and feedback from candidates who appeared in campus placement drives.</p>
+          <p class="text-muted" style="line-height:1.6;">Our questions are independently crafted, mathematically verified, and calibrated based on recent recruitment patterns, syllabus specifications, and feedback from candidates who appeared in campus placement drives. They are educational practice problems, not leaked or official test papers.</p>
+        </div>
+
+        <div style="margin-bottom: var(--space-lg);">
+          <h4 style="font-size:1.05rem; font-weight:700; margin-bottom:var(--space-xs);">What if I find an incorrect answer or typo?</h4>
+          <p class="text-muted" style="line-height:1.6;">We maintain an active editorial review registry. Visit our <a href="contact.html" style="color:var(--color-primary); font-weight:600;">Contact &amp; Errata page</a> to report the question ID, and our team will verify, flag, and update the question.</p>
         </div>
 
         <div style="margin-bottom: var(--space-lg);">
           <h4 style="font-size:1.05rem; font-weight:700; margin-bottom:var(--space-xs);">Can I practice on mobile?</h4>
-          <p class="text-muted" style="line-height:1.6;">Absolutely. PrepWise is built with a responsive, mobile-first design so you can practice on the bus, in class, or at your desk.</p>
+          <p class="text-muted" style="line-height:1.6;">Absolutely. PrepWise is built with a responsive, mobile-first design so you can practice on mobile (down to 360px), tablet, or desktop.</p>
         </div>
       </div>
 
@@ -106,9 +122,38 @@
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
-      <div class="footer-bottom" style="border:none;padding-top:0;">
-        <span>&copy; 2026 PrepWise. All rights reserved.</span>
-        <span><a href="index.html" style="color:var(--color-text-muted);">← Back to Companies</a></span>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>PrepWise</h3>
+          <p>Free, instant-access interview preparation for engineering and science graduates worldwide.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Top Companies</h4>
+          <a href="company.html?id=tcs">TCS</a>
+          <a href="company.html?id=infosys">Infosys</a>
+          <a href="company.html?id=google">Google</a>
+          <a href="company.html?id=microsoft">Microsoft</a>
+          <a href="company.html?id=amazon">Amazon</a>
+        </div>
+        <div class="footer-links">
+          <h4>Practice Areas</h4>
+          <a href="index.html#companiesGrid">Quantitative Aptitude</a>
+          <a href="index.html#companiesGrid">Logical Reasoning</a>
+          <a href="index.html#companiesGrid">Verbal Ability</a>
+          <a href="index.html#companiesGrid">Technical MCQs</a>
+        </div>
+        <div class="footer-links">
+          <h4>Trust &amp; Legal</h4>
+          <a href="about.html">About PrepWise</a>
+          <a href="contact.html">Contact Us</a>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 PrepWise. Independent educational placement platform.</span>
+        <span>Made with ❤️ for students and job seekers everywhere.</span>
       </div>
     </div>
   </footer>

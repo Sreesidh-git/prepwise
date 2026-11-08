@@ -420,14 +420,52 @@
           </section>
           <section class="panel" id="section-seo"><div class="section-heading"><div><p class="eyebrow">Search visibility</p><h2>SEO dashboard</h2></div></div><div class="empty-state"><h3>Search Console is not connected</h3><p>Configure server-only Google Search Console OAuth values before showing impressions, clicks, position, or indexed-page data. No metrics are fabricated here.</p></div></section>
           <section class="panel" id="section-feedback"><div class="section-heading"><div><p class="eyebrow">Reports from visitors</p><h2>Feedback</h2></div><button class="secondary" data-refresh="feedback">Refresh</button></div><div id="feedbackTable" class="table-wrap"></div></section>
-          <section class="panel" id="section-settings"><div class="section-heading"><div><p class="eyebrow">Public configuration</p><h2>Website settings</h2></div><button class="secondary" data-refresh="settings">Refresh</button></div><div id="settingsTable" class="table-wrap"></div></section>
+          <section class="panel" id="section-settings">
+            <div class="section-heading">
+              <div><p class="eyebrow">Public configuration</p><h2>Website settings</h2></div>
+              <div style="display: flex; gap: 8px;">
+                <button class="primary" id="newSettingButton" type="button">+ New setting</button>
+                <button class="secondary" data-refresh="settings">Refresh</button>
+              </div>
+            </div>
+            <!-- Add/Edit Setting Form Panel -->
+            <div class="card" id="settingEditorForm" style="margin-bottom: 24px; padding: 20px; border-radius: 12px; background: #ffffff; border: 1px solid var(--border);" hidden>
+              <h3 id="settingFormTitle" style="margin-top: 0; margin-bottom: 12px;">Add website setting</h3>
+              <p class="text-sm text-muted" style="margin-bottom: 16px; font-size: 0.875rem; color: var(--muted);">Configure custom application variables, announcement banners, contact information, or feature flags.</p>
+              <form id="settingForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                  <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin: 0;">
+                    Setting Key
+                    <input id="settingKeyInput" placeholder="e.g. contact_email, announcement_banner" required maxlength="100" style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                  </label>
+                  <label style="display: flex; flex-direction: row; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 500; margin: 0; align-self: center;">
+                    <input id="settingIsPublicInput" type="checkbox" style="width: auto;">
+                    Publicly accessible by anonymous visitors
+                  </label>
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin-bottom: 16px;">
+                  JSON / String Value
+                  <textarea id="settingValueInput" placeholder='{"email": "support@prepwise.com"}' required style="min-height: 120px; padding: 10px 12px; font-family: monospace; border: 1px solid var(--border); border-radius: 6px;"></textarea>
+                </label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <button class="primary" id="saveSettingButton" type="submit">Save Setting</button>
+                  <button class="secondary" id="cancelSettingButton" type="button">Cancel</button>
+                  <span id="settingFormStatus" class="status" role="status"></span>
+                </div>
+              </form>
+            </div>
+            <div id="settingsTable" class="table-wrap"></div>
+          </section>
           <section class="panel" id="section-activity"><div class="section-heading"><div><p class="eyebrow">Audit trail</p><h2>Activity logs</h2></div><button class="secondary" data-refresh="activity">Refresh</button></div><div id="activityTable" class="table-wrap"></div></section>
           <section class="panel" id="section-system"><div class="section-heading"><div><p class="eyebrow">Operational checks</p><h2>System health</h2></div><button class="secondary" id="refreshHealth">Refresh</button></div><div class="cards" id="healthCards"><div class="empty-state">Health checks have not run.</div></div></section>
           <section class="panel" id="section-security"><div class="section-heading"><div><p class="eyebrow">Owner-only access</p><h2>Security status</h2></div></div><div class="cards" id="securityCards"></div><p class="muted">Secrets, owner UUIDs, and service-role credentials are never sent to this page. Access is rejected unless the Auth token, configured owner UUID, active profile, and owner role all match.</p></section>
-          <section class="panel" id="section-administrators" hidden>
+          <section class="panel" id="section-administrators">
             <div class="section-heading">
               <div><p class="eyebrow">Owner Security Control</p><h2>Administrator management</h2></div>
-              <button class="primary" id="newAdminButton" type="button">New administrator</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="primary" id="newAdminButton" type="button">+ New administrator</button>
+                <button class="secondary" id="refreshAdminsButton" type="button">Refresh</button>
+              </div>
             </div>
             <div class="publishing-notice" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(79, 70, 229, 0.06); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; font-size: 0.875rem; color: #475569; line-height: 1.5;">
               <strong style="color: #4f46e5;">Access Delegation Model:</strong> As Owner, you maintain exclusive security control. Full Admins have broad operational permissions across companies, questions, analytics, and content management, but cannot create or modify administrator accounts.
@@ -446,6 +484,13 @@
                   <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin: 0;">
                     Display Name
                     <input id="adminDisplayNameInput" placeholder="e.g. Collaborator Name" required maxlength="120" style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                  </label>
+                  <label style="display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; font-weight: 500; margin: 0;">
+                    Role Assignment
+                    <select id="adminRoleInput" style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc;" disabled>
+                      <option value="admin" selected>Full Admin (Operational Management)</option>
+                    </select>
+                    <span style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">Owner role is non-delegable and strictly tied to your account.</span>
                   </label>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">

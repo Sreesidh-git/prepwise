@@ -54,7 +54,17 @@ function mockRequest(method, url, headers = {}, body = null) {
   console.log('--- 1. PUBLIC WEBSITE ASSET & LINK INTEGRITY ---');
 
   const rootDir = path.join(__dirname, '..');
-  const htmlFiles = ['index.html', 'about.html', 'company.html', 'quiz.html', 'admin/index.html'];
+  const htmlFiles = [
+    'index.html',
+    'about.html',
+    'contact.html',
+    'privacy.html',
+    'terms.html',
+    'disclaimer.html',
+    'company.html',
+    'quiz.html',
+    'admin/index.html'
+  ];
 
   test('All HTML files have resolvable script and stylesheet tags', () => {
     for (const relFile of htmlFiles) {
@@ -97,6 +107,41 @@ function mockRequest(method, url, headers = {}, body = null) {
   test('company.html supports both company ID and slug lookups', () => {
     const companyJs = fs.readFileSync(path.join(rootDir, 'js', 'company.js'), 'utf8');
     assert(companyJs.includes('c.slug') && companyJs.includes('c.id'), 'js/company.js must support both id and slug lookups');
+  });
+
+  test('Trust & credibility pages exist with transparent legal and contact content', () => {
+    const trustPages = ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html'];
+    for (const p of trustPages) {
+      const pPath = path.join(rootDir, p);
+      assert(fs.existsSync(pPath), `Trust page missing: ${p}`);
+      const content = fs.readFileSync(pPath, 'utf8');
+      assert(!content.includes('prepwise@example.com'), `Placeholder email found in ${p}`);
+      assert(!content.includes('Lorem ipsum'), `Placeholder text found in ${p}`);
+      assert(content.includes('About PrepWise') && content.includes('Contact Us'), `Footer links missing in ${p}`);
+    }
+
+    const contactContent = fs.readFileSync(path.join(rootDir, 'contact.html'), 'utf8');
+    assert(contactContent.includes('ra416491@gmail.com'), 'Verified owner email missing in contact.html');
+    assert(contactContent.includes('Errata'), 'Errata reporting section missing in contact.html');
+
+    const privacyContent = fs.readFileSync(path.join(rootDir, 'privacy.html'), 'utf8');
+    assert(privacyContent.includes('zero-login'), 'Zero-login disclosure missing in privacy.html');
+    assert(privacyContent.includes('character length'), 'Search telemetry length disclosure missing in privacy.html');
+
+    const disclaimerContent = fs.readFileSync(path.join(rootDir, 'disclaimer.html'), 'utf8');
+    assert(disclaimerContent.includes('not affiliated with'), 'Non-affiliation disclosure missing in disclaimer.html');
+    assert(disclaimerContent.includes('trademarks'), 'Trademark disclaimer missing in disclaimer.html');
+  });
+
+  test('Public pages contain working footer navigation to all 5 trust pages', () => {
+    const pagesWithFooter = ['index.html', 'company.html', 'about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html'];
+    const requiredLinks = ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html'];
+    for (const p of pagesWithFooter) {
+      const content = fs.readFileSync(path.join(rootDir, p), 'utf8');
+      for (const link of requiredLinks) {
+        assert(content.includes(`href="${link}"`), `Missing link to ${link} in ${p}`);
+      }
+    }
   });
 
   // ==========================================

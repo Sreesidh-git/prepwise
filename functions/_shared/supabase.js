@@ -178,18 +178,23 @@ export async function requireOwner(request, env) {
 }
 
 export async function writeActivityLog(env, token, userId, action, entityType, entityId, metadata = {}) {
-  await supabaseRequest(env, '/rest/v1/admin_activity_logs', {
-    method: 'POST',
-    accessToken: token,
-    headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify([{
-      admin_user_id: userId,
-      action,
-      entity_type: entityType,
-      entity_id: entityId || null,
-      metadata
-    }])
-  });
+  const isUuid = entityId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(entityId));
+  try {
+    await supabaseRequest(env, '/rest/v1/admin_activity_logs', {
+      method: 'POST',
+      accessToken: token,
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify([{
+        admin_user_id: userId,
+        action,
+        entity_type: entityType,
+        entity_id: isUuid ? entityId : null,
+        metadata: isUuid ? metadata : { ...metadata, ...(entityId ? { target_id: String(entityId) } : {}) }
+      }])
+    });
+  } catch (err) {
+    console.error('Failed to record activity log:', err);
+  }
 }
 
 export function readJsonBody(request) {

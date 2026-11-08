@@ -102,6 +102,7 @@
     renderSecurityStatus();
     setupQuestionImport();
     setupAdministratorManagement();
+    setupSettingsManagement();
   }
 
   function showLogin(message = '') {
@@ -257,6 +258,8 @@
   function setupAdministratorManagement() {
     if (setupAdministratorManagement.initialized) return;
     setupAdministratorManagement.initialized = true;
+
+    document.getElementById('refreshAdminsButton')?.addEventListener('click', loadAdministrators);
 
     document.getElementById('newAdminButton')?.addEventListener('click', () => {
       const formPanel = document.getElementById('adminEditorForm');
@@ -643,6 +646,21 @@
   }
 
   function renderTable(container, records) {
+    if (state.resource === 'feedback') {
+      renderFeedbackTable(container, records);
+      return;
+    }
+
+    if (state.resource === 'website_settings') {
+      renderSettingsTable(container, records);
+      return;
+    }
+
+    if (state.resource === 'admin_activity_logs') {
+      renderActivityLogsTable(container, records);
+      return;
+    }
+
     if (!records.length) {
       container.innerHTML = '<div class="empty-state">No records returned from the protected API.</div>';
       return;
@@ -662,6 +680,260 @@
     container.innerHTML = `<table><thead><tr>${columns.map((column) => `<th>${column}</th>`).join('')}<th>Actions</th></tr></thead><tbody>${records.map((record) => `<tr data-id="${record.id || ''}">${columns.map((column) => `<td>${String(record[column] ?? '').slice(0, 180)}</td>`).join('')}<td class="actions"><button class="secondary edit-record">Edit</button><button class="danger delete-record">Delete</button></td></tr>`).join('')}</tbody></table>`;
     container.querySelectorAll('.edit-record').forEach((button) => button.addEventListener('click', () => openRecord(button.closest('tr').dataset.id)));
     container.querySelectorAll('.delete-record').forEach((button) => button.addEventListener('click', () => deleteRecord(button.closest('tr').dataset.id)));
+  }
+
+  function renderFeedbackTable(container, records) {
+    if (!records.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No feedback submissions yet</h3>
+          <p class="muted">Reports from visitors, question corrections, and contact messages submitted through the website will appear here for review.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Page / Subject</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${records.map((item) => {
+            const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString() : '—';
+            const kindLabel = (item.kind || 'general').replace(/_/g, ' ');
+            const statusClass = item.status === 'resolved' ? 'badge-approved' : (item.status === 'in_review' ? 'badge-draft' : 'badge-danger');
+            return `
+              <tr data-id="${escapeHtml(item.id)}">
+                <td style="white-space:nowrap;">${escapeHtml(dateStr)}</td>
+                <td><span class="badge ${escapeHtml(statusClass)}">${escapeHtml(kindLabel)}</span></td>
+                <td><code style="font-size:12px;">${escapeHtml(item.page_path || '—')}</code></td>
+                <td style="max-width: 320px; word-break: break-word;">${escapeHtml(item.message || '—')}</td>
+                <td><span class="badge ${escapeHtml(statusClass)}">${escapeHtml(item.status || 'open')}</span></td>
+                <td class="actions">
+                  ${item.status !== 'resolved' ? '<button class="secondary btn-sm resolve-feedback-btn">Mark Resolved</button>' : '<span class="muted" style="font-size:12px;">Resolved</span>'}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+
+    container.querySelectorAll('.resolve-feedback-btn').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const tr = button.closest('tr');
+        const id = tr?.dataset?.id;
+        if (!id) return;
+        try {
+          await api(`/api/admin/feedback?id=${encodeURIComponent(id)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'resolved', resolved_at: new Date().toISOString() })
+          });
+          await loadResource();
+        } catch (err) {
+          window.alert(err.message);
+        }
+      });
+    });
+  }
+
+  function renderSettingsTable(container, records) {
+    if (!records.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No custom website settings configured</h3>
+          <p class="muted">PrepWise is operating using standard application defaults. You can define custom configuration keys below.</p>
+          <button class="primary" id="emptyNewSettingBtn" type="button" style="margin-top: 14px;">+ Add Website Setting</button>
+        </div>
+      `;
+      document.getElementById('emptyNewSettingBtn')?.addEventListener('click', () => {
+        openSettingEditor();
+      });
+      return;
+    }
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Setting Key</th>
+            <th>Value</th>
+            <th>Visibility</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${records.map((s) => {
+            const valStr = typeof s.value === 'object' ? JSON.stringify(s.value) : String(s.value ?? '');
+            const updatedStr = s.updated_at ? new Date(s.updated_at).toLocaleString() : '—';
+            const visBadge = s.is_public
+              ? '<span class="status-pill status-active">Public</span>'
+              : '<span class="status-pill status-inactive">Internal</span>';
+            return `
+              <tr data-key="${escapeHtml(s.key)}">
+                <td><strong><code>${escapeHtml(s.key)}</code></strong></td>
+                <td style="max-width: 340px; font-family: monospace; font-size: 12px; word-break: break-all;">${escapeHtml(valStr)}</td>
+                <td>${visBadge}</td>
+                <td style="white-space:nowrap;">${escapeHtml(updatedStr)}</td>
+                <td class="actions">
+                  <button class="secondary btn-sm edit-setting-btn">Edit</button>
+                  <button class="danger btn-sm delete-setting-btn">Delete</button>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+
+    container.querySelectorAll('.edit-setting-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.closest('tr')?.dataset?.key;
+        if (key) openSettingEditor(key);
+      });
+    });
+
+    container.querySelectorAll('.delete-setting-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const key = btn.closest('tr')?.dataset?.key;
+        if (!key || !window.confirm(`Delete setting "${key}"?`)) return;
+        try {
+          await api(`/api/admin/website_settings?key=${encodeURIComponent(key)}`, { method: 'DELETE' });
+          await loadResource();
+        } catch (err) {
+          window.alert(err.message);
+        }
+      });
+    });
+  }
+
+  function openSettingEditor(key = '') {
+    const s = state.records.find((item) => item.key === key) || {};
+    const formPanel = document.getElementById('settingEditorForm');
+    if (!formPanel) return;
+    formPanel.hidden = false;
+    document.getElementById('settingFormTitle').textContent = key ? `Edit setting "${key}"` : 'Add website setting';
+    const keyInput = document.getElementById('settingKeyInput');
+    keyInput.value = key || '';
+    keyInput.disabled = Boolean(key);
+    const valInput = document.getElementById('settingValueInput');
+    valInput.value = s.value !== undefined ? (typeof s.value === 'object' ? JSON.stringify(s.value, null, 2) : String(s.value)) : '';
+    document.getElementById('settingIsPublicInput').checked = Boolean(s.is_public);
+    setStatus(document.getElementById('settingFormStatus'), '');
+    formPanel.scrollIntoView({ behavior: 'smooth' });
+    if (!key) keyInput.focus();
+    else valInput.focus();
+  }
+
+  function setupSettingsManagement() {
+    if (setupSettingsManagement.initialized) return;
+    setupSettingsManagement.initialized = true;
+
+    document.getElementById('newSettingButton')?.addEventListener('click', () => {
+      openSettingEditor();
+    });
+
+    document.getElementById('cancelSettingButton')?.addEventListener('click', () => {
+      const formPanel = document.getElementById('settingEditorForm');
+      if (formPanel) formPanel.hidden = true;
+    });
+
+    document.getElementById('settingForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('settingFormStatus');
+      const keyInput = document.getElementById('settingKeyInput');
+      const key = (keyInput.value || '').trim();
+      const valRaw = (document.getElementById('settingValueInput')?.value || '').trim();
+      const isPublic = Boolean(document.getElementById('settingIsPublicInput')?.checked);
+
+      if (!key) {
+        setStatus(status, 'Setting key is required.');
+        return;
+      }
+
+      let parsedValue;
+      try {
+        parsedValue = JSON.parse(valRaw);
+      } catch {
+        parsedValue = { value: valRaw };
+      }
+
+      try {
+        setStatus(status, 'Saving setting...', false);
+        const payload = {
+          key,
+          value: parsedValue,
+          is_public: isPublic
+        };
+        const method = keyInput.disabled ? 'PATCH' : 'POST';
+        const url = `/api/admin/website_settings?key=${encodeURIComponent(key)}`;
+        await api(url, {
+          method,
+          body: JSON.stringify(payload)
+        });
+        setStatus(status, '');
+        document.getElementById('settingForm').reset();
+        document.getElementById('settingEditorForm').hidden = true;
+        await loadResource();
+      } catch (err) {
+        setStatus(status, err.message);
+      }
+    });
+  }
+
+  function renderActivityLogsTable(container, records) {
+    if (!records.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No administrative activity logged yet</h3>
+          <p class="muted">Security events and administrative actions (such as managing administrator profiles, modifying questions, updating companies, or changing settings) will be automatically audited and recorded here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Action</th>
+            <th>Resource Type</th>
+            <th>Entity ID / Key</th>
+            <th>Admin User</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${records.map((log) => {
+            const dateStr = log.created_at ? new Date(log.created_at).toLocaleString() : '—';
+            const actionLabel = (log.action || 'activity').replace(/_/g, ' ');
+            const target = log.entity_id ? log.entity_id.slice(0, 8) + '...' : (log.metadata?.setting_key || log.metadata?.target_id || '—');
+            const userStr = log.admin_user_id ? log.admin_user_id.slice(0, 8) + '...' : 'System';
+            const metaStr = log.metadata ? JSON.stringify(log.metadata) : '—';
+            return `
+              <tr>
+                <td style="white-space:nowrap;">${escapeHtml(dateStr)}</td>
+                <td><code style="font-size:12px; font-weight:700;">${escapeHtml(actionLabel)}</code></td>
+                <td>${escapeHtml(log.entity_type || '—')}</td>
+                <td><code style="font-size:12px;">${escapeHtml(target)}</code></td>
+                <td><code style="font-size:12px;">${escapeHtml(userStr)}</code></td>
+                <td style="max-width:280px; font-family:monospace; font-size:11px; word-break:break-all;">${escapeHtml(metaStr)}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
   }
 
   function renderCompaniesTable(container, records) {
@@ -1413,16 +1685,23 @@
     if (button.dataset.refresh === 'overview') loadOverview();
     else if (button.dataset.refresh === 'analytics') loadAnalytics();
     else if (button.dataset.refresh === 'quiz') loadQuiz();
+    else if (button.dataset.refresh === 'feedback') { state.resource = 'feedback'; loadResource(); }
+    else if (button.dataset.refresh === 'settings') { state.resource = 'website_settings'; loadResource(); }
+    else if (button.dataset.refresh === 'activity') { state.resource = 'admin_activity_logs'; loadResource(); }
     else loadResource();
   }));
 
   document.querySelectorAll('.nav-item').forEach((button) => button.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item === button));
-    document.querySelectorAll('.panel').forEach((panel) => panel.classList.toggle('active', panel.id === `section-${button.dataset.section}`));
-    if (button.dataset.section === 'feedback') state.resource = 'feedback';
-    else if (button.dataset.section === 'settings') state.resource = 'website_settings';
-    else if (button.dataset.section === 'activity') state.resource = 'admin_activity_logs';
-    else if (button.dataset.section === 'content') { state.resource = 'companies'; loadContentSummary(); }
+    document.querySelectorAll('.panel').forEach((panel) => {
+      const isActive = panel.id === `section-${button.dataset.section}`;
+      panel.classList.toggle('active', isActive);
+      if (isActive) panel.removeAttribute('hidden');
+    });
+    if (button.dataset.section === 'feedback') { state.resource = 'feedback'; loadResource(); }
+    else if (button.dataset.section === 'settings') { state.resource = 'website_settings'; loadResource(); }
+    else if (button.dataset.section === 'activity') { state.resource = 'admin_activity_logs'; loadResource(); }
+    else if (button.dataset.section === 'content') { state.resource = 'companies'; loadContentSummary(); loadResource(); }
     else if (button.dataset.section === 'advertising') renderAdvertisingPlacements();
     else if (button.dataset.section === 'analytics' || button.dataset.section === 'companies') loadAnalytics();
     else if (button.dataset.section === 'quiz') loadQuiz();
@@ -1430,7 +1709,6 @@
     else if (button.dataset.section === 'system') loadHealth();
     else if (button.dataset.section === 'security') renderSecurityStatus();
     else if (button.dataset.section === 'administrators') loadAdministrators();
-    if (['feedback', 'settings', 'activity', 'content'].includes(button.dataset.section)) loadResource();
   }));
 
   document.getElementById('resourceSearch').addEventListener('input', (event) => {
@@ -1475,6 +1753,10 @@
       // Static local hosting intentionally has no runtime configuration endpoint.
     }
   }
+
+  setupQuestionImport();
+  setupAdministratorManagement();
+  setupSettingsManagement();
 
   (async () => {
     await loadRuntimeConfig();

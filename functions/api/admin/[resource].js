@@ -63,16 +63,42 @@ async function handle(contextOrRequest, maybeContext) {
 
     let path = `/rest/v1/${resource}`;
     let entityId = null;
+    let settingKey = null;
+
     if (request.method !== 'POST') {
-      const id = new URL(request.url).searchParams.get('id');
-      if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
-        return json({ error: 'A valid resource id is required' }, 400);
+      const url = new URL(request.url);
+      if (resource === 'website_settings') {
+        settingKey = (url.searchParams.get('key') || url.searchParams.get('id') || '').trim();
+        if (!settingKey || settingKey.length > 100) {
+          return json({ error: 'A valid setting key is required' }, 400);
+        }
+        path += `?key=eq.${encodeURIComponent(settingKey)}`;
+      } else {
+        const id = (url.searchParams.get('id') || '').trim();
+        if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
+          return json({ error: 'A valid resource id is required' }, 400);
+        }
+        entityId = id;
+        path += `?id=eq.${encodeURIComponent(id)}`;
       }
-      entityId = id;
-      path += `?id=eq.${encodeURIComponent(id)}`;
     }
 
     const body = request.method === 'DELETE' ? null : await readJsonBody(request);
+
+    if (resource === 'website_settings') {
+      if (request.method === 'POST') {
+        settingKey = (body?.key || '').trim();
+        if (!settingKey || settingKey.length > 100) {
+          return json({ error: 'Setting key is required and must be 100 characters or fewer.' }, 400);
+        }
+        body.key = settingKey;
+      }
+      if (body) {
+        body.updated_by = auth.user.id;
+        body.updated_at = new Date().toISOString();
+      }
+    }
+
     const payload = await supabaseRequest(context.env, path, {
       method: request.method,
       accessToken: auth.token,
@@ -87,14 +113,17 @@ async function handle(contextOrRequest, maybeContext) {
       `${request.method.toLowerCase()}_${resource}`,
       resource,
       entityId || createdId,
-      { fields: body ? Object.keys(body) : [] }
+      {
+        fields: body ? Object.keys(body) : [],
+        ...(resource === 'website_settings' ? { setting_key: settingKey } : {})
+      }
     );
     return json({ data: payload });
   } catch (error) {
     if (error.message === 'Request body must be a JSON object') {
       return json({ error: error.message }, 400);
     }
-    console.error('Admin resource error', error.status || 500);
+    console.error('Admin resource error', error.status || 500, error.message);
     return json({ error: 'The admin operation could not be completed' }, error.status === 409 ? 409 : 500);
   }
 }

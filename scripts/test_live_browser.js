@@ -266,6 +266,32 @@ async function runTests() {
     });
 
     // ----------------------------------------------------
+    // SUITE 2b: TRUST & CREDIBILITY PAGES NAVIGATION
+    // ----------------------------------------------------
+    console.log('\n--- 2b. TRUST & CREDIBILITY PAGES NAVIGATION ---');
+
+    const trustPages = [
+      { path: '/about.html', textCheck: 'Democratizing' },
+      { path: '/contact.html', textCheck: 'ra416491@gmail.com' },
+      { path: '/privacy.html', textCheck: 'zero-login' },
+      { path: '/terms.html', textCheck: 'educational' },
+      { path: '/disclaimer.html', textCheck: 'not affiliated' }
+    ];
+
+    for (const tp of trustPages) {
+      await check(`Trust page ${tp.path} loads cleanly with zero console errors`, async () => {
+        await browser.navigate(tp.path);
+        const heading = await browser.eval('document.querySelector("h1")?.textContent || ""');
+        assert(heading.length > 0, `Missing h1 on ${tp.path}`);
+        const bodyText = await browser.eval('document.body.innerText');
+        assert(bodyText.toLowerCase().includes(tp.textCheck.toLowerCase()), `Missing key text on ${tp.path}`);
+        const footerLinksCount = await browser.eval('document.querySelectorAll(".footer a").length');
+        assert(footerLinksCount >= 5, `Expected at least 5 footer links on ${tp.path}, found ${footerLinksCount}`);
+        assert.strictEqual(browser.unhandledExceptions.length, 0, `Exceptions on ${tp.path}`);
+      });
+    }
+
+    // ----------------------------------------------------
     // SUITE 3: QUIZ ENGINE INTERACTION & 14 REVIEW WARNINGS
     // ----------------------------------------------------
     console.log('\n--- 3. QUIZ ENGINE INTERACTION & 14 REVIEW WARNINGS ---');
@@ -455,37 +481,189 @@ async function runTests() {
           const mockSession = {
             access_token: 'valid-mock-token-for-ui-verification',
             expires_at: Math.floor(Date.now() / 1000) + 3600,
-            user: { id: '00000000-0000-0000-0000-000000000001', email: 'owner@prepwise.test' }
+            user: { id: 'fb3545e1-972e-458b-91b7-a92ff2006e83', email: 'ra416491@gmail.com' }
           };
           const loginView = document.getElementById('loginView');
           const dashboardView = document.getElementById('dashboardView');
           if (loginView && dashboardView) {
             loginView.hidden = true;
             dashboardView.hidden = false;
-            document.getElementById('adminIdentity').textContent = mockSession.user.email;
+            document.getElementById('adminIdentity').innerHTML = mockSession.user.email + ' <span class="role-badge role-owner">Owner</span>';
+            const navAdmins = document.getElementById('nav-administrators');
+            if (navAdmins) navAdmins.hidden = false;
           }
         })()
       `);
       const dashVisible = await browser.eval('!document.getElementById("dashboardView").hidden');
       assert(dashVisible, 'Dashboard should become visible');
+      const adminNavVisible = await browser.eval('!document.getElementById("nav-administrators").hidden');
+      assert(adminNavVisible, 'Administrators nav button should be visible for Owner');
     });
 
-    await check('Admin navigation switches between all panels cleanly', async () => {
-      const sections = ['overview', 'analytics', 'visitors', 'content', 'quiz', 'companies', 'advertising', 'system', 'security'];
-      for (const sec of sections) {
-        const switched = await browser.eval(`
+    await check('Admin navigation switches between all 14 panels cleanly without blank screens', async () => {
+      const all14Sections = [
+        'overview',
+        'analytics',
+        'visitors',
+        'content',
+        'quiz',
+        'companies',
+        'advertising',
+        'system',
+        'security',
+        'administrators',
+        'seo',
+        'feedback',
+        'settings',
+        'activity'
+      ];
+      for (const sec of all14Sections) {
+        const result = await browser.eval(`
           (() => {
             const btn = document.querySelector('.nav-item[data-section="${sec}"]');
-            if (btn) {
-              btn.click();
-              const panel = document.getElementById('section-${sec}');
-              return panel && panel.classList.contains('active');
-            }
-            return false;
+            if (!btn) return { ok: false, reason: 'Button missing for ${sec}' };
+            btn.click();
+            const panel = document.getElementById('section-${sec}');
+            if (!panel) return { ok: false, reason: 'Panel missing for ${sec}' };
+            const isActive = panel.classList.contains('active');
+            const isHiddenAttr = panel.hasAttribute('hidden');
+            const computedDisplay = window.getComputedStyle(panel).display;
+            return {
+              ok: isActive && !isHiddenAttr && computedDisplay !== 'none',
+              isActive,
+              isHiddenAttr,
+              computedDisplay
+            };
           })()
         `);
-        assert(switched, `Failed to navigate to section: ${sec}`);
+        assert(result.ok, `Section "${sec}" failed visibility check: ${JSON.stringify(result)}`);
       }
+    });
+
+    await check('Administrators panel displays form, controls and Full Admin role lock', async () => {
+      const adminTest = await browser.eval(`
+        (() => {
+          const btn = document.querySelector('.nav-item[data-section="administrators"]');
+          btn.click();
+          const panel = document.getElementById('section-administrators');
+          const newBtn = document.getElementById('newAdminButton');
+          const formPanel = document.getElementById('adminEditorForm');
+          const roleSelect = document.getElementById('adminRoleInput');
+          const refreshBtn = document.getElementById('refreshAdminsButton');
+
+          // Click new administrator button
+          newBtn.click();
+          const formRevealed = !formPanel.hidden;
+
+          // Check role select is disabled and set to admin
+          const roleValue = roleSelect ? roleSelect.value : null;
+          const roleDisabled = roleSelect ? roleSelect.disabled : false;
+
+          // Test entering collaborator UID
+          const uidInput = document.getElementById('adminUserIdInput');
+          const nameInput = document.getElementById('adminDisplayNameInput');
+          if (uidInput && nameInput) {
+            uidInput.value = 'bc9a49fc-4392-4097-a115-113583846d26';
+            nameInput.value = 'Sreesidh';
+          }
+
+          // Test cancel button hides form
+          const cancelBtn = document.getElementById('cancelAdminButton');
+          cancelBtn.click();
+          const formHiddenAfterCancel = formPanel.hidden;
+
+          return {
+            panelVisible: panel.classList.contains('active') && !panel.hidden,
+            hasRefreshBtn: Boolean(refreshBtn),
+            formRevealed,
+            roleValue,
+            roleDisabled,
+            formHiddenAfterCancel
+          };
+        })()
+      `);
+      assert(adminTest.panelVisible, 'Administrators panel should be active and visible');
+      assert(adminTest.hasRefreshBtn, 'Administrators panel should have a Refresh button');
+      assert(adminTest.formRevealed, 'Clicking New administrator should reveal form');
+      assert.strictEqual(adminTest.roleValue, 'admin', 'Role assignment must be admin');
+      assert.strictEqual(adminTest.roleDisabled, true, 'Role selector must be locked/disabled');
+      assert(adminTest.formHiddenAfterCancel, 'Cancel button must re-hide form');
+    });
+
+    await check('Feedback panel displays dedicated review UI and empty state without API error', async () => {
+      const feedbackTest = await browser.eval(`
+        (() => {
+          document.querySelector('.nav-item[data-section="feedback"]')?.click();
+          const panel = document.getElementById('section-feedback');
+          const tableWrap = document.getElementById('feedbackTable');
+          const text = tableWrap ? tableWrap.textContent : '';
+          return {
+            panelVisible: panel.classList.contains('active') && !panel.hidden,
+            hasHeading: panel.querySelector('h2')?.textContent.includes('Feedback'),
+            noApiError: !text.includes('No records returned from the protected API.')
+          };
+        })()
+      `);
+      assert(feedbackTest.panelVisible, 'Feedback panel should be visible');
+      assert(feedbackTest.hasHeading, 'Feedback heading should be visible');
+      assert(feedbackTest.noApiError, 'Feedback panel must not show confusing API error');
+    });
+
+    await check('Website Settings panel displays Setting Editor and empty state', async () => {
+      const settingsTest = await browser.eval(`
+        (() => {
+          document.querySelector('.nav-item[data-section="settings"]')?.click();
+          const panel = document.getElementById('section-settings');
+          const newBtn = document.getElementById('newSettingButton');
+          const formPanel = document.getElementById('settingEditorForm');
+
+          // Open form
+          newBtn.click();
+          const formOpened = !formPanel.hidden;
+          const keyInput = document.getElementById('settingKeyInput');
+          const valInput = document.getElementById('settingValueInput');
+          const isPubInput = document.getElementById('settingIsPublicInput');
+
+          // Close form with cancel
+          document.getElementById('cancelSettingButton')?.click();
+          const formClosed = formPanel.hidden;
+
+          const tableWrap = document.getElementById('settingsTable');
+          const text = tableWrap ? tableWrap.textContent : '';
+
+          return {
+            panelVisible: panel.classList.contains('active') && !panel.hidden,
+            formOpened,
+            formClosed,
+            hasInputs: Boolean(keyInput && valInput && isPubInput),
+            noApiError: !text.includes('No records returned from the protected API.')
+          };
+        })()
+      `);
+      assert(settingsTest.panelVisible, 'Settings panel should be visible');
+      assert(settingsTest.formOpened, 'New setting button should open setting editor form');
+      assert(settingsTest.formClosed, 'Cancel button should close setting editor form');
+      assert(settingsTest.hasInputs, 'Setting editor form should have key, value, and public inputs');
+      assert(settingsTest.noApiError, 'Settings panel must not show confusing API error');
+    });
+
+    await check('Activity Logs panel displays Audit Trail UI without generic API error', async () => {
+      const activityTest = await browser.eval(`
+        (() => {
+          document.querySelector('.nav-item[data-section="activity"]')?.click();
+          const panel = document.getElementById('section-activity');
+          const tableWrap = document.getElementById('activityTable');
+          const text = tableWrap ? tableWrap.textContent : '';
+          return {
+            panelVisible: panel.classList.contains('active') && !panel.hidden,
+            hasHeading: panel.querySelector('h2')?.textContent.includes('Activity logs'),
+            noApiError: !text.includes('No records returned from the protected API.')
+          };
+        })()
+      `);
+      assert(activityTest.panelVisible, 'Activity logs panel should be visible');
+      assert(activityTest.hasHeading, 'Activity logs heading should be visible');
+      assert(activityTest.noApiError, 'Activity logs panel must not show confusing API error');
     });
 
     await check('Advertising panel displays 13 locked placements in UI', async () => {
@@ -523,7 +701,11 @@ async function runTests() {
       '/api/admin/questions',
       '/api/admin/content-summary',
       '/api/admin/analytics',
-      '/api/admin/system'
+      '/api/admin/system',
+      '/api/admin/administrators',
+      '/api/admin/feedback',
+      '/api/admin/website_settings',
+      '/api/admin/admin_activity_logs'
     ];
 
     for (const ep of adminEndpoints) {

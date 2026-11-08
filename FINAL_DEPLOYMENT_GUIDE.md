@@ -433,12 +433,12 @@ The supported workflows:
 ## 4. Owner & Full Admin Provisioning Procedure
 
 ### Step 4.1: Retrieve the Existing Owner Auth UID
-The project owner's account (`rayyanshajahan416@gmail.com`) is already created in Supabase Auth. Run this query in the SQL Editor to copy the assigned UUID:
+The project owner's account (`ra416491@gmail.com`) is already created in Supabase Auth. Run this query in the SQL Editor to copy the assigned UUID:
 
 ```sql
 select id, email, created_at
 from auth.users
-where email = 'rayyanshajahan416@gmail.com';
+where email = 'ra416491@gmail.com';
 ```
 
 ### Step 4.2: Bootstrap the Owner Account
@@ -457,7 +457,7 @@ where role = 'owner';
 
 ### Step 4.3: Verify Owner Login in Admin Portal
 1. Open `https://<YOUR-PAGES-DOMAIN>/admin/`.
-2. Log in using `rayyanshajahan416@gmail.com` and your password.
+2. Log in using `ra416491@gmail.com` and your password.
 3. Verify that the top bar displays your name and the purple **Owner** badge.
 4. Verify that the **Administrators** management tab is visible in the navigation sidebar.
 
