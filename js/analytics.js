@@ -137,7 +137,7 @@
     }
     const companyId = new URLSearchParams(window.location.search).get('id');
     if (companyId) track('company_view', { companyId });
-    if (window.location.pathname.endsWith('/quiz.html')) {
+    if (window.location.pathname.endsWith('/quiz.html') || window.location.pathname === '/quiz' || window.location.pathname.endsWith('/quiz')) {
       track('quiz_start', { companyId: new URLSearchParams(window.location.search).get('company') || 'tcs' });
     }
   });

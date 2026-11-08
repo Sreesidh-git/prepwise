@@ -54,7 +54,8 @@ button, .primary, .secondary, .link-button { border: 0; border-radius: 9px; padd
 .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px; }
 .stat-card, .chart-card, .empty-state, .record-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .stat-card .number { display: block; font-size: 28px; font-weight: 900; margin-top: 6px; }
-.chart-card { min-height: 220px; }
+.chart-card { min-height: 220px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.chart-card canvas { max-height: 180px; max-width: 100% !important; flex: 1 1 auto; }
 .resource-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .resource-tabs button.active { background: var(--primary); color: white; }
 .toolbar { display: flex; gap: 10px; margin-bottom: 14px; }

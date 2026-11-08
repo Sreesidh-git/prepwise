@@ -75,11 +75,14 @@ export async function onRequestGet(context) {
     const pageViews = eventList.filter((e) => e.event_name === 'page_view').length;
     const quizStarts = eventList.filter((e) => e.event_name === 'quiz_start').length;
     const quizCompletions = eventList.filter((e) => e.event_name === 'quiz_complete').length;
+    const quizAttempts = attemptList.length;
     const completedAttempts = attemptList.filter((a) => !a.is_abandoned && a.completed_at).length;
     const uniqueVisitors = new Set(sessionList.map((s) => s.anonymous_id).filter(Boolean)).size;
 
-    const completionRate = quizStarts > 0
-      ? Math.round((quizCompletions / quizStarts) * 10000) / 100
+    const eligibleStarts = quizStarts > 0 ? quizStarts : quizAttempts;
+    const eligibleCompletions = quizStarts > 0 ? quizCompletions : completedAttempts;
+    const completionRate = eligibleStarts > 0
+      ? Math.round((eligibleCompletions / eligibleStarts) * 10000) / 100
       : null;
 
     // Aggregate popular companies from company_view events

@@ -324,12 +324,34 @@
   }
 
   function renderChart(key, canvasId, type, labels, values, label) {
-    if (state.charts[key]) state.charts[key].destroy();
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (state.charts[key]) {
+      state.charts[key].destroy();
+      state.charts[key] = null;
+    }
     if (!window.Chart) return;
-    state.charts[key] = new Chart(document.getElementById(canvasId), {
+    canvas.removeAttribute('style');
+    canvas.style.maxHeight = '180px';
+    canvas.style.maxWidth = '100%';
+    state.charts[key] = new Chart(canvas, {
       type,
-      data: { labels, datasets: [{ label, data: values, backgroundColor: '#2563eb', borderColor: '#2563eb', tension: 0.25 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      data: {
+        labels: Array.isArray(labels) ? [...labels] : [],
+        datasets: [{
+          label,
+          data: Array.isArray(values) ? [...values] : [],
+          backgroundColor: '#2563eb',
+          borderColor: '#2563eb',
+          tension: 0.25
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 250 },
+        plugins: { legend: { display: false } }
+      }
     });
   }
 
@@ -509,9 +531,15 @@
 
       document.getElementById('overviewNote').textContent = `Showing verified records from ${new Date(result.range.from).toLocaleDateString()} to ${new Date(result.range.to).toLocaleDateString()}. Generated at ${new Date(result.generatedAt).toLocaleTimeString()}.`;
 
-      if (state.chart) state.chart.destroy();
+      if (state.chart) {
+        state.chart.destroy();
+        state.chart = null;
+      }
       const canvas = document.getElementById('overviewChart');
-      if (window.Chart) {
+      if (canvas && window.Chart) {
+        canvas.removeAttribute('style');
+        canvas.style.maxHeight = '180px';
+        canvas.style.maxWidth = '100%';
         state.chart = new Chart(canvas, {
           type: 'bar',
           data: {
@@ -522,7 +550,12 @@
               backgroundColor: '#2563eb'
             }]
           },
-          options: { responsive: true, plugins: { legend: { display: false } } }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 250 },
+            plugins: { legend: { display: false } }
+          }
         });
       }
 

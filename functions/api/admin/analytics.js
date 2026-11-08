@@ -43,6 +43,34 @@ function increment(map, key, amount = 1) {
   map.set(key, (map.get(key) || 0) + amount);
 }
 
+function chronologicalDailySeries(events, rangeStart, rangeEnd) {
+  const counts = new Map();
+  events.forEach((e) => {
+    if (!e.occurred_at) return;
+    const k = new Date(e.occurred_at).toISOString().slice(0, 10);
+    counts.set(k, (counts.get(k) || 0) + 1);
+  });
+
+  const timeline = [];
+  const current = new Date(rangeStart);
+  current.setUTCHours(0, 0, 0, 0);
+  const end = new Date(rangeEnd);
+  end.setUTCHours(23, 59, 59, 999);
+
+  let iterations = 0;
+  while (current <= end && iterations < 366) {
+    const dayStr = current.toISOString().slice(0, 10);
+    timeline.push({
+      label: dayStr,
+      count: counts.get(dayStr) || 0
+    });
+    current.setUTCDate(current.getUTCDate() + 1);
+    iterations++;
+  }
+
+  return timeline;
+}
+
 function sortedMap(map, limit = 20) {
   return [...map.entries()]
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
@@ -74,11 +102,12 @@ async function loadData(env, range, token) {
   };
 }
 
-function summarize(data) {
+function summarize(data, range) {
   const pageViews = data.events.filter((event) => event.event_name === 'page_view').length;
   const quizStarts = data.events.filter((event) => event.event_name === 'quiz_start').length;
   const quizCompletions = data.events.filter((event) => event.event_name === 'quiz_complete').length;
   const completedAttempts = data.attempts.filter((attempt) => !attempt.is_abandoned && attempt.completed_at).length;
+  const quizAttempts = data.attempts.length;
   const uniqueVisitors = new Set(data.sessions.map((session) => session.anonymous_id).filter(Boolean)).size;
   const daily = new Map();
   const pages = new Map();
@@ -105,11 +134,19 @@ function summarize(data) {
   });
   data.views.forEach((view) => increment(devices, view.device_category || 'unknown'));
 
-  const completionRate = quizStarts > 0 ? Math.round((quizCompletions / quizStarts) * 10000) / 100 : null;
+  const eligibleStarts = quizStarts > 0 ? quizStarts : quizAttempts;
+  const eligibleCompletions = quizStarts > 0 ? quizCompletions : completedAttempts;
+  const completionRate = eligibleStarts > 0
+    ? Math.round((eligibleCompletions / eligibleStarts) * 10000) / 100
+    : null;
   const scores = data.attempts.filter((attempt) => !attempt.is_abandoned && Number.isFinite(attempt.score));
   const averageScore = scores.length
     ? Math.round((scores.reduce((total, attempt) => total + attempt.score, 0) / scores.length) * 100) / 100
     : null;
+
+  const dailyActivity = range?.start && range?.end
+    ? chronologicalDailySeries(data.events, range.start, range.end)
+    : sortedMap(daily, MAX_DAYS);
 
   return {
     totals: {
@@ -119,11 +156,11 @@ function summarize(data) {
       quizStarts,
       quizCompletions,
       completionRate,
-      quizAttempts: data.attempts.length,
+      quizAttempts,
       completedAttempts,
       averageScore
     },
-    dailyActivity: sortedMap(daily, MAX_DAYS),
+    dailyActivity,
     eventTypes: sortedMap(eventTypes),
     popularPages: sortedMap(pages),
     popularCompanies: sortedMap(companies),
@@ -194,7 +231,7 @@ export async function onRequestGet(context) {
       }
       return json({ data: pagedRows, pagination: { page, pageSize, total: filteredRows.length, hasNext: offset + pageSize < filteredRows.length }, range: { from: range.start.toISOString(), to: range.end.toISOString() } });
     }
-    return json({ data: summarize(data), range: { from: range.start.toISOString(), to: range.end.toISOString() } });
+    return json({ data: summarize(data, range), range: { from: range.start.toISOString(), to: range.end.toISOString() } });
   } catch (error) {
     console.error('Admin analytics error', error.message);
     return json({ error: 'Analytics could not be loaded' }, 500);
