@@ -137,6 +137,31 @@
         lazy: false
       },
 
+      // 1c. Homepage Native Stream: Native Banner between cards (Desktop & Mobile)
+      'ad-homepage-stream': {
+        slotId: 'ad-homepage-stream',
+        page: 'homepage',
+        name: 'Homepage Native Content Stream',
+        label: 'Sponsored Content',
+        enabled: true,
+        desktopUnitId: '32172759', // Native Banner
+        mobileUnitId: '32172759',  // Native Banner
+        fallbackUnitId: '32172760', // Banner 300x250
+        lazy: false
+      },
+
+      // 1d. Homepage Tertiary: Banner 728x90 on Desktop / 300x250 on Mobile
+      'ad-homepage-inline-tertiary': {
+        slotId: 'ad-homepage-inline-tertiary',
+        page: 'homepage',
+        name: 'Homepage Tertiary Content Break',
+        label: 'Sponsored',
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        mobileUnitId: '32172760',  // Banner 300x250
+        lazy: true
+      },
+
       // 2. Company Profile: Native Banner on Desktop / 300x250 on Mobile
       'ad-company-roles-inline': {
         slotId: 'ad-company-roles-inline',
@@ -149,6 +174,18 @@
         lazy: true
       },
 
+      // 2b. Company Profile Sidebar: Banner 300x250 on Desktop
+      'ad-company-sidebar': {
+        slotId: 'ad-company-sidebar',
+        page: 'company',
+        name: 'Company Sidebar Rectangle',
+        label: 'Sponsored',
+        enabled: true,
+        desktopUnitId: '32172760', // Banner 300x250
+        mobileUnitId: '32172760',
+        lazy: false
+      },
+
       // 3. Quiz Completion Screen: Banner 728x90 on Desktop / 300x250 on Mobile
       'ad-quiz-results': {
         slotId: 'ad-quiz-results',
@@ -159,6 +196,30 @@
         desktopUnitId: '32172762', // Banner 728x90
         mobileUnitId: '32172760',   // Banner 300x250
         fallbackUnitId: '32172760',
+        lazy: false
+      },
+
+      // 4. Sticky Bottom Banners (Non-blocking, dismissible)
+      'ad-sticky-bottom-desktop': {
+        slotId: 'ad-sticky-bottom-desktop',
+        page: 'all',
+        name: 'Sticky Bottom Desktop Leaderboard',
+        label: 'Advertisement',
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        dismissible: true,
+        lazy: false
+      },
+
+      'ad-sticky-bottom-mobile': {
+        slotId: 'ad-sticky-bottom-mobile',
+        page: 'all',
+        name: 'Sticky Bottom Mobile Banner',
+        label: 'Advertisement',
+        enabled: true,
+        mobileUnitId: '32172761',  // Banner 320x50
+        fallbackUnitId: '32172760', // Banner 300x250
+        dismissible: true,
         lazy: false
       },
 

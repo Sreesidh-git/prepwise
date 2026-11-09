@@ -279,18 +279,47 @@
     autoInit() {
       if (!hasAdvertisingConsent() || !config || !config.enabled) return;
 
+      const device = getDeviceType();
+
       // Enable active display placements on their respective pages
       if (typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
-        if (document.getElementById('ad-homepage-leaderboard')) {
-          window.PREPWISE_ADS.enable('ad-homepage-leaderboard', { lazy: false });
-        }
-        if (document.getElementById('ad-homepage-inline-secondary')) {
-          window.PREPWISE_ADS.enable('ad-homepage-inline-secondary', { lazy: false });
-        }
-        if (document.getElementById('ad-company-roles-inline')) {
-          // Company profile roles ad will load when user views roles tab
+        const slotsToEnable = [
+          'ad-homepage-leaderboard',
+          'ad-homepage-stream',
+          'ad-homepage-inline-secondary',
+          'ad-homepage-inline-tertiary',
+          'ad-company-sidebar',
+          'ad-company-roles-inline',
+          'ad-quiz-results'
+        ];
+
+        slotsToEnable.forEach(slotId => {
+          if (document.getElementById(slotId)) {
+            window.PREPWISE_ADS.enable(slotId, { lazy: false });
+          }
+        });
+
+        // Bottom sticky banners (non-blocking, dismissible)
+        if (device === 'mobile') {
+          if (document.getElementById('ad-sticky-bottom-mobile')) {
+            window.PREPWISE_ADS.enable('ad-sticky-bottom-mobile', { lazy: false });
+          }
+        } else {
+          if (document.getElementById('ad-sticky-bottom-desktop')) {
+            window.PREPWISE_ADS.enable('ad-sticky-bottom-desktop', { lazy: false });
+          }
         }
       }
+
+      // Close button handler for dismissible sticky banners
+      document.querySelectorAll('.ad-slot-sticky .ad-slot-close').forEach(btn => {
+        btn.removeAttribute('hidden');
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const slot = btn.closest('.ad-slot-sticky');
+          if (slot) slot.style.display = 'none';
+        };
+      });
 
       // Initialize Social Bar & Popunder (only outside active timed quiz)
       if (!isQuizPageActive()) {
@@ -321,7 +350,7 @@
         config.enabled = false;
       }
       // Terminate all candidate placements in DOM regardless of rendering state
-      ['ad-homepage-leaderboard', 'ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].forEach((id) => this.killPlacement(id));
+      ['ad-homepage-leaderboard', 'ad-homepage-stream', 'ad-homepage-inline-secondary', 'ad-homepage-inline-tertiary', 'ad-company-sidebar', 'ad-company-roles-inline', 'ad-quiz-results', 'ad-sticky-bottom-desktop', 'ad-sticky-bottom-mobile'].forEach((id) => this.killPlacement(id));
       renderedPlacements.forEach((id) => this.killPlacement(id));
       renderedPlacements.clear();
 

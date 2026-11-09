@@ -89,10 +89,24 @@
     let cardsHtml = '';
     companies.forEach((company, index) => {
       cardsHtml += createCompanyCard(company);
-
+      if (index === 2 && companies.length > 3) {
+        cardsHtml += `
+          <div class="ad-slot ad-slot-stream" id="ad-homepage-stream" data-ad-slot="homepage-stream" style="grid-column: 1 / -1; margin: var(--space-md) 0;" aria-label="Sponsored Content"></div>
+        `;
+      }
     });
 
     companiesGrid.innerHTML = cardsHtml;
+
+    // Trigger in-stream native ad if adsterra is ready & consent granted
+    if (window.PREPWISE_ADSTERRA && typeof window.PREPWISE_ADSTERRA.renderPlacement === 'function' && window.PrepWiseConsent?.hasConsent('advertising')) {
+      const streamSlot = document.getElementById('ad-homepage-stream');
+      if (streamSlot && !streamSlot.classList.contains('adsterra-active')) {
+        window.PREPWISE_ADSTERRA.renderPlacement(streamSlot).catch(() => {
+          streamSlot.style.display = 'none';
+        });
+      }
+    }
     
     const countryText = activeCountry ? ` operating in ${activeCountry}` : '';
     filterCount.textContent = `Showing ${companies.length} ${companies.length === 1 ? 'company' : 'companies'}${countryText}`;

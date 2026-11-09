@@ -148,7 +148,16 @@
       rejectionReason: 'Exit-intent popups violate user trust and Better Ads Standards'
     }
   ].map((placement) => {
-    const isLaunchCandidate = ['ad-homepage-leaderboard', 'ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].includes(placement.id);
+    const isLaunchCandidate = [
+      'ad-homepage-leaderboard',
+      'ad-homepage-inline-secondary',
+      'ad-homepage-inline-tertiary',
+      'ad-company-sidebar',
+      'ad-company-roles-inline',
+      'ad-quiz-results',
+      'ad-sticky-bottom-desktop',
+      'ad-sticky-bottom-mobile'
+    ].includes(placement.id);
     return {
       ...placement,
       enabled: isLaunchCandidate, // 3 approved display placements enabled with genuine Adsterra units
