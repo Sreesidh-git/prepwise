@@ -107,9 +107,21 @@
       }
     },
 
-    // Site Placement Mappings (Exactly 3 Active Display Slots)
+    // Site Placement Mappings (Display Placements)
     placements: {
-      // 1. Homepage: Banner 728x90 on Desktop / Banner 320x50 on Mobile
+      // 1. Homepage Top Leaderboard: Banner 728x90 on Desktop / Banner 320x50 on Mobile (Immediate Above-the-fold)
+      'ad-homepage-leaderboard': {
+        slotId: 'ad-homepage-leaderboard',
+        page: 'homepage',
+        name: 'Homepage Top Leaderboard',
+        label: 'Sponsored',
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        mobileUnitId: '32172761',  // Banner 320x50
+        lazy: false
+      },
+
+      // 1b. Homepage In-Content: Banner 728x90 on Desktop / Banner 320x50 on Mobile
       'ad-homepage-inline-secondary': {
         slotId: 'ad-homepage-inline-secondary',
         page: 'homepage',
@@ -118,7 +130,7 @@
         enabled: true,
         desktopUnitId: '32172762', // Banner 728x90
         mobileUnitId: '32172761',  // Banner 320x50
-        lazy: true
+        lazy: false
       },
 
       // 2. Company Profile: Native Banner on Desktop / 300x250 on Mobile

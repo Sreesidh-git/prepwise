@@ -261,8 +261,11 @@
 
       // Enable active display placements on their respective pages
       if (typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
+        if (document.getElementById('ad-homepage-leaderboard')) {
+          window.PREPWISE_ADS.enable('ad-homepage-leaderboard', { lazy: false });
+        }
         if (document.getElementById('ad-homepage-inline-secondary')) {
-          window.PREPWISE_ADS.enable('ad-homepage-inline-secondary');
+          window.PREPWISE_ADS.enable('ad-homepage-inline-secondary', { lazy: false });
         }
         if (document.getElementById('ad-company-roles-inline')) {
           // Company profile roles ad will load when user views roles tab
@@ -292,7 +295,7 @@
         config.enabled = false;
       }
       // Terminate all candidate placements in DOM regardless of rendering state
-      ['ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].forEach((id) => this.killPlacement(id));
+      ['ad-homepage-leaderboard', 'ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].forEach((id) => this.killPlacement(id));
       renderedPlacements.forEach((id) => this.killPlacement(id));
       renderedPlacements.clear();
 
@@ -315,6 +318,7 @@
   if (typeof window !== 'undefined') {
     window.addEventListener('prepwise_consent_updated', function (e) {
       if (e.detail?.advertising) {
+        if (config) config.enabled = true;
         AdsterraProvider.autoInit();
       } else {
         AdsterraProvider.killAll();

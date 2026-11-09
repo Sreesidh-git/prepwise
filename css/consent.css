@@ -68,21 +68,28 @@
   outline-offset: 2px;
 }
 
-.btn-consent-accept {
+.btn-consent-accept,
+.btn-consent-all {
   background-color: var(--color-primary, #2563eb);
   color: #ffffff;
+  border-color: var(--color-primary, #2563eb);
 }
-.btn-consent-accept:hover {
+.btn-consent-accept:hover,
+.btn-consent-all:hover {
   background-color: #1d4ed8;
+  border-color: #1d4ed8;
 }
 
-.btn-consent-reject {
-  background-color: transparent;
+.btn-consent-reject,
+.btn-consent-essential {
+  background-color: #ffffff;
   border-color: var(--color-border, #cbd5e1);
   color: var(--color-text, #0f172a);
 }
-.btn-consent-reject:hover {
-  background-color: #f1f5f9;
+.btn-consent-reject:hover,
+.btn-consent-essential:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
 }
 
 .btn-consent-manage {
@@ -92,6 +99,22 @@
 }
 .btn-consent-manage:hover {
   background-color: #f1f5f9;
+  color: var(--color-text, #0f172a);
+}
+
+.btn-consent-link {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 8px 10px;
+  font-family: inherit;
+  transition: color 0.15s ease;
+}
+.btn-consent-link:hover {
   color: var(--color-text, #0f172a);
 }
 

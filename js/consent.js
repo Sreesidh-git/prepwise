@@ -1,14 +1,13 @@
 /**
- * PrepWise Consent & Privacy Preferences Module
+ * PrepWise Consent & Privacy Preferences Module (js/consent.js)
  * 
  * Provides first-party cookie/storage preference management:
  * - Strictly Necessary (always active)
- * - Optional Analytics (default: off until consent)
- * - Optional Advertising (default: off until consent; all ad slots currently disabled)
- * 
- * Note: This custom banner manages first-party preferences on PrepWise.
- * It is not an IAB TCF v2.2 certified CMP (which will be required when
- * commercial advertising is enabled for visitors in the EEA, UK, and Switzerland).
+ * - Two-tier advertising choice:
+ *     1. "Show All Ads" (Tier: 'all') -> Authorizes standard Adsterra display banners and minimal analytics.
+ *     2. "Show Essential Ads" (Tier: 'essential') -> Rejects third-party tracking cookies; no consent-dependent ad requests are sent.
+ * - Persistent "Cookie Settings" link in the footer to modify or withdraw consent at any time.
+ * - Zero dark patterns: clear equal choices, no preselected optional tracking.
  */
 (function () {
   'use strict';
@@ -46,6 +45,7 @@
       necessary: true,
       analytics: Boolean(prefs.analytics),
       advertising: Boolean(prefs.advertising),
+      tier: prefs.tier || (prefs.advertising ? 'all' : 'essential'),
       timestamp: new Date().toISOString(),
       version: VERSION
     };
@@ -83,45 +83,44 @@
     banner.id = 'prepwise-consent-banner';
     banner.className = 'prepwise-consent-banner';
     banner.setAttribute('role', 'region');
-    banner.setAttribute('aria-label', 'Cookie and privacy preferences');
+    banner.setAttribute('aria-label', 'Privacy and Advertising Choices');
     banner.innerHTML = `
       <div class="prepwise-consent-content">
         <div class="prepwise-consent-text">
-          <p class="prepwise-consent-title"><strong>Your Privacy Choices</strong></p>
+          <p class="prepwise-consent-title"><strong>Privacy &amp; Advertising Choices</strong></p>
           <p class="prepwise-consent-desc">
-            We use strictly necessary storage to power practice quizzes and maintain platform security.
-            With your permission, we also show non-intrusive display banners from Adsterra and collect minimal analytics to keep PrepWise free for students globally.
+            We use cookies and partner with Adsterra to keep PrepWise free for students. Choose your preferred advertising experience:
           </p>
         </div>
         <div class="prepwise-consent-actions">
-          <button type="button" class="btn-consent btn-consent-reject" id="btnConsentReject">Reject Optional</button>
-          <button type="button" class="btn-consent btn-consent-manage" id="btnConsentManage">Manage Preferences</button>
-          <button type="button" class="btn-consent btn-consent-accept" id="btnConsentAccept">Accept All</button>
+          <button type="button" class="btn-consent btn-consent-essential" id="btnConsentEssential">Show Essential Ads</button>
+          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnConsentAll">Show All Ads</button>
+          <button type="button" class="btn-consent-link" id="btnConsentSettings">Cookie Settings</button>
         </div>
       </div>
     `;
     document.body.appendChild(banner);
 
-    const acceptBtn = banner.querySelector('#btnConsentAccept') || document.getElementById('btnConsentAccept');
-    const rejectBtn = banner.querySelector('#btnConsentReject') || document.getElementById('btnConsentReject');
-    const manageBtn = banner.querySelector('#btnConsentManage') || document.getElementById('btnConsentManage');
+    const acceptBtn = banner.querySelector('#btnConsentAll') || banner.querySelector('#btnConsentAccept');
+    const essentialBtn = banner.querySelector('#btnConsentEssential') || banner.querySelector('#btnConsentReject');
+    const settingsBtn = banner.querySelector('#btnConsentSettings') || banner.querySelector('#btnConsentManage');
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', () => {
-        savePreferences({ analytics: true, advertising: true });
+        savePreferences({ analytics: true, advertising: true, tier: 'all' });
         hideBanner();
       });
     }
 
-    if (rejectBtn) {
-      rejectBtn.addEventListener('click', () => {
-        savePreferences({ analytics: false, advertising: false });
+    if (essentialBtn) {
+      essentialBtn.addEventListener('click', () => {
+        savePreferences({ analytics: false, advertising: false, tier: 'essential' });
         hideBanner();
       });
     }
 
-    if (manageBtn) {
-      manageBtn.addEventListener('click', () => {
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
         openModal();
       });
     }
@@ -147,12 +146,12 @@
       <div class="prepwise-consent-backdrop" id="consentModalBackdrop"></div>
       <div class="prepwise-consent-dialog" tabIndex="-1">
         <div class="prepwise-consent-header">
-          <h2 id="consentModalTitle">Privacy &amp; Cookie Preferences</h2>
+          <h2 id="consentModalTitle">Cookie &amp; Advertising Settings</h2>
           <button type="button" class="prepwise-consent-close" id="btnConsentClose" aria-label="Close preferences dialog">&times;</button>
         </div>
         <div class="prepwise-consent-body">
           <p class="prepwise-consent-intro">
-            PrepWise is built with data minimization in mind. You can customize your preferences for non-essential storage below.
+            PrepWise is built with data minimization in mind. You can update your advertising preferences or withdraw consent below at any time.
           </p>
 
           <div class="consent-category">
@@ -170,6 +169,19 @@
 
           <div class="consent-category">
             <div class="consent-category-header">
+              <label for="toggleAdvertising">
+                <strong>Advertising &amp; Monetization (Adsterra)</strong>
+                <span class="consent-badge">Optional</span>
+              </label>
+              <input type="checkbox" id="toggleAdvertising" class="consent-toggle">
+            </div>
+            <p class="consent-category-desc">
+              Authorizes standard non-intrusive display banners and native widgets from partner Adsterra in three designated content breaks. If disabled, third-party advertising tracking is blocked. Zero popunders, floating bars, or in-quiz ads run on this site.
+            </p>
+          </div>
+
+          <div class="consent-category">
+            <div class="consent-category-header">
               <label for="toggleAnalytics">
                 <strong>Analytics &amp; Performance Telemetry</strong>
               </label>
@@ -179,25 +191,12 @@
               Allows anonymous first-party telemetry (page view counts, quiz completion rates, and company syllabus interest) to help us improve question sets. No personal profiles are built.
             </p>
           </div>
-
-          <div class="consent-category">
-            <div class="consent-category-header">
-              <label for="toggleAdvertising">
-                <strong>Advertising &amp; Monetization</strong>
-                <span class="consent-badge">Optional</span>
-              </label>
-              <input type="checkbox" id="toggleAdvertising" class="consent-toggle">
-            </div>
-            <p class="consent-category-desc">
-              Authorizes standard non-intrusive display banners and native widgets from our partner Adsterra in three designated content breaks. Zero popunders, floating bars, or in-quiz ads run on this site.
-            </p>
-          </div>
         </div>
 
         <div class="prepwise-consent-footer">
-          <button type="button" class="btn-consent btn-consent-reject" id="btnModalRejectAll">Reject Optional</button>
-          <button type="button" class="btn-consent btn-consent-save" id="btnModalSave">Save Preferences</button>
-          <button type="button" class="btn-consent btn-consent-accept" id="btnModalAcceptAll">Accept All</button>
+          <button type="button" class="btn-consent btn-consent-essential" id="btnModalEssential">Show Essential Ads</button>
+          <button type="button" class="btn-consent btn-consent-save" id="btnModalSave">Save Settings</button>
+          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnModalAcceptAll">Show All Ads</button>
         </div>
       </div>
     `;
@@ -207,22 +206,22 @@
     const closeBtn = modal.querySelector('#btnConsentClose') || document.getElementById('btnConsentClose');
     const saveBtn = modal.querySelector('#btnModalSave') || document.getElementById('btnModalSave');
     const acceptAllBtn = modal.querySelector('#btnModalAcceptAll') || document.getElementById('btnModalAcceptAll');
-    const rejectAllBtn = modal.querySelector('#btnModalRejectAll') || document.getElementById('btnModalRejectAll');
+    const essentialBtn = modal.querySelector('#btnModalEssential') || modal.querySelector('#btnModalRejectAll') || document.getElementById('btnModalEssential');
 
     if (backdrop) backdrop.addEventListener('click', closeModal);
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
     if (acceptAllBtn) {
       acceptAllBtn.addEventListener('click', () => {
-        savePreferences({ analytics: true, advertising: true });
+        savePreferences({ analytics: true, advertising: true, tier: 'all' });
         closeModal();
         hideBanner();
       });
     }
 
-    if (rejectAllBtn) {
-      rejectAllBtn.addEventListener('click', () => {
-        savePreferences({ analytics: false, advertising: false });
+    if (essentialBtn) {
+      essentialBtn.addEventListener('click', () => {
+        savePreferences({ analytics: false, advertising: false, tier: 'essential' });
         closeModal();
         hideBanner();
       });
@@ -234,7 +233,11 @@
         const toggleAd = modal.querySelector('#toggleAdvertising') || document.getElementById('toggleAdvertising');
         const analyticsChecked = toggleAn ? toggleAn.checked : false;
         const advertisingChecked = toggleAd ? toggleAd.checked : false;
-        savePreferences({ analytics: analyticsChecked, advertising: advertisingChecked });
+        savePreferences({
+          analytics: analyticsChecked,
+          advertising: advertisingChecked,
+          tier: advertisingChecked ? 'all' : 'essential'
+        });
         closeModal();
         hideBanner();
       });
@@ -282,9 +285,9 @@
       createBanner();
     }
 
-    // Bind all footer/navigation triggers
+    // Bind all footer/navigation triggers for Cookie Settings
     document.addEventListener('click', (e) => {
-      const trigger = e.target.closest('#openConsentPreferences, .open-consent-preferences, [data-consent-preferences]');
+      const trigger = e.target.closest('#openConsentPreferences, #openConsentSettings, .open-consent-preferences, [data-consent-preferences], a[href="#cookie-settings"], a[href="#privacy-choices"]');
       if (trigger) {
         e.preventDefault();
         openModal();
@@ -306,10 +309,10 @@
     openPreferences: openModal,
     closePreferences: closeModal,
     acceptAll() {
-      return savePreferences({ analytics: true, advertising: true });
+      return savePreferences({ analytics: true, advertising: true, tier: 'all' });
     },
     rejectOptional() {
-      return savePreferences({ analytics: false, advertising: false });
+      return savePreferences({ analytics: false, advertising: false, tier: 'essential' });
     }
   };
 })();
