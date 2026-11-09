@@ -79,6 +79,9 @@ async function runVerification() {
   console.log('PREPWISE IN-BROWSER ADSTERRA 6-UNIT FULL VERIFICATION');
   console.log('========================================================================\n');
 
+  const baseUrl = process.argv.includes('--live') ? 'https://prepwises.online' : 'http://localhost:8788';
+  console.log(`Target Base URL: ${baseUrl}\n`);
+
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
   const port = 9230;
   const userDataDir = 'C:\\Users\\ra416\\.gemini\\antigravity\\brain\\ae369e51-6e67-4ff5-bbc6-598e6e96c682\\scratch\\chrome-full-audit';
@@ -127,7 +130,7 @@ async function runVerification() {
     // 1. CONSENT DENIAL TEST: ZERO AD REQUESTS WHEN ADVERTISING CONSENT IS DENIED
     // ====================================================================
     console.log('--- 1. CONSENT DENIAL AUDIT ---');
-    await client.send('Page.navigate', { url: 'http://localhost:8788/' });
+    await client.send('Page.navigate', { url: `${baseUrl}/` });
     await new Promise(r => setTimeout(r, 1000));
 
     // Explicitly reject optional advertising and clear request buffer
@@ -234,7 +237,7 @@ async function runVerification() {
       mobile: true
     });
 
-    await client.send('Page.navigate', { url: 'http://localhost:8788/' });
+    await client.send('Page.navigate', { url: `${baseUrl}/` });
     await new Promise(r => setTimeout(r, 1500));
 
     await client.send('Runtime.evaluate', {
@@ -274,7 +277,7 @@ async function runVerification() {
       mobile: false
     });
 
-    await client.send('Page.navigate', { url: 'http://localhost:8788/company?id=google' });
+    await client.send('Page.navigate', { url: `${baseUrl}/company?id=google` });
     await new Promise(r => setTimeout(r, 1500));
 
     await client.send('Runtime.evaluate', {
@@ -313,7 +316,7 @@ async function runVerification() {
       deviceScaleFactor: 2,
       mobile: true
     });
-    await client.send('Page.navigate', { url: 'http://localhost:8788/company?id=google' });
+    await client.send('Page.navigate', { url: `${baseUrl}/company?id=google` });
     await new Promise(r => setTimeout(r, 1500));
     await client.send('Runtime.evaluate', {
       expression: `
@@ -351,7 +354,7 @@ async function runVerification() {
       mobile: false
     });
 
-    await client.send('Page.navigate', { url: 'http://localhost:8788/quiz?company=google' });
+    await client.send('Page.navigate', { url: `${baseUrl}/quiz?company=google` });
     await new Promise(r => setTimeout(r, 1500));
 
     const quizActive = await client.send('Runtime.evaluate', {
