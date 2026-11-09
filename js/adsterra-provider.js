@@ -246,22 +246,11 @@
     },
 
     /**
-     * Popunder (Unit 32172757) with educational click guards
+     * Popunder (Unit 32172757) — Disabled to eliminate automatic click redirects
      */
     initPopunder() {
-      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
-      if (!config.units?.['32172757']?.enabled) return;
-      if (isQuizPageActive()) return; // strictly disabled on active timed quiz
-      if (document.getElementById('adsterra-popunder')) return;
-
-      setupPopunderClickGuard();
-
-      const script = document.createElement('script');
-      script.id = 'adsterra-popunder';
-      script.dataset.cfasync = 'false';
-      script.src = config.units['32172757'].scriptSrc;
-      document.body.appendChild(script);
-      loadedScripts.add(script.src);
+      // Intentionally disabled: Popunder attaches document-wide click listeners causing unwanted redirects
+      return;
     },
 
     /**
@@ -291,18 +280,22 @@
 
         slotsToEnable.forEach(slotId => {
           if (document.getElementById(slotId)) {
-            window.PREPWISE_ADS.enable(slotId, { lazy: false });
+            try {
+              window.PREPWISE_ADS.enable(slotId, { lazy: false });
+            } catch (err) {
+              // Gracefully handle slot if not registered in engine
+            }
           }
         });
 
         // Bottom sticky banners (non-blocking, dismissible)
         if (device === 'mobile') {
           if (document.getElementById('ad-sticky-bottom-mobile')) {
-            window.PREPWISE_ADS.enable('ad-sticky-bottom-mobile', { lazy: false });
+            try { window.PREPWISE_ADS.enable('ad-sticky-bottom-mobile', { lazy: false }); } catch (e) {}
           }
         } else {
           if (document.getElementById('ad-sticky-bottom-desktop')) {
-            window.PREPWISE_ADS.enable('ad-sticky-bottom-desktop', { lazy: false });
+            try { window.PREPWISE_ADS.enable('ad-sticky-bottom-desktop', { lazy: false }); } catch (e) {}
           }
         }
       }
@@ -317,10 +310,9 @@
         };
       });
 
-      // Initialize Social Bar & Popunder (only outside active timed quiz)
+      // Initialize Social Bar & secondary non-redirecting placements (outside active timed quiz)
       if (!isQuizPageActive()) {
         AdsterraProvider.initSocialBar();
-        AdsterraProvider.initPopunder();
         AdsterraProvider.initTimedPromotionalPlacement();
         AdsterraProvider.initAdblockNotice();
       }

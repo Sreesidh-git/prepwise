@@ -28,19 +28,19 @@
       excludeAlertsAndDeceptiveSoftware: true,
       excludeForcedRedirects: true,
       excludeSmartlinks: true,
-      excludePopunders: false,
+      excludePopunders: true,
       excludeSocialBar: false
     },
 
     // Units Catalog & Status
     units: {
-      // 1. Popunder — ACTIVE (Approved Unit 32172757)
+      // 1. Popunder — DISABLED (Unit 32172757 removed to stop automatic click redirects)
       '32172757': {
         unitId: '32172757',
         format: 'popunder',
         name: 'Popunder',
-        enabled: true,
-        status: 'active',
+        enabled: false,
+        status: 'disabled',
         scriptSrc: 'https://abscloud.org/1/4290fb116e3ec38fe27d7faf2bc56147',
         cfAsync: false,
         rawSnippet: '<script data-cfasync="false" src="https://abscloud.org/1/4290fb116e3ec38fe27d7faf2bc56147"></script>'
@@ -250,13 +250,13 @@
         lazy: false
       },
 
-      // Active Full-Format Placements
+      // Full-Format Placements
       'popunder-global': {
         unitId: '32172757',
         format: 'popunder',
         name: 'Global Popunder',
-        enabled: true,
-        status: 'active'
+        enabled: false,
+        status: 'disabled'
       },
 
       'social-bar-global': {
