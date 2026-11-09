@@ -34,7 +34,7 @@
 
     // Units Catalog & Status
     units: {
-      // 1. Popunder — DISABLED (Unit 32172757 removed to stop automatic click redirects)
+      // 1. Popunder — DISABLED PERMANENTLY (Unit 32172757 strictly disabled to prevent click redirects)
       '32172757': {
         unitId: '32172757',
         format: 'popunder',

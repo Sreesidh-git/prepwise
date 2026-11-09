@@ -50,26 +50,44 @@
     return true; // Active quiz taking place
   }
 
-  function setupPopunderClickGuard(prohibitedSelectors) {
+  function setupEducationalClickProtection() {
     if (clickGuardInstalled) return;
     clickGuardInstalled = true;
 
-    const selector = (prohibitedSelectors && prohibitedSelectors.length > 0)
-      ? prohibitedSelectors.join(', ')
-      : '.option-btn, .quiz-btn, #prevBtn, #nextBtn, #skipBtn, input, textarea, button';
+    // Guard normal PrepWise educational elements, navigation, and controls
+    // from being intercepted by background ad scripts or unwanted window opening.
+    const isNormalContent = function (target) {
+      if (!target || typeof target.closest !== 'function') return true;
+      // If the interaction is inside an actual ad element, allow provider handling
+      const isAdElement = target.closest(
+        '#adsterra-social-bar, [id*="sb_"], [class*="sb_"], [id*="sbar_"], [class*="sbar_"], [class*="finlink"], .ad-slot, .ad-content-box, iframe[src*="ad-frame"]'
+      );
+      return !isAdElement;
+    };
 
-    // Capture and suppress ad popunder triggers on functional educational clicks
-    document.addEventListener('click', function (e) {
-      if (e.target && typeof e.target.closest === 'function') {
-        const isEducationalControl = e.target.closest(selector);
-        if (isEducationalControl) {
-          // Prevent popunder from intercepting clicks on options, navigation, or form controls
-          if (typeof e.stopImmediatePropagation === 'function') {
-            // Note: Stop other document-level ad click hooks while letting target execute
-          }
-        }
+    let lastInteractionTime = 0;
+    let lastInteractionIsNormalContent = false;
+
+    // Track user clicks and touch interactions
+    ['click', 'pointerup', 'touchend'].forEach(evtName => {
+      document.addEventListener(evtName, function (e) {
+        lastInteractionTime = Date.now();
+        lastInteractionIsNormalContent = isNormalContent(e.target);
+      }, true);
+    });
+
+    // Guard window.open: allow legitimate ad clicks, but block when click was on ordinary PrepWise content
+    const originalWindowOpen = window.open;
+    window.open = function (url, target, features) {
+      const timeSinceInteraction = Date.now() - lastInteractionTime;
+      if (timeSinceInteraction < 1000 && lastInteractionIsNormalContent) {
+        // Click was on normal educational content (menu, quiz button, card, search, etc.)
+        // Prevent background ad popunder / tab opening
+        console.warn('[PrepWise Safety] Blocked advertising navigation triggered from ordinary site content.');
+        return null;
       }
-    }, true);
+      return originalWindowOpen.apply(this, arguments);
+    };
   }
 
   const AdsterraProvider = {
@@ -229,13 +247,15 @@
     },
 
     /**
-     * Social Bar (Unit 32172758)
+     * Social Bar (Unit 32172758) — Active In-Page Notification Format
      */
     initSocialBar() {
       if (!hasAdvertisingConsent() || !config || !config.enabled) return;
       if (!config.units?.['32172758']?.enabled) return;
       if (isQuizPageActive()) return; // strictly disabled on active timed quiz
       if (document.getElementById('adsterra-social-bar')) return;
+
+      setupEducationalClickProtection();
 
       const script = document.createElement('script');
       script.id = 'adsterra-social-bar';
@@ -246,10 +266,9 @@
     },
 
     /**
-     * Popunder (Unit 32172757) — Disabled to eliminate automatic click redirects
+     * Popunder (Unit 32172757) — Strictly and permanently disabled
      */
     initPopunder() {
-      // Intentionally disabled: Popunder attaches document-wide click listeners causing unwanted redirects
       return;
     },
 
@@ -258,6 +277,8 @@
      */
     autoInit() {
       if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+
+      setupEducationalClickProtection();
 
       const device = getDeviceType();
 
