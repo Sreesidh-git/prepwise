@@ -123,6 +123,7 @@
         }
 
         // 6. Layout Stability & Accessible Label
+        element.classList.add('is-enabled');
         const size = unit.width && unit.height
           ? [unit.width, unit.height]
           : (unit.format === 'native-banner' ? [728, 120] : (device === 'mobile' ? [320, 50] : [728, 90]));
@@ -199,7 +200,8 @@
           frame.style.border = 'none';
           frame.style.overflow = 'hidden';
           frame.scrolling = 'no';
-          frame.title = 'Advertisement';
+          frame.title = placementConfig.label || 'Sponsored';
+          frame.style.display = 'block';
           container.appendChild(frame);
 
           try {
@@ -243,6 +245,7 @@
      */
     renderPlacement(element) {
       if (!element) return Promise.reject(new Error('Element required'));
+      element.classList.add('is-enabled');
       const placementId = element.id;
       const placement = { id: placementId };
       return this.request({ placement, element });
@@ -301,9 +304,13 @@
           'ad-homepage-inline-tertiary',
           'ad-company-sidebar',
           'ad-company-roles-inline',
-          'ad-quiz-results',
           'ad-content-page'
         ];
+
+        // Quiz results ad is ONLY enabled after quiz completion, never during active questions
+        if (!isQuizPageActive() && document.getElementById('ad-quiz-results')) {
+          slotsToEnable.push('ad-quiz-results');
+        }
 
         slotsToEnable.forEach(slotId => {
           if (document.getElementById(slotId)) {
@@ -352,11 +359,14 @@
     initTimedPromotionalPlacement() {
       if (!hasAdvertisingConsent() || !config || !config.enabled) return;
       if (isQuizPageActive()) return;
+      // Dedicated sticky bottom banner handles mobile (#ad-sticky-bottom-mobile) without overlapping popups
+      if (getDeviceType() === 'mobile') return;
       if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
       if (document.getElementById('ad-promo-floater-container')) return;
 
       setTimeout(() => {
         if (!hasAdvertisingConsent() || isQuizPageActive()) return;
+        if (getDeviceType() === 'mobile') return;
         if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
         if (document.getElementById('ad-promo-floater-container')) return;
 
@@ -371,7 +381,7 @@
             <span class="ad-promo-label">Sponsored • <span id="adPromoCountdown">10</span>s</span>
             <button type="button" id="adPromoCloseBtn" class="ad-promo-close-btn" aria-label="Close promotion">&times;</button>
           </div>
-          <div class="ad-slot ad-slot-promo" id="ad-promo-floater" data-ad-slot="promo-floater" aria-label="Advertisement"></div>
+          <div class="ad-slot ad-slot-promo is-enabled" id="ad-promo-floater" data-ad-slot="promo-floater" aria-label="Advertisement"></div>
         `;
 
         document.body.appendChild(container);
@@ -379,6 +389,7 @@
         // Render the ad unit
         const promoSlot = document.getElementById('ad-promo-floater');
         if (promoSlot && typeof window.PREPWISE_ADSTERRA !== 'undefined' && typeof window.PREPWISE_ADSTERRA.renderPlacement === 'function') {
+          promoSlot.classList.add('is-enabled');
           window.PREPWISE_ADSTERRA.renderPlacement(promoSlot).catch(() => {
             container.remove();
           });
