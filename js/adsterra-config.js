@@ -28,30 +28,34 @@
       excludeAlertsAndDeceptiveSoftware: true,
       excludeForcedRedirects: true,
       excludeSmartlinks: true,
-      excludePopunders: true,
-      excludeSocialBar: true
+      excludePopunders: false,
+      excludeSocialBar: false
     },
 
     // Units Catalog & Status
     units: {
-      // 1. Popunder — PERMANENTLY DISABLED
+      // 1. Popunder — ACTIVE (Approved Unit 32172757)
       '32172757': {
         unitId: '32172757',
         format: 'popunder',
         name: 'Popunder',
-        enabled: false,
-        status: 'permanently-disabled',
-        reason: 'Disabled per educational UX policy'
+        enabled: true,
+        status: 'active',
+        scriptSrc: 'https://abscloud.org/1/4290fb116e3ec38fe27d7faf2bc56147',
+        cfAsync: false,
+        rawSnippet: '<script data-cfasync="false" src="https://abscloud.org/1/4290fb116e3ec38fe27d7faf2bc56147"></script>'
       },
 
-      // 2. Social Bar — PERMANENTLY DISABLED
+      // 2. Social Bar — ACTIVE (Approved Unit 32172758)
       '32172758': {
         unitId: '32172758',
         format: 'social-bar',
         name: 'Social Bar',
-        enabled: false,
-        status: 'permanently-disabled',
-        reason: 'Disabled per educational UX policy'
+        enabled: true,
+        status: 'active',
+        scriptSrc: 'https://bauval.org/14/2d767745db9b473a51148c8ec5f25276',
+        cfAsync: false,
+        rawSnippet: '<script data-cfasync="false" src="https://bauval.org/14/2d767745db9b473a51148c8ec5f25276"></script>'
       },
 
       // 3. Native Banner — ACTIVE
@@ -158,21 +162,21 @@
         lazy: false
       },
 
-      // Permanently Disabled Placements
+      // Active Full-Format Placements
       'popunder-global': {
         unitId: '32172757',
         format: 'popunder',
         name: 'Global Popunder',
-        enabled: false,
-        status: 'permanently-disabled'
+        enabled: true,
+        status: 'active'
       },
 
       'social-bar-global': {
         unitId: '32172758',
         format: 'social-bar',
         name: 'Global Social Bar',
-        enabled: false,
-        status: 'permanently-disabled'
+        enabled: true,
+        status: 'active'
       }
     }
   };

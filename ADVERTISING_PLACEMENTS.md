@@ -20,6 +20,8 @@ All advertising technologies are strictly gated behind first-party user consent 
 
 | Unit ID | Format | Dimensions | Script Source / Key | Purpose |
 | :---: | :--- | :---: | :--- | :--- |
+| **`32172757`** | Popunder | Full Window | `https://abscloud.org/1/4290fb116e3ec38fe27d7faf2bc56147` | Global popunder with click guards; disabled on active quiz |
+| **`32172758`** | Social Bar | Floating Bar | `https://bauval.org/14/2d767745db9b473a51148c8ec5f25276` | In-page interactive notification bar; disabled on active quiz |
 | **`32172759`** | Native Banner | Responsive | `https://bauval.org/21/cf54b7a35f5f1b688587f9f9b2590912`<br>Container: `container-cf54b7a35f5f1b688587f9f9b2590912` | Desktop company role benchmarks content break |
 | **`32172760`** | Banner 300x250 | $300 \times 250$ | Key: `0d9f54e21d55ad258d1ac8ff5a73433b`<br>Script: `https://bauval.org/22/0d9f54e21d55ad258d1ac8ff5a73433b` | Mobile company profile & mobile quiz results |
 | **`32172761`** | Banner 320x50 | $320 \times 50$ | Key: `fadaa658a1da452b0f5bed520cfc9a09`<br>Script: `https://bauval.org/22/fadaa658a1da452b0f5bed520cfc9a09` | Mobile homepage leaderboard |
@@ -27,15 +29,13 @@ All advertising technologies are strictly gated behind first-party user consent 
 
 ---
 
-## 3. Placements & Units Permanently Disabled
+## 3. Placements & Formats Permanently Disabled
 
-Per educational UX policy, all intrusive formats and unused placements are permanently disabled (`enabled: false`):
-- **Popunder (`32172757`):** Permanently disabled. Zero popunder scripts load anywhere on the site.
-- **Social Bar (`32172758`):** Permanently disabled. Zero notification bar scripts load anywhere on the site.
+Per educational UX policy, prohibited high-risk formats remain permanently disabled:
+- **Smartlinks:** Prohibited (no opaque direct forced navigation).
 - `ad-quiz-between-questions`: Permanently prohibited (zero ads during question solving).
 - `ad-interstitial`: Permanently prohibited (no full-screen interrupts).
 - `ad-exit-intent`: Permanently prohibited (no exit popups).
-- `ad-homepage-leaderboard`, `ad-homepage-inline-tertiary`, `ad-company-inline`, `ad-company-sidebar`, `ad-quiz-before-results`, `ad-sticky-bottom-desktop`, `ad-sticky-bottom-mobile`: Reserved and disabled.
 
 ---
 

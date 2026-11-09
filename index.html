@@ -109,37 +109,48 @@
   </section>
 
   <!-- ========== FILTER BAR ========== -->
-  <section class="filter-section">
+  <section class="filter-section" id="filterSection">
     <div class="container">
       <div class="filter-bar">
-        <div class="filter-search">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Search companies, freshers roles, or tech stack..." aria-label="Search companies">
-          <kbd class="search-kbd" title="Press / to focus search">/</kbd>
+        <div class="filter-search-row">
+          <div class="filter-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search companies, freshers roles, or tech stack..." aria-label="Search companies">
+            <kbd class="search-kbd" title="Press / to focus search">/</kbd>
+          </div>
+          <button type="button" class="mobile-filter-btn" id="mobileFilterToggle" aria-expanded="false" aria-controls="mobileFilterPanel" aria-label="Toggle filters">
+            <span class="filter-btn-icon">⚡</span>
+            <span>Filters</span>
+            <span class="filter-active-badge" id="filterActiveBadge" hidden>0</span>
+          </button>
         </div>
-        <select class="filter-select" id="countryFilter" aria-label="Filter by country" style="min-width: 200px;">
-          <option value="">🌍 All Countries</option>
-          <!-- Loaded dynamically from data/countries.json without GDP numbers -->
-        </select>
-        <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
-          <option value="">All Sectors</option>
-          <option value="Big Tech">Big Tech (FAANG / Product)</option>
-          <option value="IT Services">IT Services & Mass Hiring</option>
-          <option value="Consulting">Consulting & Digital</option>
-        </select>
-        <span class="filter-count" id="filterCount">Showing 22 companies</span>
-      </div>
 
-      <!-- Level Selector Pills -->
-      <div class="level-selector-bar">
-        <span style="font-size:0.8rem; font-weight:700; color:var(--color-text-muted);">Preparation Level:</span>
-        <button class="level-pill active" data-level="">All Levels</button>
-        <button class="level-pill" data-level="Beginner">🌱 Beginner (Foundational)</button>
-        <button class="level-pill" data-level="Intermediate">⚡ Intermediate (Campus Standard)</button>
-        <button class="level-pill" data-level="Advanced">⚔️ Advanced (High Package)</button>
-        <button class="level-pill pill-legend" data-level="Legend">👑 Legend (FAANG Tier)</button>
-      </div>
+        <div class="filter-collapsible-panel" id="mobileFilterPanel">
+          <div class="filter-selects-row">
+            <select class="filter-select" id="countryFilter" aria-label="Filter by country">
+              <option value="">🌍 All Countries</option>
+              <!-- Loaded dynamically from data/countries.json without GDP numbers -->
+            </select>
+            <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
+              <option value="">All Sectors</option>
+              <option value="Big Tech">Big Tech (FAANG / Product)</option>
+              <option value="IT Services">IT Services & Mass Hiring</option>
+              <option value="Consulting">Consulting & Digital</option>
+            </select>
+            <span class="filter-count" id="filterCount">Showing 22 companies</span>
+          </div>
 
+          <!-- Level Selector Pills -->
+          <div class="level-selector-bar">
+            <span style="font-size:0.8rem; font-weight:700; color:var(--color-text-muted);">Preparation Level:</span>
+            <button class="level-pill active" data-level="">All Levels</button>
+            <button class="level-pill" data-level="Beginner">🌱 Beginner (Foundational)</button>
+            <button class="level-pill" data-level="Intermediate">⚡ Intermediate (Campus Standard)</button>
+            <button class="level-pill" data-level="Advanced">⚔️ Advanced (High Package)</button>
+            <button class="level-pill pill-legend" data-level="Legend">👑 Legend (FAANG Tier)</button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

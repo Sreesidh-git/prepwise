@@ -238,19 +238,39 @@
     },
 
     /**
-     * Social Bar (Unit 32172758) — Permanently Disabled.
+     * Social Bar (Unit 32172758)
      */
     initSocialBar() {
-      // Intentionally permanently disabled per educational UX policy.
-      return;
+      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (!config.units?.['32172758']?.enabled) return;
+      if (isQuizPageActive()) return; // strictly disabled on active timed quiz
+      if (document.getElementById('adsterra-social-bar')) return;
+
+      const script = document.createElement('script');
+      script.id = 'adsterra-social-bar';
+      script.dataset.cfasync = 'false';
+      script.src = config.units['32172758'].scriptSrc;
+      document.body.appendChild(script);
+      loadedScripts.add(script.src);
     },
 
     /**
-     * Popunder (Unit 32172757) — Permanently Disabled.
+     * Popunder (Unit 32172757) with educational click guards
      */
     initPopunder() {
-      // Intentionally permanently disabled per educational UX policy.
-      return;
+      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (!config.units?.['32172757']?.enabled) return;
+      if (isQuizPageActive()) return; // strictly disabled on active timed quiz
+      if (document.getElementById('adsterra-popunder')) return;
+
+      setupPopunderClickGuard();
+
+      const script = document.createElement('script');
+      script.id = 'adsterra-popunder';
+      script.dataset.cfasync = 'false';
+      script.src = config.units['32172757'].scriptSrc;
+      document.body.appendChild(script);
+      loadedScripts.add(script.src);
     },
 
     /**
@@ -270,6 +290,12 @@
         if (document.getElementById('ad-company-roles-inline')) {
           // Company profile roles ad will load when user views roles tab
         }
+      }
+
+      // Initialize Social Bar & Popunder (only outside active timed quiz)
+      if (!isQuizPageActive()) {
+        this.initSocialBar();
+        this.initPopunder();
       }
     },
 

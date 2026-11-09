@@ -182,6 +182,26 @@
     });
 
     renderCompanies(filteredCompanies);
+    updateMobileFilterBadge();
+  }
+
+  function updateMobileFilterBadge() {
+    const badge = document.getElementById('filterActiveBadge');
+    const toggleBtn = document.getElementById('mobileFilterToggle');
+    if (!badge || !toggleBtn) return;
+    let count = 0;
+    if (countryFilter && countryFilter.value) count++;
+    if (categoryFilter && categoryFilter.value) count++;
+    if (activeLevel) count++;
+
+    if (count > 0) {
+      badge.textContent = count;
+      badge.hidden = false;
+      toggleBtn.classList.add('has-active-filters');
+    } else {
+      badge.hidden = true;
+      toggleBtn.classList.remove('has-active-filters');
+    }
   }
 
   // ---------- Event Listeners ----------
@@ -217,6 +237,16 @@
         applyFilters();
       });
     });
+
+    // Mobile filter collapsible toggle
+    const mobileFilterToggle = document.getElementById('mobileFilterToggle');
+    const mobileFilterPanel = document.getElementById('mobileFilterPanel');
+    if (mobileFilterToggle && mobileFilterPanel) {
+      mobileFilterToggle.addEventListener('click', () => {
+        const isOpen = mobileFilterPanel.classList.toggle('is-open');
+        mobileFilterToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
 
     // Mobile menu toggle
     if (mobileMenuBtn && navMenu) {
