@@ -205,7 +205,7 @@
           try {
             const frameDoc = frame.contentDocument || frame.contentWindow.document;
             frameDoc.open();
-            frameDoc.write(`<!DOCTYPE html><html><head><base target="_blank"><style>body{margin:0;padding:0;overflow:hidden;display:flex;justify-content:center;align-items:center;background:transparent;}</style></head><body><script type="text/javascript">atOptions = {'key': '${unit.key || adsterraKey}','format': 'iframe','height': ${size[1]},'width': ${size[0]},'params': {}};</script><script type="text/javascript" src="${scriptSrc}"></script></body></html>`);
+            frameDoc.write(`<!DOCTYPE html><html><head><base target="_blank"><style>body{margin:0;padding:0;overflow:hidden;display:flex;justify-content:center;align-items:center;background:transparent;}</style></head><body><script type="text/javascript">atOptions = {'key': '${unit.key || adsterraKey}','format': 'iframe','height': ${size[1]},'width': ${size[0]},'params': {}};</script><script type="text/javascript" data-cfasync="false" src="${scriptSrc}"></script></body></html>`);
             frameDoc.close();
 
             loadedScripts.add(scriptSrc);
@@ -223,6 +223,7 @@
             };
             const script = document.createElement('script');
             script.id = `adsterra-script-${unitId}`;
+            script.setAttribute('data-cfasync', 'false');
             script.src = scriptSrc;
             script.onload = () => {
               loadedScripts.add(scriptSrc);
