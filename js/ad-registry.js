@@ -151,7 +151,7 @@
     const isLaunchCandidate = ['ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].includes(placement.id);
     return {
       ...placement,
-      enabled: false, // Invariant: all 13 remain disabled until genuine codes are verified
+      enabled: isLaunchCandidate, // 3 approved display placements enabled with genuine Adsterra units
       selectedForLaunch: isLaunchCandidate,
       provider: isLaunchCandidate ? 'adsterra' : null,
       networkConfig: isLaunchCandidate ? { provider: 'adsterra' } : null

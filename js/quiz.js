@@ -384,6 +384,8 @@
     if (idx < 0 || idx >= quizQuestions.length) return;
     isReviewMode = true;
     quizResults.style.display = 'none';
+    const quizAd = document.getElementById('ad-quiz-results');
+    if (quizAd) quizAd.style.display = 'none';
     quizHeader.style.display = 'block';
     if (quizRoleBanner && roleParam) quizRoleBanner.style.display = 'flex';
     questionArea.style.display = 'block';
@@ -600,12 +602,21 @@
       solutionVisibility = {};
       isReviewMode = false;
       quizResults.style.display = 'none';
+      const quizAd = document.getElementById('ad-quiz-results');
+      if (quizAd) quizAd.style.display = 'none';
       quizHeader.style.display = 'block';
       if (quizRoleBanner && roleParam) quizRoleBanner.style.display = 'flex';
       questionArea.style.display = 'block';
       quizNav.style.display = 'flex';
       renderQuestion(0);
     });
+
+    // Trigger quiz results ad slot if consented and enabled
+    const quizAd = document.getElementById('ad-quiz-results');
+    if (quizAd) quizAd.style.display = '';
+    if (typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
+      window.PREPWISE_ADS.enable('ad-quiz-results', { lazy: false });
+    }
 
     window.scrollTo({ top: quizResults.offsetTop - 50, behavior: 'smooth' });
   }

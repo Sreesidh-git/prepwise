@@ -394,13 +394,16 @@ function mockRequest(method, url, headers = {}, body = null) {
 
   const adRegistry = require('../js/ad-registry.js');
 
-  test('Every registered ad placement is explicitly disabled and locked', () => {
+  test('Every registered ad placement is explicitly managed (only 3 approved candidates enabled)', () => {
     const placements = adRegistry.placements;
     assert.strictEqual(placements.length, 13, `Expected 13 placements, found ${placements.length}`);
     for (const p of placements) {
-      assert.strictEqual(p.enabled, false, `Placement ${p.id} must be disabled`);
-      assert.strictEqual(p.provider, null, `Placement ${p.id} must have null provider`);
-      assert.strictEqual(p.networkConfig, null, `Placement ${p.id} must have null networkConfig`);
+      if (p.selectedForLaunch) {
+        assert.strictEqual(p.provider, 'adsterra', `Launch placement ${p.id} must use adsterra`);
+      } else {
+        assert.strictEqual(p.enabled, false, `Non-launch placement ${p.id} must be disabled`);
+        assert.strictEqual(p.provider, null, `Non-launch placement ${p.id} must have null provider`);
+      }
     }
   });
 

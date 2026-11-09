@@ -1,61 +1,53 @@
-# PrepWise Advertising Placements & Monetization Architecture
+# PrepWise Advertising Placements & Monetization Architecture (Adsterra)
 
-PrepWise has transitioned to **Adsterra** as its prospective sole advertising provider.
+PrepWise uses **Adsterra** as its advertising provider across three strictly non-intrusive container display placements.
 
-All 13 registered ad units in this codebase are currently **disabled** (`enabled: false`).
-Zero mock ad keys, simulated impressions, or placeholder scripts run on this platform.
-
-Monetization will launch only after the Adsterra publisher account and domain (`prepwises.online`) are approved and genuine provider ad tags are installed.
+All advertising technologies are strictly gated behind first-party user consent (`PrepWiseConsent.hasConsent('advertising')`). Zero ad scripts load without explicit user consent.
 
 ---
 
-## 1. Initial Launch Placement Strategy (3 Placements)
+## 1. The Three Active Display Placements
 
-To protect the educational student experience and prevent layout clutter or accidental clicks, PrepWise initially selects only three placements:
-
-| ID | Location | Format & Sizing | Intended Trigger | Launch Role |
+| Placement Slot ID | Page Context | Desktop Unit | Mobile Unit | Trigger Timing |
 | :--- | :--- | :--- | :--- | :--- |
-| `ad-homepage-inline-secondary` | Below the homepage company cards grid | Banner: 728×90 (desktop) / 320×50 (mobile) | Natural content break after grid render | **Launch Candidate 1** (Homepage in-content) |
-| `ad-company-roles-inline` | Between company syllabus and hiring roles | Native banner / 300×250 rectangle | After roles grid render | **Launch Candidate 2** (Company profile native) |
-| `ad-quiz-results` | Strictly below quiz completion score & answers | Responsive Banner: 728×90 (desktop) / 300×250 (mobile) | After test completion and results render | **Launch Candidate 3** (Quiz completion screen) |
+| **`ad-homepage-inline-secondary`** | Homepage content break | **Unit `32172762`** ($728 \times 90$) | **Unit `32172761`** ($320 \times 50$) | Lazy-loaded on scroll below company cards grid |
+| **`ad-company-roles-inline`** | Company profile roles | **Unit `32172759`** (Native Banner) | **Unit `32172760`** ($300 \times 250$) | Loaded on user navigation to Roles & Salaries tab |
+| **`ad-quiz-results`** | Post-quiz completion screen | **Unit `32172762`** ($728 \times 90$) | **Unit `32172760`** ($300 \times 250$) | Rendered strictly after test scoring & answer review |
 
 ---
 
-## 2. Placements Kept Disabled (10 Placements)
+## 2. Active Units & Format Specifications
 
-The remaining 10 placements remain explicitly disabled in `js/ad-registry.js` and `js/adsterra-config.js`:
-
-| ID | Reason for Disabling |
-| :--- | :--- |
-| `ad-homepage-leaderboard` | Reserved; limited to 1 in-content banner on homepage initially. |
-| `ad-homepage-inline-tertiary` | Reserved; secondary in-content slot sufficient for long-scroll flow. |
-| `ad-company-inline` | Reserved; company overview kept distraction-free. |
-| `ad-company-sidebar` | Reserved; company sidebar kept focused on official metadata. |
-| `ad-quiz-before-results` | Reserved; must never delay or obstruct quiz scoring. |
-| `ad-sticky-bottom-desktop` | Reserved; sticky banners restricted to avoid obstructing student navigation. |
-| `ad-sticky-bottom-mobile` | Reserved; preserves mobile viewport height. |
-| `ad-quiz-between-questions` | **PROHIBITED:** High policy risk. Zero ads permitted during active quizzes or near answer buttons. |
-| `ad-interstitial` | **PROHIBITED:** Full-screen overlays violate educational UX standards. |
-| `ad-exit-intent` | **PROHIBITED:** Exit popups degrade user trust. |
+| Unit ID | Format | Dimensions | Script Source / Key | Purpose |
+| :---: | :--- | :---: | :--- | :--- |
+| **`32172759`** | Native Banner | Responsive | `https://bauval.org/21/cf54b7a35f5f1b688587f9f9b2590912`<br>Container: `container-cf54b7a35f5f1b688587f9f9b2590912` | Desktop company role benchmarks content break |
+| **`32172760`** | Banner 300x250 | $300 \times 250$ | Key: `0d9f54e21d55ad258d1ac8ff5a73433b`<br>Script: `https://bauval.org/22/0d9f54e21d55ad258d1ac8ff5a73433b` | Mobile company profile & mobile quiz results |
+| **`32172761`** | Banner 320x50 | $320 \times 50$ | Key: `fadaa658a1da452b0f5bed520cfc9a09`<br>Script: `https://bauval.org/22/fadaa658a1da452b0f5bed520cfc9a09` | Mobile homepage leaderboard |
+| **`32172762`** | Banner 728x90 | $728 \times 90$ | Key: `f2c5fa5caeb276be7a6a9192acffab05`<br>Script: `https://bauval.org/22/f2c5fa5caeb276be7a6a9192acffab05` | Desktop homepage & desktop quiz results |
 
 ---
 
-## 3. Adsterra Quality & Safety Invariants
+## 3. Placements & Units Permanently Disabled
 
-In the Adsterra Publisher Dashboard, the following formats and categories MUST be excluded:
-- **No Adult / NSFW Content**
-- **No Gambling or Casino Promotions**
-- **No Software / Deceptive Download Alerts** (e.g. fake "virus detected" or "browser update" warnings)
-- **No Forced Redirects or Browser Abuse**
-- **No Popunders (Onclick)**
-- **No Smartlinks** (Smartlinks are strictly prohibited on quiz buttons, navigation links, or question options)
+Per educational UX policy, all intrusive formats and unused placements are permanently disabled (`enabled: false`):
+- **Popunder (`32172757`):** Permanently disabled. Zero popunder scripts load anywhere on the site.
+- **Social Bar (`32172758`):** Permanently disabled. Zero notification bar scripts load anywhere on the site.
+- `ad-quiz-between-questions`: Permanently prohibited (zero ads during question solving).
+- `ad-interstitial`: Permanently prohibited (no full-screen interrupts).
+- `ad-exit-intent`: Permanently prohibited (no exit popups).
+- `ad-homepage-leaderboard`, `ad-homepage-inline-tertiary`, `ad-company-inline`, `ad-company-sidebar`, `ad-quiz-before-results`, `ad-sticky-bottom-desktop`, `ad-sticky-bottom-mobile`: Reserved and disabled.
 
 ---
 
-## 4. Technical Architecture & File Inventory
+## 4. Educational Safeguards & Policy Invariants
 
-- [`js/adsterra-config.js`](./js/adsterra-config.js): Central source of truth for Adsterra settings, publisher ID, unit types, dimensions, and per-placement enable/disable switches.
-- [`js/adsterra-provider.js`](./js/adsterra-provider.js): Provider implementation implementing the `request({ placement, element })` contract for `window.PREPWISE_ADS`. Enforces consent verification, deduplication, responsive layout reservation, and emergency kill-switches (`PREPWISE_ADSTERRA.killPlacement` and `PREPWISE_ADSTERRA.killAll`).
-- [`js/ad-registry.js`](./js/ad-registry.js): Browser-safe catalog of all 13 placements. All set to `enabled: false`.
-- [`js/ad-loader.js`](./js/ad-loader.js): Provider-agnostic lifecycle engine (device targeting, IntersectionObserver lazy loading, frequency-capping, Escape dismissal).
-- [`js/consent.js`](./js/consent.js): First-party cookie and preference manager. Ads will NEVER load without explicit `advertising: true` consent.
+1. **Explicit Cookie Consent Gate:**
+   No ad script tag or iframe is created until the user explicitly accepts advertising cookies in `PrepWiseConsent`.
+2. **Zero In-Quiz Interruptions:**
+   No ads appear between questions or within question cards. While the student is actively solving questions, the quiz container is 100% ad-free.
+3. **Cumulative Layout Shift (CLS) Prevention:**
+   Every active slot reserves explicit min-height matching unit dimensions (`728x90` reserves 114px, `300x250` reserves 274px, `320x50` reserves 74px) with accessible `Advertisement` labels.
+4. **Isolated Friendly Iframes:**
+   Display banners execute in isolated child frames, preventing `window.atOptions` collision and CSS bleed.
+5. **Emergency Kill-Switches:**
+   `PREPWISE_ADSTERRA.killPlacement(id)` and `PREPWISE_ADSTERRA.killAll()` allow real-time programmatic shutdown if any ad unit misbehaves.

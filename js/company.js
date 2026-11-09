@@ -497,6 +497,11 @@
         btn.classList.add('active');
         const activePanel = document.getElementById(`tab-${target}`);
         if (activePanel) activePanel.classList.add('active');
+
+        // Trigger in-content role advertisement if user navigates to roles tab
+        if (target === 'roles' && typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
+          window.PREPWISE_ADS.enable('ad-company-roles-inline', { lazy: false });
+        }
       });
     });
   }

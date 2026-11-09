@@ -90,8 +90,7 @@
           <p class="prepwise-consent-title"><strong>Your Privacy Choices</strong></p>
           <p class="prepwise-consent-desc">
             We use strictly necessary storage to power practice quizzes and maintain platform security.
-            With your permission, we also collect minimal, anonymized analytics to see which interview topics are most helpful.
-            All advertising is currently 100% disabled.
+            With your permission, we also show non-intrusive display banners from Adsterra and collect minimal analytics to keep PrepWise free for students globally.
           </p>
         </div>
         <div class="prepwise-consent-actions">
@@ -184,13 +183,13 @@
           <div class="consent-category">
             <div class="consent-category-header">
               <label for="toggleAdvertising">
-                <strong>Advertising &amp; Personalization</strong>
-                <span class="consent-badge consent-badge-disabled">All Ads Disabled</span>
+                <strong>Advertising &amp; Monetization</strong>
+                <span class="consent-badge">Optional</span>
               </label>
               <input type="checkbox" id="toggleAdvertising" class="consent-toggle">
             </div>
             <p class="consent-category-desc">
-              Authorizes future non-intrusive educational display banners. <em>Note: All 13 advertising placements are currently 100% disabled in PrepWise. No ad networks run on this site.</em>
+              Authorizes standard non-intrusive display banners and native widgets from our partner Adsterra in three designated content breaks. Zero popunders, floating bars, or in-quiz ads run on this site.
             </p>
           </div>
         </div>

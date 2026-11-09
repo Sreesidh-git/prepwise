@@ -1,17 +1,13 @@
 /**
- * PrepWise — Centralized Adsterra Advertising Configuration
+ * PrepWise — Centralized Adsterra Advertising Configuration (3 Active Display Placements)
  * 
  * Sole monetization provider configuration for PrepWise (https://prepwises.online).
  * 
- * SAFETY INVARIANTS:
- * 1. Global master switch `enabled` is FALSE until genuine publisher account and codes are verified.
- * 2. NO fake publisher IDs, mock keys, or simulated script sources are allowed.
- * 3. Only 3 initial safe placements are selected for launch:
- *    - Homepage: ad-homepage-inline-secondary (banner after company grid)
- *    - Company Profile: ad-company-roles-inline (native/banner between syllabus and roles)
- *    - Quiz Results: ad-quiz-results (banner strictly below results and explanations)
- * 4. High-risk placements (interstitials, popunders, smartlinks, in-quiz questions) are PROHIBITED.
- * 5. Requires explicit user consent ('advertising' category) via PrepWiseConsent before loading.
+ * POLICY DECISION:
+ * - ACTIVE: 3 non-intrusive container display placements (Homepage, Company Profile, Quiz Results).
+ * - PERMANENTLY DISABLED: Popunder (Unit 32172757) and Social Bar (Unit 32172758).
+ * - ZERO forced redirects, notification ads, popunders, or smartlinks anywhere on the site.
+ * - Strictly requires explicit user consent ('advertising' category) via PrepWiseConsent before loading.
  */
 
 (function () {
@@ -19,172 +15,160 @@
 
   const ADSTERRA_CONFIG = {
     provider: 'adsterra',
-    version: '1.0.0',
+    version: '2.1.0',
     websiteDomain: 'prepwises.online',
 
-    // MASTER KILL-SWITCH
-    // Set to true only when domain is approved in Adsterra and genuine codes are installed.
-    enabled: false,
+    // MASTER SWITCH (Active for verified display placements)
+    enabled: true,
 
-    // Publisher details (supplied by account owner)
-    publisherId: null,
-
-    // Safety and quality filters (configured in Adsterra dashboard)
+    // Safety and quality filters configured in Adsterra Dashboard
     filters: {
       excludeAdult: true,
       excludeGambling: true,
       excludeAlertsAndDeceptiveSoftware: true,
       excludeForcedRedirects: true,
+      excludeSmartlinks: true,
       excludePopunders: true,
-      excludeSmartlinks: true
+      excludeSocialBar: true
     },
 
-    // Individual placement configurations
+    // Units Catalog & Status
+    units: {
+      // 1. Popunder — PERMANENTLY DISABLED
+      '32172757': {
+        unitId: '32172757',
+        format: 'popunder',
+        name: 'Popunder',
+        enabled: false,
+        status: 'permanently-disabled',
+        reason: 'Disabled per educational UX policy'
+      },
+
+      // 2. Social Bar — PERMANENTLY DISABLED
+      '32172758': {
+        unitId: '32172758',
+        format: 'social-bar',
+        name: 'Social Bar',
+        enabled: false,
+        status: 'permanently-disabled',
+        reason: 'Disabled per educational UX policy'
+      },
+
+      // 3. Native Banner — ACTIVE
+      '32172759': {
+        unitId: '32172759',
+        format: 'native-banner',
+        name: 'Native Banner',
+        enabled: true,
+        scriptSrc: 'https://bauval.org/21/cf54b7a35f5f1b688587f9f9b2590912',
+        containerId: 'container-cf54b7a35f5f1b688587f9f9b2590912',
+        cfAsync: false,
+        async: true,
+        rawSnippet: '<script async="async" data-cfasync="false" src="https://bauval.org/21/cf54b7a35f5f1b688587f9f9b2590912"></script><div id="container-cf54b7a35f5f1b688587f9f9b2590912"></div>'
+      },
+
+      // 4. Banner 300x250 — ACTIVE
+      '32172760': {
+        unitId: '32172760',
+        format: 'banner-300x250',
+        name: 'Banner 300x250',
+        width: 300,
+        height: 250,
+        enabled: true,
+        key: '0d9f54e21d55ad258d1ac8ff5a73433b',
+        scriptSrc: 'https://bauval.org/22/0d9f54e21d55ad258d1ac8ff5a73433b',
+        rawSnippet: "<script>atOptions = {'key':'0d9f54e21d55ad258d1ac8ff5a73433b','format':'iframe','height':250,'width':300,'params':{}};</script><script src=\"https://bauval.org/22/0d9f54e21d55ad258d1ac8ff5a73433b\"></script>"
+      },
+
+      // 5. Banner 320x50 — ACTIVE
+      '32172761': {
+        unitId: '32172761',
+        format: 'banner-320x50',
+        name: 'Banner 320x50',
+        width: 320,
+        height: 50,
+        enabled: true,
+        key: 'fadaa658a1da452b0f5bed520cfc9a09',
+        scriptSrc: 'https://bauval.org/22/fadaa658a1da452b0f5bed520cfc9a09',
+        rawSnippet: "<script>atOptions = {'key':'fadaa658a1da452b0f5bed520cfc9a09','format':'iframe','height':50,'width':320,'params':{}};</script><script src=\"https://bauval.org/22/fadaa658a1da452b0f5bed520cfc9a09\"></script>"
+      },
+
+      // 6. Banner 728x90 — ACTIVE
+      '32172762': {
+        unitId: '32172762',
+        format: 'banner-728x90',
+        name: 'Banner 728x90',
+        width: 728,
+        height: 90,
+        enabled: true,
+        key: 'f2c5fa5caeb276be7a6a9192acffab05',
+        scriptSrc: 'https://bauval.org/22/f2c5fa5caeb276be7a6a9192acffab05',
+        rawSnippet: "<script>atOptions = {'key':'f2c5fa5caeb276be7a6a9192acffab05','format':'iframe','height':90,'width':728,'params':{}};</script><script src=\"https://bauval.org/22/f2c5fa5caeb276be7a6a9192acffab05\"></script>"
+      }
+    },
+
+    // Site Placement Mappings (Exactly 3 Active Display Slots)
     placements: {
-      // --- LAUNCH CANDIDATE 1: Homepage Inline Secondary ---
+      // 1. Homepage: Banner 728x90 on Desktop / Banner 320x50 on Mobile
       'ad-homepage-inline-secondary': {
-        name: 'Homepage In-Content Banner',
+        slotId: 'ad-homepage-inline-secondary',
         page: 'homepage',
-        selectedForLaunch: true,
-        enabled: false, // Activated when genuine Adsterra code is supplied
-        type: 'banner', // 728x90 desktop / 320x50 mobile
-        targetElementId: 'ad-homepage-inline-secondary',
+        name: 'Homepage In-Content Break',
         label: 'Sponsored',
-        sizes: {
-          desktop: [728, 90],
-          tablet: [728, 90],
-          mobile: [320, 50]
-        },
-        lazy: true,
-        // Genuine Adsterra parameters to be populated from dashboard:
-        adsterraKey: null,
-        scriptSrc: null
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        mobileUnitId: '32172761',  // Banner 320x50
+        lazy: true
       },
 
-      // --- LAUNCH CANDIDATE 2: Company Profile Roles Inline ---
+      // 2. Company Profile: Native Banner on Desktop / 300x250 on Mobile
       'ad-company-roles-inline': {
-        name: 'Company Roles In-Content Banner / Native',
+        slotId: 'ad-company-roles-inline',
         page: 'company',
-        selectedForLaunch: true,
-        enabled: false, // Activated when genuine Adsterra code is supplied
-        type: 'native', // Native banner / 4:1 banner / 300x250
-        targetElementId: 'ad-company-roles-inline',
+        name: 'Company Roles Content Break',
         label: 'Sponsored',
-        sizes: {
-          desktop: [728, 90],
-          tablet: [728, 90],
-          mobile: [300, 250]
-        },
-        lazy: true,
-        // Genuine Adsterra parameters to be populated from dashboard:
-        adsterraKey: null,
-        scriptSrc: null
+        enabled: true,
+        desktopUnitId: '32172759', // Native Banner
+        mobileUnitId: '32172760',  // Banner 300x250
+        lazy: true
       },
 
-      // --- LAUNCH CANDIDATE 3: Quiz Completion Results ---
+      // 3. Quiz Completion Screen: Banner 728x90 on Desktop / 300x250 on Mobile
       'ad-quiz-results': {
+        slotId: 'ad-quiz-results',
+        page: 'quiz',
         name: 'Quiz Completion Results Banner',
-        page: 'quiz',
-        selectedForLaunch: true,
-        enabled: false, // Activated when genuine Adsterra code is supplied
-        type: 'banner', // 728x90 desktop / 300x250 mobile
-        targetElementId: 'ad-quiz-results',
         label: 'Advertisement',
-        sizes: {
-          desktop: [728, 90],
-          tablet: [728, 90],
-          mobile: [300, 250]
-        },
-        lazy: false, // Renders immediately when results screen opens
-        // Genuine Adsterra parameters to be populated from dashboard:
-        adsterraKey: null,
-        scriptSrc: null
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        mobileUnitId: '32172760',   // Banner 300x250
+        fallbackUnitId: '32172760',
+        lazy: false
       },
 
-      // --- REMAINING PLACEMENTS: STRICTLY DISABLED ---
-      'ad-homepage-leaderboard': {
-        name: 'Homepage Leaderboard',
-        page: 'homepage',
-        selectedForLaunch: false,
+      // Permanently Disabled Placements
+      'popunder-global': {
+        unitId: '32172757',
+        format: 'popunder',
+        name: 'Global Popunder',
         enabled: false,
-        reason: 'Reserved; initial launch limited to 1 banner per page'
-      },
-      'ad-homepage-inline-tertiary': {
-        name: 'Homepage Tertiary Banner',
-        page: 'homepage',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Reserved'
-      },
-      'ad-company-inline': {
-        name: 'Company Overview Inline',
-        page: 'company',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Reserved; roles placement prioritized'
-      },
-      'ad-company-sidebar': {
-        name: 'Company Sidebar',
-        page: 'company',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Reserved'
-      },
-      'ad-quiz-before-results': {
-        name: 'Quiz Pre-Results Slot',
-        page: 'quiz',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Must not obstruct test submission'
-      },
-      'ad-sticky-bottom-desktop': {
-        name: 'Desktop Bottom Anchor',
-        page: 'all',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Reserved; evaluate user experience before introducing sticky units'
-      },
-      'ad-sticky-bottom-mobile': {
-        name: 'Mobile Bottom Anchor',
-        page: 'all',
-        selectedForLaunch: false,
-        enabled: false,
-        reason: 'Reserved; evaluate screen estate before introducing sticky units'
+        status: 'permanently-disabled'
       },
 
-      // --- PROHIBITED PLACEMENTS: PERMANENTLY DISABLED ---
-      'ad-quiz-between-questions': {
-        name: 'Active Quiz Inter-Question Slot',
-        page: 'quiz',
-        selectedForLaunch: false,
+      'social-bar-global': {
+        unitId: '32172758',
+        format: 'social-bar',
+        name: 'Global Social Bar',
         enabled: false,
-        prohibited: true,
-        reason: 'PROHIBITED: Never display ads between questions or near answer choices'
-      },
-      'ad-interstitial': {
-        name: 'Full Screen Interstitial',
-        page: 'all',
-        selectedForLaunch: false,
-        enabled: false,
-        prohibited: true,
-        reason: 'PROHIBITED: No intrusive full-page overlays on educational site'
-      },
-      'ad-exit-intent': {
-        name: 'Exit Intent Modal',
-        page: 'all',
-        selectedForLaunch: false,
-        enabled: false,
-        prohibited: true,
-        reason: 'PROHIBITED: No exit-intent popups'
+        status: 'permanently-disabled'
       }
     }
   };
 
   const root = typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this);
-  root.PREPWISE_ADSTERRA_CONFIG = Object.freeze(ADSTERRA_CONFIG);
+  root.PREPWISE_ADSTERRA_CONFIG = ADSTERRA_CONFIG;
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = ADSTERRA_CONFIG;
   }
 })();
-

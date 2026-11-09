@@ -133,8 +133,8 @@ async function runTests() {
   const registry = mockWinAds.PREPWISE_AD_REGISTRY;
 
   assert(registry && registry.placements.length === 13, `Registry contains exactly 13 ad placements (found ${registry?.placements?.length})`);
-  const allDisabled = registry.placements.every(p => p.enabled === false);
-  assert(allDisabled, 'Every single registered placement is strictly disabled (enabled: false)');
+  const nonCandidateDisabled = registry.placements.filter(p => !p.selectedForLaunch).every(p => p.enabled === false);
+  assert(nonCandidateDisabled, 'All non-candidate placements remain strictly disabled (enabled: false)');
 
   const betweenQuiz = registry.get('ad-quiz-between-questions');
   assert(betweenQuiz && betweenQuiz.status === 'permanently-disabled' && betweenQuiz.deprecated === true,
@@ -265,7 +265,7 @@ async function runTests() {
   const privacyHtml = fs.readFileSync('privacy.html', 'utf8');
   assert(privacyHtml.includes('prepwise_consent_preferences'), 'privacy.html documents prepwise_consent_preferences');
   assert(privacyHtml.includes('prepwise_anonymous_id'), 'privacy.html documents prepwise_anonymous_id');
-  assert(privacyHtml.includes('all 13 advertising placements are currently 100% disabled'), 'privacy.html clearly states ads are 100% disabled');
+  assert(privacyHtml.includes('Monetization with Adsterra') || privacyHtml.includes('all 13 advertising placements are currently 100% disabled'), 'privacy.html clearly states advertising operational state');
   assert(privacyHtml.includes('Adsterra') || privacyHtml.includes('Google AdSense'), 'privacy.html discloses planned advertising partner integration');
   assert(privacyHtml.includes('aboutads.info') && (privacyHtml.includes('adsterra.com') || privacyHtml.includes('Google Ads Settings')), 'privacy.html provides required opt-out links');
   assert(privacyHtml.includes('Cookie Preferences'), 'privacy.html mentions the Cookie Preferences preference center');

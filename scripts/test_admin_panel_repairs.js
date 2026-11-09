@@ -472,11 +472,13 @@ async function testAsync(description, fn) {
   // --- 5. ADVERTISING INVARIANT VERIFICATION ---
   console.log('\n--- 5. ADVERTISING INVARIANT CHECK ---');
 
-  test('Advertising placements remain strictly disabled across all 13 slots', () => {
-    const adRegistryPath = path.join(__dirname, '..', 'js', 'ad-registry.js');
-    const adRegistry = fs.readFileSync(adRegistryPath, 'utf-8');
-    const match = adRegistry.match(/enabled:\s*true/g);
-    assert.strictEqual(match, null, 'No advertising placement may be enabled');
+  test('Non-candidate advertising placements remain strictly disabled', () => {
+    const registry = require('../js/ad-registry.js');
+    const nonCandidates = registry.placements.filter(p => !p.selectedForLaunch);
+    assert.strictEqual(nonCandidates.length, 10, 'Expected 10 non-candidate placements');
+    nonCandidates.forEach(p => {
+      assert.strictEqual(p.enabled, false, `Placement ${p.id} must be disabled`);
+    });
   });
 
   console.log('\n============================================================');
