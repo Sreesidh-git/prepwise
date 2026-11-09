@@ -1,0 +1,430 @@
+[
+  {
+    "type": "company",
+    "slug": "tcs",
+    "expectedCanonical": "https://prepwises.online/company?id=tcs",
+    "actualCanonical": "https://prepwises.online/company?id=tcs",
+    "title": "Tata Consultancy Services Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Tata Consultancy Services (TCS)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "infosys",
+    "expectedCanonical": "https://prepwises.online/company?id=infosys",
+    "actualCanonical": "https://prepwises.online/company?id=infosys",
+    "title": "Infosys Limited Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Infosys Limited (Infosys)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "wipro",
+    "expectedCanonical": "https://prepwises.online/company?id=wipro",
+    "actualCanonical": "https://prepwises.online/company?id=wipro",
+    "title": "Wipro Limited Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Wipro Limited (Wipro)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "google",
+    "expectedCanonical": "https://prepwises.online/company?id=google",
+    "actualCanonical": "https://prepwises.online/company?id=google",
+    "title": "Google (Alphabet Inc.) Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Google (Alphabet Inc.) (Google)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "microsoft",
+    "expectedCanonical": "https://prepwises.online/company?id=microsoft",
+    "actualCanonical": "https://prepwises.online/company?id=microsoft",
+    "title": "Microsoft Corporation Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Microsoft Corporation (Microsoft)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "amazon",
+    "expectedCanonical": "https://prepwises.online/company?id=amazon",
+    "actualCanonical": "https://prepwises.online/company?id=amazon",
+    "title": "Amazon.com, Inc. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Amazon.com, Inc. (Amazon)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "accenture",
+    "expectedCanonical": "https://prepwises.online/company?id=accenture",
+    "actualCanonical": "https://prepwises.online/company?id=accenture",
+    "title": "Accenture plc Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Accenture plc (Accenture)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "cognizant",
+    "expectedCanonical": "https://prepwises.online/company?id=cognizant",
+    "actualCanonical": "https://prepwises.online/company?id=cognizant",
+    "title": "Cognizant Technology Solutions Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Cognizant Technology Solutions (Cognizant)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "hcl",
+    "expectedCanonical": "https://prepwises.online/company?id=hcl",
+    "actualCanonical": "https://prepwises.online/company?id=hcl",
+    "title": "HCL Technologies Limited Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "HCL Technologies Limited (HCL Tech)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "ibm",
+    "expectedCanonical": "https://prepwises.online/company?id=ibm",
+    "actualCanonical": "https://prepwises.online/company?id=ibm",
+    "title": "International Business Machines Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "International Business Machines (IBM)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "sap",
+    "expectedCanonical": "https://prepwises.online/company?id=sap",
+    "actualCanonical": "https://prepwises.online/company?id=sap",
+    "title": "SAP SE Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "SAP SE (SAP)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "samsung",
+    "expectedCanonical": "https://prepwises.online/company?id=samsung",
+    "actualCanonical": "https://prepwises.online/company?id=samsung",
+    "title": "Samsung Electronics Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Samsung Electronics (Samsung)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "sony",
+    "expectedCanonical": "https://prepwises.online/company?id=sony",
+    "actualCanonical": "https://prepwises.online/company?id=sony",
+    "title": "Sony Group Corporation Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Sony Group Corporation (Sony)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "atlassian",
+    "expectedCanonical": "https://prepwises.online/company?id=atlassian",
+    "actualCanonical": "https://prepwises.online/company?id=atlassian",
+    "title": "Atlassian Corporation Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Atlassian Corporation (Atlassian)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "spotify",
+    "expectedCanonical": "https://prepwises.online/company?id=spotify",
+    "actualCanonical": "https://prepwises.online/company?id=spotify",
+    "title": "Spotify Technology S.A. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Spotify Technology S.A. (Spotify)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "shopify",
+    "expectedCanonical": "https://prepwises.online/company?id=shopify",
+    "actualCanonical": "https://prepwises.online/company?id=shopify",
+    "title": "Shopify Inc. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Shopify Inc. (Shopify)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "asml",
+    "expectedCanonical": "https://prepwises.online/company?id=asml",
+    "actualCanonical": "https://prepwises.online/company?id=asml",
+    "title": "ASML Holding N.V. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "ASML Holding N.V. (ASML)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "stripe",
+    "expectedCanonical": "https://prepwises.online/company?id=stripe",
+    "actualCanonical": "https://prepwises.online/company?id=stripe",
+    "title": "Stripe, Inc. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Stripe, Inc. (Stripe)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "capgemini",
+    "expectedCanonical": "https://prepwises.online/company?id=capgemini",
+    "actualCanonical": "https://prepwises.online/company?id=capgemini",
+    "title": "Capgemini SE Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Capgemini SE (Capgemini)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "careem",
+    "expectedCanonical": "https://prepwises.online/company?id=careem",
+    "actualCanonical": "https://prepwises.online/company?id=careem",
+    "title": "Careem (An Uber Company) Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Careem (An Uber Company) (Careem)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "nubank",
+    "expectedCanonical": "https://prepwises.online/company?id=nubank",
+    "actualCanonical": "https://prepwises.online/company?id=nubank",
+    "title": "Nu Holdings Ltd. (Nubank) Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Nu Holdings Ltd. (Nubank) (Nubank)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "company",
+    "slug": "mercadolibre",
+    "expectedCanonical": "https://prepwises.online/company?id=mercadolibre",
+    "actualCanonical": "https://prepwises.online/company?id=mercadolibre",
+    "title": "Mercado Libre, Inc. Interview Prep, Roles &amp; Salaries — PrepWise",
+    "h1": "Mercado Libre, Inc. (Mercado Libre)",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notGenericCompany": true,
+      "notPagesDev": true,
+      "contentMatchesCompany": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Homepage",
+    "route": "/",
+    "expectedCanonical": "https://prepwises.online/",
+    "actualCanonical": "https://prepwises.online/",
+    "title": "PrepWise — Free Company Interview Prep &amp; Aptitude Tests",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Quiz",
+    "route": "/quiz",
+    "expectedCanonical": "https://prepwises.online/quiz",
+    "actualCanonical": "https://prepwises.online/quiz",
+    "title": "TCS Practice Quiz (Full Test) — PrepWise",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "About",
+    "route": "/about",
+    "expectedCanonical": "https://prepwises.online/about",
+    "actualCanonical": "https://prepwises.online/about",
+    "title": "About PrepWise — Frictionless Interview Preparation",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Contact",
+    "route": "/contact",
+    "expectedCanonical": "https://prepwises.online/contact",
+    "actualCanonical": "https://prepwises.online/contact",
+    "title": "Contact Us — PrepWise",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Privacy Policy",
+    "route": "/privacy",
+    "expectedCanonical": "https://prepwises.online/privacy",
+    "actualCanonical": "https://prepwises.online/privacy",
+    "title": "Privacy Policy — PrepWise",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Terms of Use",
+    "route": "/terms",
+    "expectedCanonical": "https://prepwises.online/terms",
+    "actualCanonical": "https://prepwises.online/terms",
+    "title": "Terms of Use — PrepWise",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  },
+  {
+    "type": "static",
+    "name": "Disclaimer",
+    "route": "/disclaimer",
+    "expectedCanonical": "https://prepwises.online/disclaimer",
+    "actualCanonical": "https://prepwises.online/disclaimer",
+    "title": "Disclaimer &amp; Non-Affiliation Notice — PrepWise",
+    "checks": {
+      "exactCanonicalMatch": true,
+      "notPagesDev": true,
+      "hasTitle": true
+    },
+    "passed": true
+  }
+]

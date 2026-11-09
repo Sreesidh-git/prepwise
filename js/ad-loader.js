@@ -85,7 +85,7 @@
   function load(id, options = {}) {
     const placement = getPlacement(id);
     const element = document.getElementById(id);
-    if (!element || !placement.enabled || !isTargeted(placement)) {
+    if (!element || !placement.enabled || placement.status === 'permanently-disabled' || !isTargeted(placement)) {
       return Promise.resolve({ status: 'disabled', placementId: id });
     }
     if (states.get(id)?.status === 'loaded') {
@@ -152,7 +152,7 @@
 
   function enable(id, options = {}) {
     const placement = getPlacement(id);
-    if (!placement.enabled) return false;
+    if (!placement.enabled || placement.status === 'permanently-disabled') return false;
     if (!isTargeted(placement)) return false;
     const element = document.getElementById(id);
     if (!element) return false;

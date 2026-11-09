@@ -2529,3 +2529,29 @@ input:checked + .slider:before {
   background: #fffbeb;
   color: #92400e;
 }
+
+/* Advertising Safety Guardrails: Prevent layout overlap with quiz interactive elements */
+.quiz-container,
+.question-card,
+.options-grid,
+.quiz-nav,
+.quiz-btn,
+.option-btn {
+  position: relative;
+  z-index: 10;
+}
+
+.ad-slot {
+  position: relative;
+  z-index: 1;
+}
+
+.ad-slot:not(.is-enabled) {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
+}

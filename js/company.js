@@ -85,6 +85,15 @@
       document.title = `${company.name} Interview Prep, Roles & Salaries — PrepWise`;
       breadcrumbCompany.textContent = company.shortName || company.name;
 
+      const canonicalLink = document.getElementById('canonicalLink') || document.querySelector('link[rel="canonical"]');
+      if (canonicalLink) {
+        canonicalLink.href = `https://prepwises.online/company?id=${encodeURIComponent(company.id || companyId)}`;
+      }
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.content = `Free ${company.name} interview questions, recruitment test patterns, syllabus, and practice tests on PrepWise. No login required.`;
+      }
+
       renderHeader(company);
       renderOverview(company);
       renderRoles(company);

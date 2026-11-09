@@ -21,7 +21,7 @@ async function run() {
   console.log('\n--- 1. Testing robots.txt ---');
   const robotsTxt = fs.readFileSync('robots.txt', 'utf8');
   assert(!robotsTxt.includes('YOUR-DOMAIN.example'), 'robots.txt does not contain YOUR-DOMAIN.example');
-  assert(robotsTxt.includes('Sitemap: https://prepwise-7ij.pages.dev/sitemap.xml'), 'robots.txt has production sitemap URL');
+  assert(robotsTxt.includes('Sitemap: https://prepwises.online/sitemap.xml'), 'robots.txt has production sitemap URL');
   assert(robotsTxt.includes('Allow: /'), 'robots.txt allows root public crawling');
   assert(robotsTxt.includes('Disallow: /admin/'), 'robots.txt blocks /admin/');
   assert(robotsTxt.includes('Disallow: /api/'), 'robots.txt blocks /api/');
@@ -38,8 +38,8 @@ async function run() {
   assert(locMatches.length === 29, `sitemap.xml contains exactly 29 URLs (found ${locMatches.length})`);
 
   // Check all URLs start with canonical hostname
-  const allCanonical = locMatches.every(url => url.startsWith('https://prepwise-7ij.pages.dev/'));
-  assert(allCanonical, 'All URLs use canonical https://prepwise-7ij.pages.dev/ prefix');
+  const allCanonical = locMatches.every(url => url.startsWith('https://prepwises.online/'));
+  assert(allCanonical, 'All URLs use canonical https://prepwises.online/ prefix');
 
   // Extract all <lastmod> dates and verify YYYY-MM-DD
   const lastmodMatches = [...sitemapXml.matchAll(/<lastmod>(.*?)<\/lastmod>/g)].map(m => m[1]);
@@ -67,7 +67,7 @@ async function run() {
 
   console.log('\n--- 5. Testing URL HTTP responses against local server (http://localhost:8788) ---');
   for (const url of locMatches) {
-    const localUrl = url.replace('https://prepwise-7ij.pages.dev', 'http://localhost:8788');
+    const localUrl = url.replace('https://prepwises.online', 'http://localhost:8788');
     try {
       const res = await fetch(localUrl, { method: 'HEAD', redirect: 'follow' });
       assert(res.status === 200, `${url} resolves to HTTP 200 (status: ${res.status})`);
@@ -89,3 +89,4 @@ run().catch(err => {
   console.error(err);
   process.exit(1);
 });
+

@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /functions/
 
-Sitemap: https://prepwise-7ij.pages.dev/sitemap.xml
+Sitemap: https://prepwises.online/sitemap.xml
