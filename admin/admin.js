@@ -16,8 +16,8 @@
         <td>${escapeHtml(placement.format)}</td>
         <td>${escapeHtml(placement.devices.join(', '))}</td>
         <td>${escapeHtml(placement.trigger)}</td>
-        <td>${placement.provider ? 'Configured' : 'Not configured'}</td>
-        <td><span class="muted">${placement.enabled ? 'Enabled' : 'Disabled'}</span></td>
+        <td>${placement.provider ? escapeHtml(placement.provider.toUpperCase()) : 'Unassigned'}</td>
+        <td><span class="badge ${placement.status === 'permanently-disabled' ? 'badge-flagged' : (placement.selectedForLaunch ? 'badge-intermediate' : 'badge-draft')}">${escapeHtml(placement.status === 'permanently-disabled' ? 'Prohibited' : (placement.selectedForLaunch ? 'Launch Candidate' : 'Disabled'))}</span></td>
       </tr>
     `).join('')}</tbody></table>`;
   }

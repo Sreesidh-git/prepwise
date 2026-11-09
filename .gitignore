@@ -11,3 +11,4 @@ Thumbs.db
 !.dev.vars.example
 admin/config.js
 .wrangler/
+data/backups/

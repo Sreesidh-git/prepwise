@@ -147,12 +147,16 @@
       policyRisk: 'exit-popup',
       rejectionReason: 'Exit-intent popups violate user trust and Better Ads Standards'
     }
-  ].map((placement) => ({
-    ...placement,
-    enabled: false, // Invariant: all 13 remain disabled
-    provider: null,
-    networkConfig: null
-  }));
+  ].map((placement) => {
+    const isLaunchCandidate = ['ad-homepage-inline-secondary', 'ad-company-roles-inline', 'ad-quiz-results'].includes(placement.id);
+    return {
+      ...placement,
+      enabled: false, // Invariant: all 13 remain disabled until genuine codes are verified
+      selectedForLaunch: isLaunchCandidate,
+      provider: isLaunchCandidate ? 'adsterra' : null,
+      networkConfig: isLaunchCandidate ? { provider: 'adsterra' } : null
+    };
+  });
 
   const byId = Object.fromEntries(placements.map((placement) => [placement.id, placement]));
 

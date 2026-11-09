@@ -266,8 +266,8 @@ async function runTests() {
   assert(privacyHtml.includes('prepwise_consent_preferences'), 'privacy.html documents prepwise_consent_preferences');
   assert(privacyHtml.includes('prepwise_anonymous_id'), 'privacy.html documents prepwise_anonymous_id');
   assert(privacyHtml.includes('all 13 advertising placements are currently 100% disabled'), 'privacy.html clearly states ads are 100% disabled');
-  assert(privacyHtml.includes('Google AdSense') && privacyHtml.includes('DoubleClick DART'), 'privacy.html discloses planned Google AdSense integration');
-  assert(privacyHtml.includes('Google Ads Settings') && privacyHtml.includes('aboutads.info'), 'privacy.html provides required opt-out links');
+  assert(privacyHtml.includes('Adsterra') || privacyHtml.includes('Google AdSense'), 'privacy.html discloses planned advertising partner integration');
+  assert(privacyHtml.includes('aboutads.info') && (privacyHtml.includes('adsterra.com') || privacyHtml.includes('Google Ads Settings')), 'privacy.html provides required opt-out links');
   assert(privacyHtml.includes('Cookie Preferences'), 'privacy.html mentions the Cookie Preferences preference center');
 
   // --- 6. SEO & CANONICAL READINESS ACROSS ALL PUBLIC PAGES ---

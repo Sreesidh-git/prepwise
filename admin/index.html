@@ -408,14 +408,28 @@
           </section>
           <section class="panel" id="section-companies"><div class="section-heading"><div><p class="eyebrow">Company page events</p><h2>Company performance</h2></div><button class="secondary" data-refresh="analytics">Refresh</button></div><p class="muted">Rankings below are based only on recorded company_view events for the selected analytics period.</p><div id="companyPerformance" class="table-wrap"></div></section>
           <section class="panel" id="section-advertising">
-            <div class="section-heading"><div><p class="eyebrow">Future monetization</p><h2>Advertising placements</h2></div></div>
-            <p class="muted">Placements are registered but disabled. Network activation, policy review, consent, and server-side controls are required before any unit can be enabled.</p>
+            <div class="section-heading"><div><p class="eyebrow">Monetization Engine</p><h2>Adsterra Advertising Placements</h2></div></div>
+            <p class="muted">Sole monetization partner: Adsterra. All 13 placements are currently disabled pending domain approval on prepwises.online and genuine publisher code installation. Initial rollout will activate only 3 non-intrusive placements.</p>
             <div class="cards" id="advertisingSummaryCards">
               <article class="stat-card"><span class="muted">Total Placements</span><span class="number">13</span></article>
-              <article class="stat-card"><span class="muted">Status</span><span class="number">All Disabled</span></article>
-              <article class="stat-card"><span class="muted">Ad Provider</span><span class="number">Not Configured</span></article>
-              <article class="stat-card"><span class="muted">Monetization Mode</span><span class="number">Locked</span></article>
+              <article class="stat-card"><span class="muted">Provider</span><span class="number" style="font-size:22px;">Adsterra</span></article>
+              <article class="stat-card"><span class="muted">Launch Candidates</span><span class="number" style="font-size:22px;">3 Pending Code</span></article>
+              <article class="stat-card"><span class="muted">Status</span><span class="number" style="font-size:22px; color:var(--muted);">All Disabled</span></article>
             </div>
+
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px;">
+              <h3 style="font-size:14px; margin-bottom:6px;">📊 Adsterra Performance &amp; Revenue Telemetry Specification</h3>
+              <p class="muted" style="font-size:12px; margin-bottom:12px;">Standard dimensions tracked upon genuine provider activation. Real-time impressions, clicks, eCPM, and revenue are verified exclusively via the official Adsterra Publisher Dashboard. Zero simulated metrics are displayed.</p>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Page Views</div>
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Ad Impressions</div>
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Clicks &amp; CTR</div>
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Page RPM</div>
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Est. Earnings</div>
+                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Device &amp; Geo</div>
+              </div>
+            </div>
+
             <div id="advertisingPlacements" class="table-wrap"></div>
           </section>
           <section class="panel" id="section-seo"><div class="section-heading"><div><p class="eyebrow">Search visibility</p><h2>SEO dashboard</h2></div></div><div class="empty-state"><h3>Search Console is not connected</h3><p>Configure server-only Google Search Console OAuth values before showing impressions, clicks, position, or indexed-page data. No metrics are fabricated here.</p></div></section>

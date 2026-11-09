@@ -193,6 +193,15 @@
       searchTimeout = setTimeout(applyFilters, 200);
     });
 
+    // Global shortcut: '/' focuses search input
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
     // Country filter (strict match)
     countryFilter.addEventListener('change', applyFilters);
 

@@ -22,6 +22,7 @@
   let currentIndex = 0;
   let userAnswers = {}; // { questionIndex: { selectedOptionIndex, isCorrect, skipped } }
   let solutionVisibility = {}; // { questionIndex: boolean }
+  let isReviewMode = false;
 
   // ---------- DOM Elements ----------
   const quizLoading = document.getElementById('quizLoading');
@@ -60,6 +61,7 @@
     setupMobileMenu();
     setupNavControls();
     setupLevelSwitcher();
+    setupKeyboardNavigation();
 
     try {
       const [companiesRes, questionsRes] = await Promise.all([
@@ -179,7 +181,7 @@
     const answeredCount = Object.keys(userAnswers).length;
     const progressPercent = Math.round(((index + 1) / total) * 100);
     progressFill.style.width = `${progressPercent}%`;
-    progressText.textContent = `Question ${index + 1} of ${total}`;
+    progressText.textContent = isReviewMode ? `Reviewing Question ${index + 1} of ${total}` : `Question ${index + 1} of ${total}`;
 
     // Score compute
     let currentScore = 0;
@@ -190,7 +192,9 @@
 
     // Button states
     prevBtn.disabled = index === 0;
-    if (index === total - 1) {
+    if (isReviewMode) {
+      nextBtn.textContent = index === total - 1 ? 'Back to Results 🏁' : 'Next Question →';
+    } else if (index === total - 1) {
       nextBtn.textContent = 'Finish Test 🏁';
     } else {
       nextBtn.textContent = 'Next →';
@@ -198,7 +202,7 @@
 
     const state = userAnswers[index];
     const isAnswered = state !== undefined;
-    const isSolutionOpen = !!solutionVisibility[index];
+    const isSolutionOpen = isReviewMode ? true : !!solutionVisibility[index];
 
     // Difficulty styling
     const qLevel = q.level || q.difficulty || 'Intermediate';
@@ -235,6 +239,15 @@
     const formattedExplanation = formatExplanation(explanationText || 'No step-by-step explanation provided.');
 
     questionArea.innerHTML = `
+      ${isReviewMode ? `
+        <div class="review-mode-banner">
+          <button type="button" class="quiz-btn quiz-btn-secondary" id="exitReviewBtn" style="padding: 6px 12px; font-size: 0.825rem;">
+            ← Back to Results Matrix
+          </button>
+          <span class="review-status-pill">Reviewing Question ${index + 1} of ${total}</span>
+        </div>
+      ` : ''}
+
       <div class="question-card">
         <div class="question-meta" style="align-items:center; justify-content:space-between;">
           <div style="display:flex; gap:8px; align-items:center;">
@@ -261,8 +274,14 @@
             ${explanationNeedsReview ? '<div class="question-validation-warning" role="alert"><strong>Question validation issue:</strong> This question and explanation have been flagged for manual review due to a mathematical or wording inconsistency. Do not rely on it until corrected.</div>' : ''}
             <h4>Detailed Step-by-Step Solution:</h4>
             <div>${formattedExplanation}</div>
-            
           </div>
+        </div>
+
+        <div class="quiz-shortcuts-hint" aria-hidden="true">
+          <span class="shortcut-item"><kbd>1</kbd>-<kbd>4</kbd> Select</span>
+          <span class="shortcut-item"><kbd>↵ Enter</kbd> Next</span>
+          <span class="shortcut-item"><kbd>←</kbd> Prev</span>
+          <span class="shortcut-item"><kbd>S</kbd> Solution</span>
         </div>
       </div>
     `;
@@ -276,6 +295,17 @@
           handleAnswerSelect(optIdx);
         });
       });
+    }
+
+    // Bind exit review button if in review mode
+    if (isReviewMode) {
+      const exitBtn = document.getElementById('exitReviewBtn');
+      if (exitBtn) {
+        exitBtn.addEventListener('click', () => {
+          isReviewMode = false;
+          showResults();
+        });
+      }
     }
 
     // Bind solution toggle
@@ -344,12 +374,28 @@
       renderQuestion(currentIndex + 1);
       window.scrollTo({ top: quizHeader.offsetTop - 70, behavior: 'smooth' });
     } else {
+      isReviewMode = false;
       showResults();
     }
   }
 
+  // ---------- Open Specific Question for Review ----------
+  function openReviewQuestion(idx) {
+    if (idx < 0 || idx >= quizQuestions.length) return;
+    isReviewMode = true;
+    quizResults.style.display = 'none';
+    quizHeader.style.display = 'block';
+    if (quizRoleBanner && roleParam) quizRoleBanner.style.display = 'flex';
+    questionArea.style.display = 'block';
+    quizNav.style.display = 'flex';
+    solutionVisibility[idx] = true;
+    renderQuestion(idx);
+    window.scrollTo({ top: quizHeader.offsetTop - 70, behavior: 'smooth' });
+  }
+
   // ---------- Results View & Retention Loops ----------
   function showResults() {
+    isReviewMode = false;
     quizHeader.style.display = 'none';
     if (quizRoleBanner) quizRoleBanner.style.display = 'none';
     questionArea.style.display = 'none';
@@ -392,6 +438,56 @@
       feedbackDesc = 'Solid foundation demonstrated. Advance through harder levels to secure a top-bracket job offer.';
     }
 
+    // Category breakdown computation
+    const categoryStats = {};
+    quizQuestions.forEach((q, idx) => {
+      const cat = q.category || 'General';
+      if (!categoryStats[cat]) {
+        categoryStats[cat] = { total: 0, correct: 0 };
+      }
+      categoryStats[cat].total++;
+      if (userAnswers[idx] && userAnswers[idx].isCorrect) {
+        categoryStats[cat].correct++;
+      }
+    });
+
+    const categoryBreakdownHtml = Object.keys(categoryStats).map(cat => {
+      const s = categoryStats[cat];
+      const pct = Math.round((s.correct / s.total) * 100);
+      return `
+        <div class="results-cat-row">
+          <div class="results-cat-info">
+            <span class="results-cat-name">${escapeHtml(cat)}</span>
+            <span class="results-cat-ratio">${s.correct}/${s.total} (${pct}%)</span>
+          </div>
+          <div class="results-cat-track">
+            <div class="results-cat-bar" style="width: ${pct}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Review Matrix chips computation
+    const matrixChipsHtml = quizQuestions.map((q, idx) => {
+      const ans = userAnswers[idx];
+      let statusClass = 'skipped';
+      let statusLabel = 'Skipped';
+      if (ans && !ans.skipped) {
+        if (ans.isCorrect) {
+          statusClass = 'correct';
+          statusLabel = 'Correct';
+        } else {
+          statusClass = 'incorrect';
+          statusLabel = 'Incorrect';
+        }
+      }
+      return `
+        <button type="button" class="review-chip ${statusClass}" data-review-idx="${idx}" aria-label="Review Question ${idx + 1}: ${statusLabel}" title="Question ${idx + 1}: ${statusLabel}">
+          ${idx + 1}
+        </button>
+      `;
+    }).join('');
+
     quizResults.style.display = 'block';
     quizResults.innerHTML = `
       <div class="results-score">${percentage}%</div>
@@ -413,9 +509,38 @@
         </div>
       </div>
 
+      <!-- Category Performance Breakdown -->
+      <div class="results-categories-section">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-md); text-align: left;">Category Performance Breakdown</h3>
+        <div class="results-categories-list">
+          ${categoryBreakdownHtml}
+        </div>
+      </div>
+
+      <!-- Interactive Question Review Matrix -->
+      <div class="results-review-matrix-section">
+        <div class="matrix-header">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">Question Review Matrix</h3>
+            <p class="text-xs text-muted" style="margin: 0;">Click any question number below to review your answer with step-by-step solutions.</p>
+          </div>
+          <div class="review-matrix-legend">
+            <span class="matrix-legend-item"><span class="legend-dot correct"></span> Correct (${correct})</span>
+            <span class="matrix-legend-item"><span class="legend-dot incorrect"></span> Incorrect (${incorrect})</span>
+            <span class="matrix-legend-item"><span class="legend-dot skipped"></span> Skipped (${skipped})</span>
+          </div>
+        </div>
+        <div class="review-matrix-grid" id="reviewMatrixGrid">
+          ${matrixChipsHtml}
+        </div>
+      </div>
+
       <div class="results-actions">
-        <button class="quiz-btn quiz-btn-secondary" id="retakeBtn">
+        <button type="button" class="quiz-btn quiz-btn-secondary" id="retakeBtn">
           🔄 Retake Quiz
+        </button>
+        <button type="button" class="quiz-btn quiz-btn-secondary" id="reviewAllBtn">
+          📖 Review All Solutions (Q1 - Q${total})
         </button>
         <a href="company.html?id=${companyData.id}" class="quiz-btn quiz-btn-primary">
           💼 View All Roles & Salaries for ${companyData.shortName}
@@ -451,9 +576,29 @@
       </div>
     `;
 
+    // Bind matrix chip click listeners
+    const matrixGrid = document.getElementById('reviewMatrixGrid');
+    if (matrixGrid) {
+      matrixGrid.querySelectorAll('.review-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const qIdx = parseInt(chip.dataset.reviewIdx, 10);
+          openReviewQuestion(qIdx);
+        });
+      });
+    }
+
+    // Bind review all button
+    const reviewAllBtn = document.getElementById('reviewAllBtn');
+    if (reviewAllBtn) {
+      reviewAllBtn.addEventListener('click', () => {
+        openReviewQuestion(0);
+      });
+    }
+
     document.getElementById('retakeBtn').addEventListener('click', () => {
       userAnswers = {};
       solutionVisibility = {};
+      isReviewMode = false;
       quizResults.style.display = 'none';
       quizHeader.style.display = 'block';
       if (quizRoleBanner && roleParam) quizRoleBanner.style.display = 'flex';
@@ -463,6 +608,65 @@
     });
 
     window.scrollTo({ top: quizResults.offsetTop - 50, behavior: 'smooth' });
+  }
+
+  // ---------- Keyboard Navigation Engine ----------
+  function setupKeyboardNavigation() {
+    document.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || e.target.isContentEditable) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+      }
+      if (questionArea.style.display === 'none' || quizQuestions.length === 0) {
+        return;
+      }
+
+      const key = e.key;
+
+      const optionMap = {
+        '1': 0, 'a': 0, 'A': 0,
+        '2': 1, 'b': 1, 'B': 1,
+        '3': 2, 'c': 2, 'C': 2,
+        '4': 3, 'd': 3, 'D': 3
+      };
+
+      if (key in optionMap) {
+        const optionIndex = optionMap[key];
+        const isAnswered = userAnswers[currentIndex] !== undefined;
+        const currentQ = quizQuestions[currentIndex];
+        if (!isAnswered && currentQ && currentQ.options && optionIndex < currentQ.options.length) {
+          e.preventDefault();
+          handleAnswerSelect(optionIndex);
+        }
+        return;
+      }
+
+      if (key === 'Enter' || key === 'ArrowRight') {
+        e.preventDefault();
+        goNext();
+        return;
+      }
+
+      if (key === 'ArrowLeft') {
+        if (currentIndex > 0) {
+          e.preventDefault();
+          renderQuestion(currentIndex - 1);
+          window.scrollTo({ top: quizHeader.offsetTop - 70, behavior: 'smooth' });
+        }
+        return;
+      }
+
+      if (key === 's' || key === 'S') {
+        e.preventDefault();
+        const toggleBtn = document.getElementById('toggleSolutionBtn');
+        if (toggleBtn) {
+          toggleBtn.click();
+        }
+        return;
+      }
+    });
   }
 
   // ---------- Helpers ----------
