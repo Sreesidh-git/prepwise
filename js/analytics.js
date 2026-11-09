@@ -286,10 +286,14 @@
       searchInput.addEventListener('input', () => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          track('search', {
-            queryLength: searchInput.value.trim().length,
-            resultCount: document.querySelectorAll('.company-card[data-company]').length
-          });
+          const term = searchInput.value.trim();
+          if (term.length >= 2) {
+            track('search', {
+              search_term: term,
+              queryLength: term.length,
+              resultCount: document.querySelectorAll('.company-card[data-company]').length
+            });
+          }
         }, 700);
       });
     }

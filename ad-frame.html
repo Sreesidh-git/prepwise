@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base target="_blank">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const key = params.get('key');
+      const width = parseInt(params.get('w') || '728', 10);
+      const height = parseInt(params.get('h') || '90', 10);
+
+      // Whitelist approved Adsterra keys
+      const approvedKeys = {
+        'f2c5fa5caeb276be7a6a9192acffab05': { w: 728, h: 90 },  // Unit 32172762 (Leaderboard)
+        '0d9f54e21d55ad258d1ac8ff5a73433b': { w: 300, h: 250 }, // Unit 32172760 (Medium Rectangle)
+        'fadaa658a1da452b0f5bed520cfc9a09': { w: 320, h: 50 }   // Unit 32172761 (Mobile Leaderboard)
+      };
+
+      if (!key || !approvedKeys[key]) return;
+
+      const conf = approvedKeys[key];
+      const w = conf.w || width;
+      const h = conf.h || height;
+
+      window.atOptions = {
+        'key': key,
+        'format': 'iframe',
+        'height': h,
+        'width': w,
+        'params': {}
+      };
+
+      document.write('<scr' + 'ipt type="text/javascript" data-cfasync="false" src="https://bauval.org/22/' + encodeURIComponent(key) + '"></scr' + 'ipt>');
+    })();
+  </script>
+</body>
+</html>

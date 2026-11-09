@@ -237,10 +237,20 @@
     });
 
     // Country filter (strict match)
-    countryFilter.addEventListener('change', applyFilters);
+    countryFilter.addEventListener('change', () => {
+      applyFilters();
+      if (typeof window.prepwiseTrack === 'function') {
+        window.prepwiseTrack('filter_select', { filterType: 'country', filterValue: countryFilter.value || 'all' });
+      }
+    });
 
     // Category filter
-    categoryFilter.addEventListener('change', applyFilters);
+    categoryFilter.addEventListener('change', () => {
+      applyFilters();
+      if (typeof window.prepwiseTrack === 'function') {
+        window.prepwiseTrack('filter_select', { filterType: 'category', filterValue: categoryFilter.value || 'all' });
+      }
+    });
 
     // Level selector pills
     levelPills.forEach(pill => {
@@ -249,6 +259,9 @@
         pill.classList.add('active');
         activeLevel = pill.dataset.level || '';
         applyFilters();
+        if (typeof window.prepwiseTrack === 'function') {
+          window.prepwiseTrack('filter_select', { filterType: 'level', filterValue: activeLevel || 'all' });
+        }
       });
     });
 

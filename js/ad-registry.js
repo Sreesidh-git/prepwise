@@ -12,15 +12,16 @@
   'use strict';
 
   const placements = [
-    // --- Safe Non-Intrusive Placements (Reserved for potential future use) ---
+    // --- Active Non-Intrusive Display Placements (Adsterra Monitored) ---
     {
       id: 'ad-homepage-leaderboard',
       page: 'homepage',
       format: 'leaderboard',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'after-page-load',
-      sizes: { desktop: [970, 90], mobile: [320, 100] },
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [320, 50] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-top-banner'
     },
     {
@@ -29,7 +30,9 @@
       format: 'in-content',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'after-company-grid',
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [320, 50] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-in-content'
     },
     {
@@ -38,7 +41,9 @@
       format: 'in-content',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'before-how-it-works',
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [300, 250] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-in-content'
     },
     {
@@ -47,7 +52,9 @@
       format: 'in-content',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'overview-render',
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [300, 250] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-in-content'
     },
     {
@@ -57,7 +64,8 @@
       devices: ['desktop', 'tablet'],
       trigger: 'overview-render',
       sizes: { desktop: [300, 250], tablet: [300, 250] },
-      status: 'disabled',
+      status: 'active',
+      enabled: true,
       suitability: 'safe-sidebar-rectangle'
     },
     {
@@ -66,7 +74,9 @@
       format: 'in-content',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'after-role-grid',
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [300, 250] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-in-content'
     },
     {
@@ -76,6 +86,7 @@
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'before-results',
       status: 'disabled',
+      enabled: false,
       suitability: 'caution-pre-results'
     },
     {
@@ -84,8 +95,9 @@
       format: 'banner',
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'results-render',
-      sizes: { desktop: [970, 90], mobile: [320, 100] },
-      status: 'disabled',
+      sizes: { desktop: [728, 90], mobile: [320, 50] },
+      status: 'active',
+      enabled: true,
       suitability: 'safe-post-test'
     },
     {
@@ -96,7 +108,8 @@
       trigger: 'after-page-load',
       dismissible: true,
       sizes: { desktop: [728, 90] },
-      status: 'disabled',
+      status: 'active',
+      enabled: true,
       suitability: 'safe-dismissible-bottom'
     },
     {
@@ -107,7 +120,8 @@
       trigger: 'after-page-load',
       dismissible: true,
       sizes: { mobile: [320, 50], tablet: [728, 90] },
-      status: 'disabled',
+      status: 'active',
+      enabled: true,
       suitability: 'safe-dismissible-bottom'
     },
     {
@@ -117,7 +131,8 @@
       devices: ['desktop', 'tablet', 'mobile'],
       trigger: 'after-page-load',
       sizes: { desktop: [728, 90], mobile: [300, 250] },
-      status: 'disabled',
+      status: 'active',
+      enabled: true,
       suitability: 'safe-in-content'
     },
     {
@@ -128,7 +143,8 @@
       trigger: 'timed-display',
       dismissible: true,
       sizes: { desktop: [300, 250], mobile: [320, 50] },
-      status: 'disabled',
+      status: 'active',
+      enabled: true,
       suitability: 'safe-floating-banner'
     },
 

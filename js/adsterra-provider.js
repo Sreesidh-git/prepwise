@@ -191,7 +191,8 @@
           }
         } else {
           // Standard Iframe Banners (300x250, 320x50, 728x90)
-          // Uses an isolated frame container to prevent window.atOptions collisions between units
+          // Loads through dedicated origin frame (/ad-frame.html) to preserve prepwises.online domain verification
+          // and prevent window.atOptions collisions between multiple units.
           const frame = document.createElement('iframe');
           frame.width = `${size[0]}`;
           frame.height = `${size[1]}`;
@@ -202,40 +203,16 @@
           frame.scrolling = 'no';
           frame.title = placementConfig.label || 'Sponsored';
           frame.style.display = 'block';
+          frame.loading = 'eager';
+          const targetKey = unit.key || adsterraKey;
+          frame.src = `ad-frame.html?key=${encodeURIComponent(targetKey)}&w=${size[0]}&h=${size[1]}`;
+          
           container.appendChild(frame);
 
-          try {
-            const frameDoc = frame.contentDocument || frame.contentWindow.document;
-            frameDoc.open();
-            frameDoc.write(`<!DOCTYPE html><html><head><base target="_blank"><style>body{margin:0;padding:0;overflow:hidden;display:flex;justify-content:center;align-items:center;background:transparent;}</style></head><body><script type="text/javascript">atOptions = {'key': '${unit.key || adsterraKey}','format': 'iframe','height': ${size[1]},'width': ${size[0]},'params': {}};</script><script type="text/javascript" data-cfasync="false" src="${scriptSrc}"></script></body></html>`);
-            frameDoc.close();
-
-            loadedScripts.add(scriptSrc);
-            renderedPlacements.add(placement.id);
-            element.classList.add('adsterra-active');
-            resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
-          } catch (frameErr) {
-            // Direct injection fallback
-            window.atOptions = {
-              key: unit.key || adsterraKey,
-              format: 'iframe',
-              height: size[1],
-              width: size[0],
-              params: {}
-            };
-            const script = document.createElement('script');
-            script.id = `adsterra-script-${unitId}`;
-            script.setAttribute('data-cfasync', 'false');
-            script.src = scriptSrc;
-            script.onload = () => {
-              loadedScripts.add(scriptSrc);
-              renderedPlacements.add(placement.id);
-              element.classList.add('adsterra-active');
-              resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
-            };
-            script.onerror = (err) => reject(err);
-            container.appendChild(script);
-          }
+          loadedScripts.add(scriptSrc);
+          renderedPlacements.add(placement.id);
+          element.classList.add('adsterra-active');
+          resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
         }
       });
     },
@@ -342,10 +319,10 @@
 
       // Initialize Social Bar & Popunder (only outside active timed quiz)
       if (!isQuizPageActive()) {
-        this.initSocialBar();
-        this.initPopunder();
-        this.initTimedPromotionalPlacement();
-        this.initAdblockNotice();
+        AdsterraProvider.initSocialBar();
+        AdsterraProvider.initPopunder();
+        AdsterraProvider.initTimedPromotionalPlacement();
+        AdsterraProvider.initAdblockNotice();
       }
     },
 

@@ -6,7 +6,7 @@ export function onRequestGet(context) {
       supabaseUrl: envValue(context.env, 'SUPABASE_URL'),
       supabasePublishableKey: envValue(context.env, 'SUPABASE_PUBLISHABLE_KEY'),
       siteUrl: context.env.PUBLIC_SITE_URL || '',
-      ga4MeasurementId: context.env.PUBLIC_GA4_MEASUREMENT_ID || ''
+      ga4MeasurementId: context.env.PUBLIC_GA4_MEASUREMENT_ID || 'G-K6P94Q968B'
     });
   } catch (error) {
     console.error('Public configuration error', error.message);

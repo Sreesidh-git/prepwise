@@ -5,7 +5,7 @@ window.PREPWISE_CONFIG = window.PREPWISE_CONFIG || {
   supabasePublishableKey: '',
   supabaseAnonKey: '',
   siteUrl: '',
-  ga4MeasurementId: '',
+  ga4MeasurementId: 'G-K6P94Q968B',
   futureCanonicalDomain: 'https://prepwises.online',
   activeProductionDomain: 'https://prepwise-7ij.pages.dev'
 };

@@ -89,6 +89,13 @@
       if (canonicalLink) {
         canonicalLink.href = `https://prepwises.online/company?id=${encodeURIComponent(company.id || companyId)}`;
       }
+
+      if (typeof window.prepwiseTrack === 'function') {
+        window.prepwiseTrack('view_company_profile', {
+          companyId: company.id || companyId,
+          companyName: company.name
+        });
+      }
       const metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) {
         metaDesc.content = `Free ${company.name} interview questions, recruitment test patterns, syllabus, and practice tests on PrepWise. No login required.`;

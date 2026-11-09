@@ -4,7 +4,7 @@
  * Provides first-party cookie/storage preference management:
  * - Strictly Necessary (always active)
  * - Two-tier advertising choice:
- *     1. "Show All Ads" (Tier: 'all') -> Authorizes standard Adsterra display banners and minimal analytics.
+ *     1. "Show Minimum Ads" (Tier: 'all') -> Authorizes standard Adsterra display banners and minimal analytics.
  *     2. "Show Essential Ads" (Tier: 'essential') -> Rejects third-party tracking cookies; no consent-dependent ad requests are sent.
  * - Persistent "Cookie Settings" link in the footer to modify or withdraw consent at any time.
  * - Zero dark patterns: clear equal choices, no preselected optional tracking.
@@ -39,6 +39,17 @@
     return null;
   }
 
+  function updateGoogleConsentMode(prefs) {
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        'analytics_storage': prefs.analytics ? 'granted' : 'denied',
+        'ad_storage': prefs.advertising ? 'granted' : 'denied',
+        'ad_user_data': prefs.advertising ? 'granted' : 'denied',
+        'ad_personalization': prefs.advertising ? 'granted' : 'denied'
+      });
+    }
+  }
+
   function savePreferences(prefs) {
     const store = safeStorage();
     const finalPrefs = {
@@ -56,6 +67,7 @@
         console.warn('[PrepWise Consent] Failed to save preferences', err);
       }
     }
+    updateGoogleConsentMode(finalPrefs);
     dispatchUpdate(finalPrefs);
     return finalPrefs;
   }
@@ -94,7 +106,7 @@
         </div>
         <div class="prepwise-consent-actions">
           <button type="button" class="btn-consent btn-consent-essential" id="btnConsentEssential">Show Essential Ads</button>
-          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnConsentAll">Show All Ads</button>
+          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnConsentAll">Show Minimum Ads</button>
           <button type="button" class="btn-consent-link" id="btnConsentSettings">Cookie Settings</button>
         </div>
       </div>
@@ -196,7 +208,7 @@
         <div class="prepwise-consent-footer">
           <button type="button" class="btn-consent btn-consent-essential" id="btnModalEssential">Show Essential Ads</button>
           <button type="button" class="btn-consent btn-consent-save" id="btnModalSave">Save Settings</button>
-          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnModalAcceptAll">Show All Ads</button>
+          <button type="button" class="btn-consent btn-consent-all btn-consent-accept" id="btnModalAcceptAll">Show Minimum Ads</button>
         </div>
       </div>
     `;
@@ -283,6 +295,8 @@
     const existingPrefs = getPreferences();
     if (!existingPrefs) {
       createBanner();
+    } else {
+      updateGoogleConsentMode(existingPrefs);
     }
 
     // Bind all footer/navigation triggers for Cookie Settings
