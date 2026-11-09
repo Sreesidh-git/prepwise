@@ -205,7 +205,7 @@
           frame.style.display = 'block';
           frame.loading = 'eager';
           const targetKey = unit.key || adsterraKey;
-          frame.src = `ad-frame.html?key=${encodeURIComponent(targetKey)}&w=${size[0]}&h=${size[1]}`;
+          frame.src = `ad-frame?key=${encodeURIComponent(targetKey)}&w=${size[0]}&h=${size[1]}`;
           
           container.appendChild(frame);
 
