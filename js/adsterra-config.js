@@ -223,6 +223,33 @@
         lazy: false
       },
 
+      // 5. Public Content Pages (About, Contact, Privacy, Terms, Disclaimer)
+      'ad-content-page': {
+        slotId: 'ad-content-page',
+        page: 'all',
+        name: 'Public Content Page Banner',
+        label: 'Sponsored',
+        enabled: true,
+        desktopUnitId: '32172762', // Banner 728x90
+        mobileUnitId: '32172760',  // Banner 300x250
+        fallbackUnitId: '32172761', // Banner 320x50
+        lazy: false
+      },
+
+      // 6. Timed Floating Promotional Placement (Fixed bottom-right desktop, bottom mobile)
+      'ad-promo-floater': {
+        slotId: 'ad-promo-floater',
+        page: 'all',
+        name: 'Floating Timed Promotional Unit',
+        label: 'Sponsored Promotion',
+        enabled: true,
+        desktopUnitId: '32172760', // Banner 300x250
+        mobileUnitId: '32172761',  // Banner 320x50
+        fallbackUnitId: '32172760',
+        dismissible: true,
+        lazy: false
+      },
+
       // Active Full-Format Placements
       'popunder-global': {
         unitId: '32172757',

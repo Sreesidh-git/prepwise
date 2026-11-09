@@ -110,6 +110,27 @@
       status: 'disabled',
       suitability: 'safe-dismissible-bottom'
     },
+    {
+      id: 'ad-content-page',
+      page: 'all',
+      format: 'in-content',
+      devices: ['desktop', 'tablet', 'mobile'],
+      trigger: 'after-page-load',
+      sizes: { desktop: [728, 90], mobile: [300, 250] },
+      status: 'disabled',
+      suitability: 'safe-in-content'
+    },
+    {
+      id: 'ad-promo-floater',
+      page: 'all',
+      format: 'floating',
+      devices: ['desktop', 'tablet', 'mobile'],
+      trigger: 'timed-display',
+      dismissible: true,
+      sizes: { desktop: [300, 250], mobile: [320, 50] },
+      status: 'disabled',
+      suitability: 'safe-floating-banner'
+    },
 
     // --- Permanently Disabled / Prohibited High-Risk Placements ---
     {
@@ -156,7 +177,9 @@
       'ad-company-roles-inline',
       'ad-quiz-results',
       'ad-sticky-bottom-desktop',
-      'ad-sticky-bottom-mobile'
+      'ad-sticky-bottom-mobile',
+      'ad-content-page',
+      'ad-promo-floater'
     ].includes(placement.id);
     return {
       ...placement,

@@ -208,6 +208,16 @@
       <div class="ad-slot ad-slot-sidebar" id="ad-company-sidebar" data-ad-slot="company-sidebar" data-ad-trigger="overview-render" aria-label="Advertisement"></div>
 
     `;
+
+    // Automatically initialize sidebar placement for all 22 company profiles
+    if (typeof window.PREPWISE_ADSTERRA !== 'undefined' && typeof window.PREPWISE_ADSTERRA.renderPlacement === 'function' && window.PrepWiseConsent?.hasConsent('advertising')) {
+      const sidebarSlot = document.getElementById('ad-company-sidebar');
+      if (sidebarSlot && !sidebarSlot.classList.contains('adsterra-active')) {
+        window.PREPWISE_ADSTERRA.renderPlacement(sidebarSlot).catch(() => {
+          sidebarSlot.style.display = 'none';
+        });
+      }
+    }
   }
 
   // ---------- Render Roles & Salaries ----------
@@ -367,6 +377,16 @@
     `;
 
     rolesGrid.innerHTML += internshipCard;
+
+    // Automatically initialize roles inline placement for all 22 company profiles
+    if (typeof window.PREPWISE_ADSTERRA !== 'undefined' && typeof window.PREPWISE_ADSTERRA.renderPlacement === 'function' && window.PrepWiseConsent?.hasConsent('advertising')) {
+      const rolesSlot = document.getElementById('ad-company-roles-inline');
+      if (rolesSlot && !rolesSlot.classList.contains('adsterra-active')) {
+        window.PREPWISE_ADSTERRA.renderPlacement(rolesSlot).catch(() => {
+          rolesSlot.style.display = 'none';
+        });
+      }
+    }
   }
 
   // ---------- Render Test Pattern ----------

@@ -238,6 +238,16 @@
     },
 
     /**
+     * Direct slot renderer for dynamically populated elements
+     */
+    renderPlacement(element) {
+      if (!element) return Promise.reject(new Error('Element required'));
+      const placementId = element.id;
+      const placement = { id: placementId };
+      return this.request({ placement, element });
+    },
+
+    /**
      * Social Bar (Unit 32172758)
      */
     initSocialBar() {
@@ -290,7 +300,8 @@
           'ad-homepage-inline-tertiary',
           'ad-company-sidebar',
           'ad-company-roles-inline',
-          'ad-quiz-results'
+          'ad-quiz-results',
+          'ad-content-page'
         ];
 
         slotsToEnable.forEach(slotId => {
@@ -325,7 +336,130 @@
       if (!isQuizPageActive()) {
         this.initSocialBar();
         this.initPopunder();
+        this.initTimedPromotionalPlacement();
+        this.initAdblockNotice();
       }
+    },
+
+    /**
+     * Timed Immediately Dismissible Promotional Placement
+     * - Appears after 3 seconds outside active timed quiz
+     * - Fixed right on desktop (300x250) or bottom on mobile (320x50)
+     * - Closes automatically after 10 seconds or immediately on '×'
+     * - Remembers session dismissal
+     */
+    initTimedPromotionalPlacement() {
+      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (isQuizPageActive()) return;
+      if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
+      if (document.getElementById('ad-promo-floater-container')) return;
+
+      setTimeout(() => {
+        if (!hasAdvertisingConsent() || isQuizPageActive()) return;
+        if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
+        if (document.getElementById('ad-promo-floater-container')) return;
+
+        const container = document.createElement('div');
+        container.id = 'ad-promo-floater-container';
+        container.className = 'ad-promo-floater-container';
+        container.setAttribute('role', 'region');
+        container.setAttribute('aria-label', 'Sponsored Promotion');
+
+        container.innerHTML = `
+          <div class="ad-promo-floater-header">
+            <span class="ad-promo-label">Sponsored • <span id="adPromoCountdown">10</span>s</span>
+            <button type="button" id="adPromoCloseBtn" class="ad-promo-close-btn" aria-label="Close promotion">&times;</button>
+          </div>
+          <div class="ad-slot ad-slot-promo" id="ad-promo-floater" data-ad-slot="promo-floater" aria-label="Advertisement"></div>
+        `;
+
+        document.body.appendChild(container);
+
+        // Render the ad unit
+        const promoSlot = document.getElementById('ad-promo-floater');
+        if (promoSlot && typeof window.PREPWISE_ADSTERRA !== 'undefined' && typeof window.PREPWISE_ADSTERRA.renderPlacement === 'function') {
+          window.PREPWISE_ADSTERRA.renderPlacement(promoSlot).catch(() => {
+            container.remove();
+          });
+        }
+
+        let countdownInterval = null;
+        const dismissPromo = () => {
+          sessionStorage.setItem('prepwise_promo_dismissed', 'true');
+          container.style.opacity = '0';
+          container.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => container.remove(), 300);
+          if (countdownInterval) clearInterval(countdownInterval);
+        };
+
+        const closeBtn = document.getElementById('adPromoCloseBtn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dismissPromo();
+          });
+        }
+
+        // 10-second countdown
+        let secondsLeft = 10;
+        const countdownEl = document.getElementById('adPromoCountdown');
+        countdownInterval = setInterval(() => {
+          secondsLeft--;
+          if (countdownEl) countdownEl.textContent = `${secondsLeft}`;
+          if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            dismissPromo();
+          }
+        }, 1000);
+      }, 3000);
+    },
+
+    /**
+     * Polite, Non-Blocking Ad-Block Detection Notice
+     * Only displays if consent is granted, but ad scripts fail to load/fill.
+     * Never blocks educational access or forces browser settings changes.
+     */
+    initAdblockNotice() {
+      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (isQuizPageActive()) return;
+      if (sessionStorage.getItem('prepwise_adblock_dismissed') === 'true') return;
+      if (document.getElementById('prepwiseAdblockNotice')) return;
+
+      setTimeout(() => {
+        if (!hasAdvertisingConsent() || isQuizPageActive()) return;
+        if (sessionStorage.getItem('prepwise_adblock_dismissed') === 'true') return;
+        if (document.getElementById('prepwiseAdblockNotice')) return;
+
+        // Check whether ad frames rendered or scripts failed
+        const renderedCount = renderedPlacements.size;
+        const isAdBlocked = renderedCount === 0 && !window.atOptions;
+
+        if (isAdBlocked) {
+          const notice = document.createElement('div');
+          notice.id = 'prepwiseAdblockNotice';
+          notice.className = 'adblock-banner';
+          notice.setAttribute('role', 'status');
+          notice.setAttribute('aria-live', 'polite');
+          notice.innerHTML = `
+            <div class="adblock-banner-inner">
+              <span class="adblock-banner-text">Enjoying free placement preparation on PrepWise? Advertising helps us keep our resources free. Consider allowing our permitted advertisements.</span>
+              <button type="button" class="adblock-banner-close" aria-label="Dismiss notice">&times;</button>
+            </div>
+          `;
+          
+          const header = document.querySelector('.navbar');
+          if (header && header.nextSibling) {
+            header.parentNode.insertBefore(notice, header.nextSibling);
+          } else {
+            document.body.prepend(notice);
+          }
+
+          notice.querySelector('.adblock-banner-close')?.addEventListener('click', () => {
+            sessionStorage.setItem('prepwise_adblock_dismissed', 'true');
+            notice.remove();
+          });
+        }
+      }, 4500);
     },
 
     /**
@@ -350,9 +484,12 @@
         config.enabled = false;
       }
       // Terminate all candidate placements in DOM regardless of rendering state
-      ['ad-homepage-leaderboard', 'ad-homepage-stream', 'ad-homepage-inline-secondary', 'ad-homepage-inline-tertiary', 'ad-company-sidebar', 'ad-company-roles-inline', 'ad-quiz-results', 'ad-sticky-bottom-desktop', 'ad-sticky-bottom-mobile'].forEach((id) => this.killPlacement(id));
+      ['ad-homepage-leaderboard', 'ad-homepage-stream', 'ad-homepage-inline-secondary', 'ad-homepage-inline-tertiary', 'ad-company-sidebar', 'ad-company-roles-inline', 'ad-quiz-results', 'ad-sticky-bottom-desktop', 'ad-sticky-bottom-mobile', 'ad-content-page', 'ad-promo-floater'].forEach((id) => this.killPlacement(id));
       renderedPlacements.forEach((id) => this.killPlacement(id));
       renderedPlacements.clear();
+
+      const promoFloaterEl = document.getElementById('ad-promo-floater-container');
+      if (promoFloaterEl) promoFloaterEl.remove();
 
       const popunderEl = document.getElementById('adsterra-popunder');
       if (popunderEl) popunderEl.remove();
