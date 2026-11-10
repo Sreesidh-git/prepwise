@@ -4,18 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>PrepWise Admin</title>
+  <title>PrepWise Admin Control Center</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="alternate icon" href="../favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
   <main id="app">
     <section class="auth-card" id="loginView">
       <div class="brand-mark">P</div>
-      <p class="eyebrow">Private owner access</p>
-      <h1>PrepWise Admin</h1>
-      <p class="muted">Sign in with the configured owner Supabase Auth account.</p>
+      <p class="eyebrow" style="margin-top: 14px;">Private owner &amp; admin access</p>
+      <h1>PrepWise Control Center</h1>
+      <p class="muted">Sign in with an authorized PrepWise Supabase Auth account.</p>
       <form id="loginForm">
         <label>Email <input id="email" type="email" autocomplete="username" required></label>
         <label>Password <input id="password" type="password" autocomplete="current-password" required></label>
@@ -30,64 +33,236 @@
 
     <section id="dashboardView" hidden>
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Owner control panel</p>
-          <h1>PrepWise Admin</h1>
+        <div class="topbar-brand">
+          <div class="brand-mark">P</div>
+          <div>
+            <p class="eyebrow">Centralized Operations &amp; Telemetry</p>
+            <h1>PrepWise Admin Control Center</h1>
+          </div>
         </div>
         <div class="topbar-actions">
+          <span class="topbar-pill" id="topbarLiveStatus">Live: prepwises.online</span>
           <span id="adminIdentity" class="muted"></span>
+          <a href="../index.html" target="_blank" rel="noopener" class="secondary" style="text-decoration:none;">View Public Site</a>
           <button class="secondary" id="logoutButton">Log out</button>
         </div>
       </header>
       <div class="layout">
         <nav class="sidebar" aria-label="Admin sections">
+          <span class="nav-group-label">Control Center</span>
           <button class="nav-item active" data-section="overview">Overview</button>
-          <button class="nav-item" data-section="analytics">Analytics</button>
+          <button class="nav-item" data-section="integrations">Integrations</button>
+
+          <span class="nav-group-label">Traffic &amp; SEO</span>
+          <button class="nav-item" data-section="analytics">Analytics (GA4)</button>
+          <button class="nav-item" data-section="seo">SEO (Search Console)</button>
           <button class="nav-item" data-section="visitors">Visitor activity</button>
-          <button class="nav-item" data-section="content">Content management</button>
           <button class="nav-item" data-section="quiz">Quiz analytics</button>
           <button class="nav-item" data-section="companies">Company performance</button>
-          <button class="nav-item" data-section="advertising">Advertising</button>
-          <button class="nav-item" data-section="system">System health</button>
+
+          <span class="nav-group-label">Monetization</span>
+          <button class="nav-item" data-section="advertising">Advertising &amp; Revenue</button>
+
+          <span class="nav-group-label">Platform &amp; Ops</span>
+          <button class="nav-item" data-section="database">Database monitoring</button>
+          <button class="nav-item" data-section="infrastructure">Infrastructure (CF)</button>
+          <button class="nav-item" data-section="system">Website health</button>
           <button class="nav-item" data-section="security">Security status</button>
-          <button class="nav-item" id="nav-administrators" data-section="administrators" hidden>Administrators</button>
-          <button class="nav-item" data-section="seo">SEO</button>
+
+          <span class="nav-group-label">Content &amp; Governance</span>
+          <button class="nav-item" data-section="content">Content management</button>
           <button class="nav-item" data-section="feedback">Feedback</button>
           <button class="nav-item" data-section="settings">Website settings</button>
           <button class="nav-item" data-section="activity">Activity logs</button>
+          <button class="nav-item" id="nav-administrators" data-section="administrators" hidden>Administrators</button>
         </nav>
+
         <div class="content">
+          <!-- ========== MAIN CONTROL CENTER OVERVIEW ========== -->
           <section class="panel active" id="section-overview">
-            <div class="section-heading"><div><p class="eyebrow">Verified database counts</p><h2>Overview</h2></div><button class="secondary" data-refresh="overview">Refresh</button></div>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Control Center Overview</p>
+                <h2>Operational Dashboard</h2>
+              </div>
+              <div class="section-actions">
+                <button class="secondary" id="exportOverviewCsv" type="button">Export Report CSV</button>
+                <button class="primary" data-refresh="overview" id="refreshAllOverview" type="button">Refresh All Data</button>
+              </div>
+            </div>
+
             <form class="filter-form" id="overviewFilters">
-              <label>Period
+              <label>Date Range
                 <select id="overviewPeriod">
                   <option value="today">Today</option>
                   <option value="7" selected>Last 7 days</option>
                   <option value="30">Last 30 days</option>
                   <option value="90">Last 90 days</option>
-                  <option value="custom">Custom</option>
+                  <option value="custom">Custom range</option>
+                </select>
+              </label>
+              <label>Chart Granularity
+                <select id="overviewGranularity">
+                  <option value="daily" selected>Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
                 </select>
               </label>
               <label class="custom-date">From <input id="overviewFrom" type="date"></label>
               <label class="custom-date">To <input id="overviewTo" type="date"></label>
-              <button class="primary" type="submit">Apply filters</button>
+              <button class="primary" type="submit">Apply</button>
+              <span class="last-updated-tag" id="overviewLastUpdated">Not synced yet</span>
             </form>
+
+            <div id="overviewAlerts"></div>
             <p class="status" id="overviewStatus" role="status"></p>
-            <div class="cards" id="overviewCards"></div>
-            <div class="chart-card"><h3>Activity trends</h3><canvas id="overviewChart" height="120"></canvas><p class="muted" id="overviewNote">Loading verified metrics...</p></div>
-            <div class="analytics-columns" style="margin-top: 24px;">
-              <div><h3>Most popular companies</h3><div id="overviewPopularCompanies" class="table-wrap"></div></div>
-              <div><h3>Most popular categories</h3><div id="overviewPopularCategories" class="table-wrap"></div></div>
+
+            <!-- A. Website Overview -->
+            <div class="cc-block" id="ccBlockWebsite">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">A</span>
+                  <h3>Website Overview</h3>
+                  <span class="source-tag" id="websiteSourceTag">Supabase Telemetry</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="analytics">View Analytics Details</button>
+              </div>
+              <div class="cards" id="overviewCards"></div>
+              <div class="charts-grid">
+                <div class="chart-card">
+                  <h4>Website Traffic &amp; Activity Trends</h4>
+                  <canvas id="overviewChart" height="140"></canvas>
+                </div>
+                <div class="chart-card">
+                  <h4>Visitor &amp; Revenue Trend Comparison</h4>
+                  <canvas id="overviewComparisonChart" height="140"></canvas>
+                </div>
+              </div>
+              <p class="muted" id="overviewNote" style="font-size:12px; margin-bottom:14px;">Loading verified metrics...</p>
+              <div class="analytics-columns">
+                <div><h4>Popular Pages</h4><div id="overviewPopularPages" class="table-wrap"></div></div>
+                <div><h4>Most Visited Company Profiles</h4><div id="overviewPopularCompanies" class="table-wrap"></div></div>
+              </div>
+              <div class="analytics-columns" style="margin-top: 16px;">
+                <div><h4>Popular Quiz Categories</h4><div id="overviewPopularCategories" class="table-wrap"></div></div>
+                <div><h4>Recent Visitor Activity</h4><div id="overviewRecentActivity" class="table-wrap"></div></div>
+              </div>
             </div>
-            <div class="analytics-columns" style="margin-top: 24px;">
-              <div><h3>Recent visitor activity</h3><div id="overviewRecentActivity" class="table-wrap"></div></div>
-              <div><h3>System health snapshot</h3><div id="overviewSystemHealth" class="table-wrap"></div></div>
+
+            <!-- B. Advertising and Revenue -->
+            <div class="cc-block" id="ccBlockAdvertising">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">B</span>
+                  <h3>Advertising &amp; Revenue (Adsterra)</h3>
+                  <span class="status-pill status-unavailable" id="overviewAdStatusPill">Checking...</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="advertising">Open Ad Revenue View</button>
+              </div>
+              <div id="overviewAdNotice"></div>
+              <div class="cards" id="overviewAdCards"></div>
+              <div class="charts-grid">
+                <div class="chart-card">
+                  <h4>Revenue Trends</h4>
+                  <canvas id="overviewRevenueChart" height="140"></canvas>
+                </div>
+                <div class="chart-card">
+                  <h4>Impressions by Format</h4>
+                  <canvas id="overviewAdFormatChart" height="140"></canvas>
+                </div>
+              </div>
+              <div id="overviewAdPlacementsTable" class="table-wrap"></div>
+            </div>
+
+            <!-- C. SEO Performance -->
+            <div class="cc-block" id="ccBlockSeo">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">C</span>
+                  <h3>SEO Performance (Google Search Console)</h3>
+                  <span class="status-pill status-unavailable" id="overviewSeoStatusPill">Checking...</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="seo">Open SEO Details</button>
+              </div>
+              <div id="overviewSeoNotice"></div>
+              <div class="cards" id="overviewSeoCards"></div>
+              <div class="analytics-columns">
+                <div><h4>Top Search Queries</h4><div id="overviewSeoQueries" class="table-wrap"></div></div>
+                <div><h4>Top Landing Pages &amp; Sitemaps</h4><div id="overviewSeoPages" class="table-wrap"></div></div>
+              </div>
+            </div>
+
+            <!-- D. Database Monitoring -->
+            <div class="cc-block" id="ccBlockDatabase">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">D</span>
+                  <h3>Database Monitoring (Supabase)</h3>
+                  <span class="status-pill status-unavailable" id="overviewDbStatusPill">Checking...</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="database">Open Database View</button>
+              </div>
+              <div class="cards" id="overviewDbCards"></div>
+              <div id="overviewDbTable" class="table-wrap"></div>
+            </div>
+
+            <!-- E. Infrastructure Monitoring -->
+            <div class="cc-block" id="ccBlockInfrastructure">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">E</span>
+                  <h3>Infrastructure Monitoring (Cloudflare Pages: prepwise-7ij)</h3>
+                  <span class="status-pill status-unavailable" id="overviewInfraStatusPill">Checking...</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="infrastructure">Open Infrastructure View</button>
+              </div>
+              <div id="overviewInfraNotice"></div>
+              <div class="cards" id="overviewInfraCards"></div>
+              <div id="overviewInfraDeployments" class="table-wrap"></div>
+            </div>
+
+            <!-- F. Website Health -->
+            <div class="cc-block" id="ccBlockHealth">
+              <div class="cc-block-header">
+                <div class="cc-block-title">
+                  <span class="cc-block-badge">F</span>
+                  <h3>Website Health &amp; Availability</h3>
+                  <span class="status-pill status-unavailable" id="overviewHealthStatusPill">Checking...</span>
+                </div>
+                <button class="secondary btn-sm" type="button" data-jump="system">Open Full Health Monitor</button>
+              </div>
+              <div class="cards" id="overviewHealthCards"></div>
+              <div id="overviewSystemHealth" class="table-wrap"></div>
+            </div>
+          </section>
+
+          <!-- ========== INTEGRATION SETTINGS SECTION ========== -->
+          <section class="panel" id="section-integrations">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Connected APIs &amp; Secrets Status</p>
+                <h2>Integration Settings</h2>
+              </div>
+              <div class="section-actions">
+                <button class="primary" id="testAllIntegrationsBtn" type="button">Test All Connections</button>
+              </div>
+            </div>
+            <div class="alert-banner is-info">
+              <strong>Security Boundary:</strong> All third-party API tokens, service-account keys, and secrets live exclusively in Cloudflare Pages encrypted environment variables (<code>context.env</code>). A service displays <span class="status-pill status-connected">Connected</span> only after a live authenticated server API request succeeds.
+            </div>
+            <div id="integrationsGrid" class="integrations-grid">
+              <div class="empty-state">Loading integration statuses...</div>
             </div>
           </section>
 
           <section class="panel" id="section-analytics">
-            <div class="section-heading"><div><p class="eyebrow">Real database events</p><h2>Analytics</h2></div><button class="secondary" id="refreshAnalytics">Refresh</button></div>
+            <div class="section-heading">
+              <div><p class="eyebrow">GA4 Data API &amp; First-Party Events</p><h2>Analytics</h2></div>
+              <div class="section-actions">
+                <button class="secondary" id="exportAnalyticsCsv" type="button">Export CSV</button>
+                <button class="secondary" id="refreshAnalytics" type="button">Refresh</button>
+              </div>
+            </div>
             <form class="filter-form" id="analyticsFilters">
               <label>Period <select id="analyticsPeriod"><option value="today">Today</option><option value="7" selected>Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="custom">Custom</option></select></label>
               <label class="custom-date">From <input id="analyticsFrom" type="date"></label>
@@ -95,6 +270,7 @@
               <button class="primary" type="submit">Apply filters</button>
             </form>
             <p class="status" id="analyticsStatus" role="status"></p>
+            <div id="ga4DetailContainer" style="margin-bottom: 20px;"></div>
             <div class="cards" id="analyticsCards"></div>
             <div class="charts-grid"><div class="chart-card"><h3>Daily activity</h3><canvas id="dailyActivityChart" height="130"></canvas></div><div class="chart-card"><h3>Quiz activity</h3><canvas id="quizActivityChart" height="130"></canvas></div><div class="chart-card"><h3>Page popularity</h3><canvas id="pagePopularityChart" height="130"></canvas></div></div>
             <div class="analytics-columns"><div><h3>Popular companies</h3><div id="popularCompanies" class="table-wrap"></div></div><div><h3>Popular categories</h3><div id="popularCategories" class="table-wrap"></div></div></div>
@@ -114,8 +290,8 @@
           <section class="panel" id="section-content">
             <div class="section-heading"><div><p class="eyebrow">Published content</p><h2>Content management</h2></div><button class="secondary" id="refreshContentSummary">Refresh summary</button></div>
             <div class="cards" id="contentSummaryCards" style="margin-bottom: 20px;"></div>
-            <div class="publishing-notice" style="margin-bottom: 16px; padding: 12px 16px; background: rgba(79, 70, 229, 0.06); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; font-size: 0.875rem; color: #475569; line-height: 1.5;">
-              <strong style="color: #4f46e5;">Edge CDN Publishing Workflow:</strong> Modifications made in this panel update the Supabase database in real-time. Because public visitors are served directly from high-speed edge CDN caches, database changes are not live on public visitor pages until you click <em>Export JSON</em>, update the corresponding files in <code>data/</code>, and commit/deploy to Cloudflare Pages.
+            <div class="alert-banner is-info">
+              <strong>Edge CDN Publishing Workflow:</strong> Modifications update Supabase immediately. Public static assets in <code>data/</code> require Export JSON &amp; Cloudflare Pages deployment to refresh static edge bundles.
             </div>
             <div class="resource-tabs" id="resourceTabs"></div>
 
@@ -408,31 +584,66 @@
           </section>
           <section class="panel" id="section-companies"><div class="section-heading"><div><p class="eyebrow">Company page events</p><h2>Company performance</h2></div><button class="secondary" data-refresh="analytics">Refresh</button></div><p class="muted">Rankings below are based only on recorded company_view events for the selected analytics period.</p><div id="companyPerformance" class="table-wrap"></div></section>
           <section class="panel" id="section-advertising">
-            <div class="section-heading"><div><p class="eyebrow">Monetization Engine</p><h2>Adsterra Advertising Placements</h2></div></div>
-            <p class="muted">Sole monetization partner: Adsterra. All 13 placements are currently disabled pending domain approval on prepwises.online and genuine publisher code installation. Initial rollout will activate only 3 non-intrusive placements.</p>
-            <div class="cards" id="advertisingSummaryCards">
-              <article class="stat-card"><span class="muted">Total Placements</span><span class="number">13</span></article>
-              <article class="stat-card"><span class="muted">Provider</span><span class="number" style="font-size:22px;">Adsterra</span></article>
-              <article class="stat-card"><span class="muted">Launch Candidates</span><span class="number" style="font-size:22px;">3 Pending Code</span></article>
-              <article class="stat-card"><span class="muted">Status</span><span class="number" style="font-size:22px; color:var(--muted);">All Disabled</span></article>
-            </div>
-
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:18px;">
-              <h3 style="font-size:14px; margin-bottom:6px;">📊 Adsterra Performance &amp; Revenue Telemetry Specification</h3>
-              <p class="muted" style="font-size:12px; margin-bottom:12px;">Standard dimensions tracked upon genuine provider activation. Real-time impressions, clicks, eCPM, and revenue are verified exclusively via the official Adsterra Publisher Dashboard. Zero simulated metrics are displayed.</p>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Page Views</div>
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Ad Impressions</div>
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Clicks &amp; CTR</div>
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Page RPM</div>
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Est. Earnings</div>
-                <div style="background:var(--surface-alt); padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700;">Device &amp; Geo</div>
+            <div class="section-heading">
+              <div><p class="eyebrow">Monetization &amp; Adsterra API</p><h2>Advertising &amp; Revenue</h2></div>
+              <div class="section-actions">
+                <button class="secondary" id="exportAdRevenueCsv" type="button">Export Revenue CSV</button>
+                <button class="secondary" id="refreshAdvertising" type="button">Refresh</button>
               </div>
             </div>
-
+            <div id="advertisingApiBanner"></div>
+            <div class="cards" id="advertisingSummaryCards"></div>
+            <div class="charts-grid">
+              <div class="chart-card"><h4>Adsterra Daily Revenue</h4><canvas id="adDetailRevenueChart" height="140"></canvas></div>
+              <div class="chart-card"><h4>Adsterra Daily Impressions</h4><canvas id="adDetailImpressionsChart" height="140"></canvas></div>
+            </div>
+            <h3 style="margin-bottom:10px;">Active Unit Configuration &amp; Placement Performance</h3>
             <div id="advertisingPlacements" class="table-wrap"></div>
           </section>
-          <section class="panel" id="section-seo"><div class="section-heading"><div><p class="eyebrow">Search visibility</p><h2>SEO dashboard</h2></div></div><div class="empty-state"><h3>Search Console is not connected</h3><p>Configure server-only Google Search Console OAuth values before showing impressions, clicks, position, or indexed-page data. No metrics are fabricated here.</p></div></section>
+
+          <section class="panel" id="section-seo">
+            <div class="section-heading">
+              <div><p class="eyebrow">Google Search Console API</p><h2>SEO Performance</h2></div>
+              <div class="section-actions">
+                <button class="secondary" id="exportSeoCsv" type="button">Export SEO CSV</button>
+                <button class="secondary" id="refreshSeo" type="button">Refresh</button>
+              </div>
+            </div>
+            <div id="seoApiBanner"></div>
+            <div class="cards" id="seoCards"></div>
+            <div class="chart-card" style="margin-bottom: 20px;"><h4>Search Clicks &amp; Impressions Trend</h4><canvas id="seoDetailChart" height="140"></canvas></div>
+            <div class="analytics-columns">
+              <div><h3>Top Search Queries</h3><div id="seoQueriesTable" class="table-wrap"></div></div>
+              <div><h3>Top Landing Pages</h3><div id="seoPagesTable" class="table-wrap"></div></div>
+            </div>
+            <h3 style="margin-top:20px; margin-bottom:10px;">Sitemaps &amp; Indexing</h3>
+            <div id="seoSitemapsTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="section-database">
+            <div class="section-heading">
+              <div><p class="eyebrow">Supabase Operational Telemetry</p><h2>Database Monitoring</h2></div>
+              <button class="secondary" id="refreshDatabase" type="button">Refresh</button>
+            </div>
+            <div class="cards" id="databaseCards"></div>
+            <div class="analytics-columns">
+              <div><h3>Table Row Statistics</h3><div id="databaseTablesTable" class="table-wrap"></div></div>
+              <div><h3>Storage &amp; Admin Activity</h3><div id="databaseExtrasTable" class="table-wrap"></div></div>
+            </div>
+          </section>
+
+          <section class="panel" id="section-infrastructure">
+            <div class="section-heading">
+              <div><p class="eyebrow">Cloudflare Pages: prepwise-7ij</p><h2>Infrastructure Monitoring</h2></div>
+              <button class="secondary" id="refreshInfrastructure" type="button">Refresh</button>
+            </div>
+            <div id="infraApiBanner"></div>
+            <div class="cards" id="infrastructureCards"></div>
+            <div class="chart-card" style="margin-bottom:20px;"><h4>Zone Requests Trend</h4><canvas id="infraTrafficChart" height="140"></canvas></div>
+            <h3 style="margin-bottom:10px;">Recent Cloudflare Pages Deployments</h3>
+            <div id="infrastructureDeploymentsTable" class="table-wrap"></div>
+          </section>
+
           <section class="panel" id="section-feedback"><div class="section-heading"><div><p class="eyebrow">Reports from visitors</p><h2>Feedback</h2></div><button class="secondary" data-refresh="feedback">Refresh</button></div><div id="feedbackTable" class="table-wrap"></div></section>
           <section class="panel" id="section-settings">
             <div class="section-heading">
@@ -471,7 +682,15 @@
             <div id="settingsTable" class="table-wrap"></div>
           </section>
           <section class="panel" id="section-activity"><div class="section-heading"><div><p class="eyebrow">Audit trail</p><h2>Activity logs</h2></div><button class="secondary" data-refresh="activity">Refresh</button></div><div id="activityTable" class="table-wrap"></div></section>
-          <section class="panel" id="section-system"><div class="section-heading"><div><p class="eyebrow">Operational checks</p><h2>System health</h2></div><button class="secondary" id="refreshHealth">Refresh</button></div><div class="cards" id="healthCards"><div class="empty-state">Health checks have not run.</div></div></section>
+          <section class="panel" id="section-system">
+            <div class="section-heading">
+              <div><p class="eyebrow">Operational &amp; Endpoint Availability</p><h2>Website &amp; System Health</h2></div>
+              <button class="primary" id="refreshHealth" type="button">Run Health Check</button>
+            </div>
+            <div class="cards" id="healthCards"><div class="empty-state">Health checks have not run.</div></div>
+            <h3 style="margin-bottom:10px;">Live Production Endpoint Probes</h3>
+            <div id="healthEndpointsTable" class="table-wrap"></div>
+          </section>
           <section class="panel" id="section-security"><div class="section-heading"><div><p class="eyebrow">Owner-only access</p><h2>Security status</h2></div></div><div class="cards" id="securityCards"></div><p class="muted">Secrets, owner UUIDs, and service-role credentials are never sent to this page. Access is rejected unless the Auth token, configured owner UUID, active profile, and owner role all match.</p></section>
           <section class="panel" id="section-administrators">
             <div class="section-heading">
@@ -481,8 +700,8 @@
                 <button class="secondary" id="refreshAdminsButton" type="button">Refresh</button>
               </div>
             </div>
-            <div class="publishing-notice" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(79, 70, 229, 0.06); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 8px; font-size: 0.875rem; color: #475569; line-height: 1.5;">
-              <strong style="color: #4f46e5;">Access Delegation Model:</strong> As Owner, you maintain exclusive security control. Full Admins have broad operational permissions across companies, questions, analytics, and content management, but cannot create or modify administrator accounts.
+            <div class="alert-banner is-info">
+              <strong>Access Delegation Model:</strong> As Owner, you maintain exclusive security control. Full Admins have broad operational permissions across companies, questions, analytics, and content management, but cannot create or modify administrator accounts.
             </div>
 
             <!-- Add Administrator Form Panel -->
@@ -520,8 +739,27 @@
         </div>
       </div>
     </section>
+
+    <!-- Integration Configure / Reconnect Guide Modal -->
+    <div class="modal-backdrop" id="integrationSetupModal" hidden>
+      <div class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="setupModalTitle">
+        <div class="section-heading" style="margin-bottom: 12px;">
+          <div>
+            <p class="eyebrow">Server-Only Integration Setup</p>
+            <h3 id="setupModalTitle" style="margin:0;">Configure Service</h3>
+          </div>
+          <button type="button" class="secondary btn-sm" id="closeSetupModal">Close</button>
+        </div>
+        <div id="setupModalBody"></div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:18px;">
+          <button type="button" class="secondary" id="setupModalTestBtn">Test Connection Now</button>
+          <button type="button" class="primary" id="setupModalDoneBtn">Done</button>
+        </div>
+      </div>
+    </div>
   </main>
   <script src="config.js"></script>
+  <script src="../js/adsterra-config.js"></script>
   <script src="../js/ad-registry.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>

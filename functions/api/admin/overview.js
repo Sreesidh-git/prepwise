@@ -85,12 +85,26 @@ export async function onRequestGet(context) {
       ? Math.round((eligibleCompletions / eligibleStarts) * 10000) / 100
       : null;
 
-    // Aggregate popular companies from company_view events
+    // Aggregate popular companies, popular pages, and daily series from events
     const companyCounts = new Map();
     const categoryCounts = new Map();
+    const pageCounts = new Map();
+    const dailyMap = new Map();
 
     eventList.forEach((e) => {
       const props = e.properties && typeof e.properties === 'object' ? e.properties : {};
+      if (e.occurred_at) {
+        const day = new Date(e.occurred_at).toISOString().slice(0, 10);
+        const bucket = dailyMap.get(day) || { date: day, pageViews: 0, quizStarts: 0, quizCompletions: 0, totalEvents: 0 };
+        bucket.totalEvents += 1;
+        if (e.event_name === 'page_view') bucket.pageViews += 1;
+        if (e.event_name === 'quiz_start') bucket.quizStarts += 1;
+        if (e.event_name === 'quiz_complete') bucket.quizCompletions += 1;
+        dailyMap.set(day, bucket);
+      }
+      if (e.event_name === 'page_view' && e.path) {
+        pageCounts.set(e.path, (pageCounts.get(e.path) || 0) + 1);
+      }
       if (e.event_name === 'company_view') {
         const c = props.companyId || props.company_id;
         if (c) companyCounts.set(c, (companyCounts.get(c) || 0) + 1);
@@ -101,9 +115,27 @@ export async function onRequestGet(context) {
       }
     });
 
+    const dailyActivity = [];
+    const cursor = new Date(range.start);
+    cursor.setUTCHours(0, 0, 0, 0);
+    const endDay = new Date(range.end);
+    endDay.setUTCHours(23, 59, 59, 999);
+    let guard = 0;
+    while (cursor <= endDay && guard < 370) {
+      const day = cursor.toISOString().slice(0, 10);
+      dailyActivity.push(dailyMap.get(day) || { date: day, pageViews: 0, quizStarts: 0, quizCompletions: 0, totalEvents: 0 });
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+      guard++;
+    }
+
+    const popularPages = [...pageCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([label, count]) => ({ label, count }));
+
     const popularCompanies = [...companyCounts.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
+      .slice(0, 10)
       .map(([label, count]) => ({ label, count }));
 
     const popularCategories = [...categoryCounts.entries()]
@@ -146,7 +178,9 @@ export async function onRequestGet(context) {
           completionRate
         },
         popularCompanies,
+        popularPages,
         popularCategories,
+        dailyActivity,
         recentActivity,
         systemHealth: {
           backend: 'operational',

@@ -8,22 +8,31 @@ export async function onRequestGet(context) {
   try {
     let dbStatus = 'standby';
     let companyCount = 0;
+    let questionCount = 0;
+    let analyticsCount = 0;
+
     try {
-      companyCount = await supabaseCount(context.env, '/rest/v1/companies?select=id', auth.token);
+      [companyCount, questionCount, analyticsCount] = await Promise.all([
+        supabaseCount(context.env, '/rest/v1/companies?select=id', auth.token),
+        supabaseCount(context.env, '/rest/v1/interview_questions?select=id', auth.token),
+        supabaseCount(context.env, '/rest/v1/analytics_events?select=id', auth.token).catch(() => 0)
+      ]);
       dbStatus = companyCount > 0 ? 'reachable' : 'standby';
     } catch {
-      dbStatus = 'standby (credentials not provisioned)';
+      dbStatus = 'connection error';
     }
 
     return json({
       data: {
         backendConnectivity: 'operational',
         databaseAvailability: dbStatus,
-        adminApiHealth: 'healthy (owner-authenticated)',
-        contentValidationStatus: 'verified (1,100 questions: 1,086 approved, 14 under review)',
-        analyticsAvailability: 'active (first-party tracking)',
-        advertisingConfigurationStatus: 'disabled (13 placements registered, monetization locked)',
+        adminApiHealth: `healthy (${auth.role}-authenticated)`,
+        contentValidationStatus: `verified (${companyCount} companies, ${questionCount} questions in database)`,
+        analyticsAvailability: `active (first-party: ${analyticsCount} recorded events; GA4 G-K6P94Q968B)`,
+        advertisingConfigurationStatus: 'active (5 Adsterra display/social units; Popunder 32172757 permanently disabled)',
         contentRecords: companyCount,
+        questionRecords: questionCount,
+        analyticsRecords: analyticsCount,
         responseMs: Date.now() - startedAt,
         checkedAt: new Date().toISOString()
       }

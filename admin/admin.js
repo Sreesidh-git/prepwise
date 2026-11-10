@@ -6,25 +6,88 @@
     config.supabaseAnonKey = config.supabasePublishableKey || '';
   }
 
+  function getAdsterraConfigUnits() {
+    const cfg = window.PREPWISE_ADSTERRA_CONFIG;
+    if (!cfg || !cfg.units) return [];
+    return Object.values(cfg.units);
+  }
+
   function renderAdvertisingPlacements() {
     const container = document.getElementById('advertisingPlacements');
+    if (!container) return;
     const placements = window.PREPWISE_AD_REGISTRY?.placements || [];
-    container.innerHTML = `<table><thead><tr><th>Placement</th><th>Page</th><th>Format</th><th>Devices</th><th>Trigger</th><th>Provider</th><th>Status</th></tr></thead><tbody>${placements.map((placement) => `
-      <tr>
-        <td>${escapeHtml(placement.id)}</td>
-        <td>${escapeHtml(placement.page)}</td>
-        <td>${escapeHtml(placement.format)}</td>
-        <td>${escapeHtml(placement.devices.join(', '))}</td>
-        <td>${escapeHtml(placement.trigger)}</td>
-        <td>${placement.provider ? escapeHtml(placement.provider.toUpperCase()) : 'Unassigned'}</td>
-        <td><span class="badge ${placement.status === 'permanently-disabled' ? 'badge-flagged' : (placement.selectedForLaunch ? 'badge-intermediate' : 'badge-draft')}">${escapeHtml(placement.status === 'permanently-disabled' ? 'Prohibited' : (placement.selectedForLaunch ? 'Launch Candidate' : 'Disabled'))}</span></td>
-      </tr>
-    `).join('')}</tbody></table>`;
+    const cfg = window.PREPWISE_ADSTERRA_CONFIG;
+    const adApi = state.integrationsReport?.integrations?.adsterra;
+    const apiStatsMap = new Map();
+    if (adApi?.status === 'Connected' && Array.isArray(adApi.data?.byPlacement)) {
+      adApi.data.byPlacement.forEach((p) => apiStatsMap.set(String(p.placementId), p));
+    }
+
+    const unitsRows = getAdsterraConfigUnits().map((u) => {
+      const apiRow = apiStatsMap.get(String(u.unitId));
+      const isPopunder = u.unitId === '32172757';
+      const statusPill = isPopunder
+        ? '<span class="status-pill status-inactive">Permanently Disabled</span>'
+        : (u.enabled ? '<span class="status-pill status-connected">Active</span>' : '<span class="status-pill status-unavailable">Disabled</span>');
+      return `
+        <tr>
+          <td><strong>Unit ${escapeHtml(u.unitId)}</strong><br><span class="muted" style="font-size:11px;">${escapeHtml(u.name || u.format)}</span></td>
+          <td>${escapeHtml(u.format)}</td>
+          <td>${statusPill}</td>
+          <td>${apiRow ? apiRow.impressions.toLocaleString() : '—'}</td>
+          <td>${apiRow ? apiRow.clicks.toLocaleString() : '—'}</td>
+          <td>${apiRow ? `$${Number(apiRow.cpm).toFixed(2)}` : '—'}</td>
+          <td>${apiRow ? `$${Number(apiRow.revenue).toFixed(3)}` : '—'}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const placementRows = placements.map((placement) => {
+      const pc = cfg?.placements?.[placement.id];
+      const activeUnit = pc ? (pc.desktopUnitId || pc.mobileUnitId || pc.unitId || '—') : '—';
+      const isProhibited = placement.status === 'permanently-disabled' || placement.prohibited;
+      const pillClass = isProhibited ? 'status-inactive' : (placement.enabled ? 'status-connected' : 'status-unavailable');
+      const pillLabel = isProhibited ? 'Prohibited' : (placement.enabled ? 'Active' : 'Disabled');
+      return `
+        <tr>
+          <td><code>${escapeHtml(placement.id)}</code></td>
+          <td>${escapeHtml(placement.page)}</td>
+          <td>${escapeHtml(placement.format)}</td>
+          <td>${escapeHtml(placement.devices.join(', '))}</td>
+          <td>${escapeHtml(activeUnit)}</td>
+          <td><span class="status-pill ${pillClass}">${escapeHtml(pillLabel)}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <table style="margin-bottom: 18px;">
+        <thead><tr><th>Adsterra Unit</th><th>Format</th><th>Policy Status</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Est. Revenue</th></tr></thead>
+        <tbody>${unitsRows || '<tr><td colspan="7" class="muted">No Adsterra units found in config.</td></tr>'}</tbody>
+      </table>
+      <table>
+        <thead><tr><th>DOM Placement Slot</th><th>Page</th><th>Format</th><th>Devices</th><th>Mapped Unit</th><th>Slot Status</th></tr></thead>
+        <tbody>${placementRows}</tbody>
+      </table>
+    `;
   }
+
   const loginView = document.getElementById('loginView');
   const dashboardView = document.getElementById('dashboardView');
   const loginStatus = document.getElementById('loginStatus');
-  const state = { session: null, currentUser: null, isOwner: false, resource: 'companies', records: [], chart: null, charts: {}, analytics: { period: '7', page: 1 } };
+  const state = {
+    session: null,
+    currentUser: null,
+    isOwner: false,
+    resource: 'companies',
+    records: [],
+    chart: null,
+    charts: {},
+    analytics: { period: '7', page: 1 },
+    integrationsReport: null,
+    overviewReport: null,
+    activeSetupService: null
+  };
   const resources = ['companies', 'interview_questions', 'hiring_news', 'feedback', 'website_settings', 'admin_activity_logs'];
 
   function setStatus(element, message, isError = true) {
@@ -378,13 +441,152 @@
     companyPerformance.innerHTML = document.getElementById('popularCompanies').innerHTML;
   }
 
+  function integrationStatusClass(status) {
+    if (status === 'Connected') return 'status-connected';
+    if (status === 'Not configured') return 'status-not-configured';
+    if (status === 'Authentication required') return 'status-auth-required';
+    if (status === 'Connection error') return 'status-error';
+    return 'status-unavailable';
+  }
+
+  function renderStatusPill(status) {
+    return `<span class="status-pill ${integrationStatusClass(status)}">${escapeHtml(status || 'Data unavailable')}</span>`;
+  }
+
+  function renderStatCards(containerId, cards) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = cards.map(([label, val, source, sub]) => `
+      <article class="stat-card">
+        <div class="stat-meta">
+          <span>${escapeHtml(label)}</span>
+          ${source ? `<span class="source-tag">${escapeHtml(source)}</span>` : ''}
+        </div>
+        <span class="number">${typeof val === 'number' ? val.toLocaleString() : escapeHtml(val ?? 'Unavailable')}</span>
+        ${sub ? `<span class="stat-sub">${escapeHtml(sub)}</span>` : ''}
+      </article>
+    `).join('');
+  }
+
+  function formatDurationSeconds(sec) {
+    if (!Number.isFinite(sec)) return 'Unavailable';
+    const s = Math.max(0, Math.round(sec));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m > 0 ? `${m}m ${r}s` : `${r}s`;
+  }
+
+  function formatBytes(bytes) {
+    if (!Number.isFinite(bytes)) return 'Unavailable';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1073741824) return `${(bytes / 1048576).toFixed(2)} MB`;
+    return `${(bytes / 1073741824).toFixed(2)} GB`;
+  }
+
+  function downloadCsv(filename, rows, columns) {
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [columns.join(','), ...rows.map((r) => columns.map((c) => esc(r[c])).join(','))].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  function aggregateDailyByGranularity(rows, granularity, dateKey, valueKeys) {
+    if (!Array.isArray(rows) || !rows.length) return [];
+    if (granularity === 'daily') return rows;
+    const buckets = new Map();
+    rows.forEach((row) => {
+      const raw = row[dateKey];
+      if (!raw) return;
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) return;
+      let key;
+      if (granularity === 'weekly') {
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
+        key = monday.toISOString().slice(0, 10);
+      } else {
+        key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+      }
+      const existing = buckets.get(key) || { [dateKey]: key };
+      valueKeys.forEach((vk) => {
+        existing[vk] = (existing[vk] || 0) + Number(row[vk] || 0);
+      });
+      buckets.set(key, existing);
+    });
+    return [...buckets.values()].sort((a, b) => String(a[dateKey]).localeCompare(String(b[dateKey])));
+  }
+
+  function renderMultiChart(key, canvasId, type, labels, datasets) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (state.charts[key]) {
+      state.charts[key].destroy();
+      state.charts[key] = null;
+    }
+    if (!window.Chart) return;
+    canvas.removeAttribute('style');
+    canvas.style.maxHeight = '190px';
+    canvas.style.maxWidth = '100%';
+    state.charts[key] = new Chart(canvas, {
+      type,
+      data: {
+        labels: Array.isArray(labels) ? [...labels] : [],
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { legend: { display: datasets.length > 1 } }
+      }
+    });
+  }
+
   async function loadAnalytics() {
     const status = document.getElementById('analyticsStatus');
     status.textContent = 'Loading analytics...';
     try {
       const params = analyticsQuery(document.getElementById('analyticsPeriod').value, 'analyticsFrom', 'analyticsTo');
-      const result = await api(`/api/admin/analytics?${params}`);
+      const [result, intRes] = await Promise.all([
+        api(`/api/admin/analytics?${params}`),
+        api(`/api/admin/integrations?service=ga4&${params}`).catch(() => null)
+      ]);
       renderAnalytics(result);
+      const ga4 = intRes?.data?.integrations?.ga4;
+      const ga4Wrap = document.getElementById('ga4DetailContainer');
+      if (ga4Wrap) {
+        if (ga4?.status === 'Connected' && ga4.data) {
+          const t = ga4.data.totals || {};
+          ga4Wrap.innerHTML = `
+            <div class="cc-block" style="margin-bottom:16px;">
+              <div class="cc-block-header">
+                <div class="cc-block-title"><h3>Google Analytics 4 Live Reporting (Property connected)</h3>${renderStatusPill(ga4.status)}</div>
+                <span class="muted" style="font-size:12px;">Measurement ID: ${escapeHtml(ga4.measurementId)} &bull; GTM: ${escapeHtml(ga4.gtmContainerId)}</span>
+              </div>
+              <div class="cards">
+                <article class="stat-card"><span class="stat-meta">GA4 Active Users</span><span class="number">${Number(t.activeUsers || 0).toLocaleString()}</span></article>
+                <article class="stat-card"><span class="stat-meta">GA4 New Users</span><span class="number">${Number(t.newUsers || 0).toLocaleString()}</span></article>
+                <article class="stat-card"><span class="stat-meta">GA4 Views</span><span class="number">${Number(t.views || 0).toLocaleString()}</span></article>
+                <article class="stat-card"><span class="stat-meta">GA4 Sessions</span><span class="number">${Number(t.sessions || 0).toLocaleString()}</span></article>
+                <article class="stat-card"><span class="stat-meta">Avg Engagement Time</span><span class="number">${formatDurationSeconds(t.avgEngagementSeconds)}</span></article>
+              </div>
+              <div class="analytics-columns">
+                <div><h4>GA4 Landing Pages</h4><div class="table-wrap"><table><thead><tr><th>Landing Page</th><th>Sessions</th><th>Users</th></tr></thead><tbody>${(ga4.data.landingPages || []).map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.sessions}</td><td>${r.activeUsers}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">No rows</td></tr>'}</tbody></table></div></div>
+                <div><h4>GA4 Traffic Sources</h4><div class="table-wrap"><table><thead><tr><th>Channel</th><th>Sessions</th><th>Users</th></tr></thead><tbody>${(ga4.data.trafficSources || []).map((r) => `<tr><td>${escapeHtml(r.channel)}</td><td>${r.sessions}</td><td>${r.activeUsers}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">No rows</td></tr>'}</tbody></table></div></div>
+              </div>
+            </div>
+          `;
+        } else {
+          ga4Wrap.innerHTML = `<div class="alert-banner is-warning"><strong>GA4 Data API (${escapeHtml(ga4?.status || 'Not configured')}):</strong> ${escapeHtml(ga4?.error || 'GA4 Data API credentials not configured.')} First-party Supabase metrics remain live below.</div>`;
+        }
+      }
+      state.lastAnalyticsResult = result;
       status.textContent = `Showing ${new Date(result.range.from).toLocaleString()} - ${new Date(result.range.to).toLocaleString()}.`;
       status.style.color = 'var(--primary)';
     } catch (error) {
@@ -400,16 +602,13 @@
       const period = document.getElementById('activityPeriod')?.value || '7';
       const params = analyticsQuery(period, 'activityFrom', 'activityTo');
 
-      // Fetch aggregated analytics summary for visitor panels
       try {
         const summary = await api(`/api/admin/analytics?${params.toString()}`);
         if (summary?.data) {
           renderSimpleTable('visitorPopularPages', summary.data.popularPages?.slice(0, 10) || [], 'No page visits recorded for this period.');
           renderSimpleTable('visitorPopularCompanies', summary.data.popularCompanies?.slice(0, 10) || [], 'No company visits recorded for this period.');
         }
-      } catch (e) {
-        // Analytics summary failure should not prevent activity stream from loading
-      }
+      } catch (e) {}
 
       params.set('view', 'activity');
       params.set('sort', document.getElementById('activitySort').value);
@@ -475,90 +674,292 @@
 
   async function loadHealth() {
     const cards = document.getElementById('healthCards');
-    cards.innerHTML = '<div class="empty-state">Checking protected services...</div>';
+    const epTable = document.getElementById('healthEndpointsTable');
+    if (cards) cards.innerHTML = '<div class="empty-state">Running live system &amp; endpoint checks...</div>';
     try {
-      const result = await api('/api/admin/system');
-      const d = result.data || {};
-      const entries = [
-        ['Backend connectivity', d.backendConnectivity || 'operational', 'badge-approved'],
-        ['Database availability', d.databaseAvailability || 'standby', d.databaseAvailability === 'reachable' ? 'badge-approved' : 'badge-draft'],
-        ['Admin API health', d.adminApiHealth || 'healthy (owner-authenticated)', 'badge-approved'],
-        ['Content validation status', d.contentValidationStatus || 'verified (1,100 questions: 1,086 approved, 14 under review)', 'badge-approved'],
-        ['Analytics availability', d.analyticsAvailability || 'active (first-party tracking)', 'badge-approved'],
-        ['Advertising configuration', d.advertisingConfigurationStatus || 'disabled (13 placements registered, monetization locked)', 'badge-draft']
-      ];
-      cards.innerHTML = entries.map(([title, val, badgeClass]) => `
-        <article class="stat-card">
-          <span class="muted">${escapeHtml(title)}</span>
-          <span style="display:block; margin:8px 0;"><span class="badge ${badgeClass}">${escapeHtml(val)}</span></span>
-          <span style="font-size:11px; color:var(--muted);">Latency: ${d.responseMs || 0}ms &bull; Checked ${new Date(d.checkedAt || Date.now()).toLocaleTimeString()}</span>
-        </article>
-      `).join('');
+      const [sysRes, healthRes] = await Promise.all([
+        api('/api/admin/system'),
+        api('/api/admin/integrations?service=health')
+      ]);
+      const d = sysRes.data || {};
+      const h = healthRes?.data?.integrations?.health;
+      const hd = h?.data || {};
+      if (cards) {
+        renderStatCards('healthCards', [
+          ['Endpoint Availability', `${hd.healthyCount ?? 0} / ${hd.totalCount ?? 0} OK`, 'Live Probe', hd.allHealthy ? 'All routes passing' : 'Degraded route detected'],
+          ['Avg Response Time', hd.avgLatencyMs != null ? `${hd.avgLatencyMs} ms` : 'Unavailable', 'HTTP Check', `Checked ${new Date(h?.lastSyncedAt || Date.now()).toLocaleTimeString()}`],
+          ['Database Reachability', d.databaseAvailability || 'standby', 'Supabase', `Query ${d.responseMs || 0} ms`],
+          ['Content Records', `${d.contentRecords ?? 0} Co / ${d.questionRecords ?? 0} Qs`, 'Supabase', 'Live count'],
+          ['Ad Policy Status', '5 Active + Popunder OFF', 'Policy', 'Unit 32172757 disabled']
+        ]);
+      }
+      if (epTable) {
+        const eps = hd.endpoints || [];
+        epTable.innerHTML = eps.length
+          ? `<table><thead><tr><th>Endpoint / Route</th><th>Target URL</th><th>HTTP Status</th><th>Latency</th><th>Health</th></tr></thead><tbody>${eps.map((ep) => `<tr><td><strong>${escapeHtml(ep.name)}</strong></td><td><code>${escapeHtml(ep.url)}</code></td><td>${ep.status || 'ERR'}</td><td>${ep.latencyMs} ms</td><td><span class="status-pill ${ep.ok ? 'status-connected' : 'status-error'}">${ep.ok ? 'Healthy' : 'Failed'}</span></td></tr>`).join('')}</tbody></table>`
+          : '<div class="empty-state">No endpoint probe results returned.</div>';
+      }
     } catch (error) {
-      cards.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}<br><button class="secondary" id="retryHealth" style="margin-top:8px;">Retry</button></div>`;
-      document.getElementById('retryHealth')?.addEventListener('click', loadHealth);
+      if (cards) {
+        cards.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}<br><button class="secondary" id="retryHealth" style="margin-top:8px;">Retry</button></div>`;
+        document.getElementById('retryHealth')?.addEventListener('click', loadHealth);
+      }
+    }
+  }
+
+  function renderAdOverviewSection(adsterra, granularity) {
+    const pill = document.getElementById('overviewAdStatusPill');
+    const notice = document.getElementById('overviewAdNotice');
+    if (pill) {
+      pill.className = `status-pill ${integrationStatusClass(adsterra?.status || 'Not configured')}`;
+      pill.textContent = adsterra?.status || 'Not configured';
+    }
+    const isConnected = adsterra?.status === 'Connected' && adsterra?.data;
+    const t = adsterra?.data?.totals || {};
+
+    if (notice) {
+      if (isConnected) {
+        notice.innerHTML = '<div class="alert-banner is-success"><strong>Connected to Adsterra Publisher API:</strong> Displaying live authenticated impressions, clicks, CPM, and estimated earnings. Popunder unit <code>32172757</code> remains permanently disabled.</div>';
+      } else {
+        notice.innerHTML = `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(adsterra?.status || 'Not configured')}):</strong> ${escapeHtml(adsterra?.error || 'Provide ADSTERRA_API_TOKEN in Cloudflare Pages Secrets to retrieve live revenue and impressions.')} Active client units: 32172758, 32172759, 32172760, 32172761, 32172762 (Popunder 32172757 permanently disabled).</div>`;
+      }
+    }
+
+    renderStatCards('overviewAdCards', [
+      ['Ad Impressions', isConnected ? t.impressions : 'Unavailable', isConnected ? 'Adsterra API' : 'Not configured'],
+      ['Ad Clicks', isConnected ? t.clicks : 'Unavailable', isConnected ? 'Adsterra API' : 'Not configured'],
+      ['CPM / eCPM', isConnected ? `$${Number(t.cpm || 0).toFixed(2)}` : 'Unavailable', isConnected ? 'Adsterra API' : 'Not configured'],
+      ['Estimated Revenue', isConnected ? `$${Number(t.revenue || 0).toFixed(3)}` : 'Unavailable', isConnected ? 'Adsterra API' : 'Not configured']
+    ]);
+
+    const dailyRev = aggregateDailyByGranularity(adsterra?.data?.daily || [], granularity, 'date', ['revenue', 'impressions']);
+    renderMultiChart('overviewRev', 'overviewRevenueChart', 'line',
+      dailyRev.map((d) => d.date),
+      [{ label: 'Est. Revenue ($)', data: dailyRev.map((d) => d.revenue), borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', fill: true, tension: 0.25 }]
+    );
+
+    const byPlacement = adsterra?.data?.byPlacement || [];
+    renderMultiChart('overviewAdFmt', 'overviewAdFormatChart', 'bar',
+      byPlacement.map((p) => p.name || `Unit ${p.placementId}`),
+      [{ label: 'Impressions', data: byPlacement.map((p) => p.impressions), backgroundColor: '#2563eb' }]
+    );
+
+    const tableEl = document.getElementById('overviewAdPlacementsTable');
+    if (tableEl) {
+      const units = getAdsterraConfigUnits();
+      const apiMap = new Map((byPlacement || []).map((p) => [String(p.placementId), p]));
+      tableEl.innerHTML = `<table><thead><tr><th>Unit ID</th><th>Format</th><th>Policy Status</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Revenue</th></tr></thead><tbody>${units.map((u) => {
+        const row = apiMap.get(String(u.unitId));
+        const isPop = u.unitId === '32172757';
+        return `<tr><td><strong>${escapeHtml(u.unitId)}</strong> (${escapeHtml(u.name)})</td><td>${escapeHtml(u.format)}</td><td><span class="status-pill ${isPop ? 'status-inactive' : 'status-connected'}">${isPop ? 'Permanently Disabled' : 'Active'}</span></td><td>${row ? row.impressions.toLocaleString() : '—'}</td><td>${row ? row.clicks.toLocaleString() : '—'}</td><td>${row ? `$${Number(row.cpm).toFixed(2)}` : '—'}</td><td>${row ? `$${Number(row.revenue).toFixed(3)}` : '—'}</td></tr>`;
+      }).join('')}</tbody></table>`;
+    }
+  }
+
+  function renderSeoOverviewSection(gsc) {
+    const pill = document.getElementById('overviewSeoStatusPill');
+    const notice = document.getElementById('overviewSeoNotice');
+    if (pill) {
+      pill.className = `status-pill ${integrationStatusClass(gsc?.status || 'Not configured')}`;
+      pill.textContent = gsc?.status || 'Not configured';
+    }
+    const ok = gsc?.status === 'Connected' && gsc?.data;
+    const t = gsc?.data?.totals || {};
+    if (notice) {
+      notice.innerHTML = ok
+        ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console property <code>${escapeHtml(gsc.data.siteUrl)}</code> verified.</div>`
+        : `<div class="alert-banner is-warning"><strong>Google Search Console (${escapeHtml(gsc?.status || 'Not configured')}):</strong> ${escapeHtml(gsc?.error || 'Missing server-side Search Console OAuth/Service Account credentials.')}</div>`;
+    }
+    renderStatCards('overviewSeoCards', [
+      ['Search Clicks', ok ? t.clicks : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['Search Impressions', ok ? t.impressions : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['CTR', ok ? `${t.ctr}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['Avg Position', ok && t.avgPosition != null ? t.avgPosition : 'Unavailable', ok ? 'GSC API' : 'Not configured']
+    ]);
+
+    const qEl = document.getElementById('overviewSeoQueries');
+    const pEl = document.getElementById('overviewSeoPages');
+    if (qEl) {
+      const qs = gsc?.data?.topQueries || [];
+      qEl.innerHTML = qs.length
+        ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>Pos</th></tr></thead><tbody>${qs.slice(0, 8).map((r) => `<tr><td>${escapeHtml(r.query)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.position}</td></tr>`).join('')}</tbody></table>`
+        : '<div class="empty-state">Connect Google Search Console to view top search queries.</div>';
+    }
+    if (pEl) {
+      const pgs = gsc?.data?.topPages || [];
+      const maps = gsc?.data?.sitemaps || [];
+      if (pgs.length || maps.length) {
+        pEl.innerHTML = `<table><thead><tr><th>Landing Page / Sitemap</th><th>Clicks</th><th>Impressions / Status</th></tr></thead><tbody>${pgs.slice(0, 6).map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.clicks}</td><td>${r.impressions}</td></tr>`).join('')}${maps.map((m) => `<tr><td><strong>Sitemap:</strong> ${escapeHtml(m.path)}</td><td>—</td><td>Errors: ${m.errors}, Warnings: ${m.warnings}</td></tr>`).join('')}</tbody></table>`;
+      } else {
+        pEl.innerHTML = '<div class="empty-state">Connect Google Search Console to view landing pages &amp; sitemap indexing.</div>';
+      }
+    }
+  }
+
+  function renderDbOverviewSection(supa) {
+    const pill = document.getElementById('overviewDbStatusPill');
+    if (pill) {
+      pill.className = `status-pill ${integrationStatusClass(supa?.status || 'Connection error')}`;
+      pill.textContent = supa?.status || 'Unknown';
+    }
+    const d = supa?.data || {};
+    renderStatCards('overviewDbCards', [
+      ['Project Health', supa?.status || 'Unavailable', 'Supabase', `Latency: ${supa?.latencyMs ?? 0} ms`],
+      ['Total DB Rows', d.totalRows ?? 'Unavailable', 'Supabase', `${d.tablesCount ?? 0} tables inspected`],
+      ['Storage Buckets', Array.isArray(d.storageBuckets) ? d.storageBuckets.length : 'Unavailable', 'Storage API'],
+      ['Auth Accounts', d.authUsersCount != null ? d.authUsersCount : 'Unavailable', 'Auth API'],
+      ['Table Query Errors', d.errorTables ?? 0, 'Diagnostics']
+    ]);
+    const el = document.getElementById('overviewDbTable');
+    if (el) {
+      const tbls = d.tables || [];
+      el.innerHTML = tbls.length
+        ? `<table><thead><tr><th>Table</th><th>Rows</th><th>Status</th></tr></thead><tbody>${tbls.map((t) => `<tr><td><code>${escapeHtml(t.table)}</code></td><td>${t.rows != null ? t.rows.toLocaleString() : '—'}</td><td><span class="status-pill ${t.status === 'reachable' ? 'status-connected' : 'status-error'}">${escapeHtml(t.status)}</span></td></tr>`).join('')}</tbody></table>`
+        : '<div class="empty-state">Database telemetry unavailable.</div>';
+    }
+  }
+
+  function renderInfraOverviewSection(cf) {
+    const pill = document.getElementById('overviewInfraStatusPill');
+    const notice = document.getElementById('overviewInfraNotice');
+    if (pill) {
+      pill.className = `status-pill ${integrationStatusClass(cf?.status || 'Not configured')}`;
+      pill.textContent = cf?.status || 'Not configured';
+    }
+    const ok = cf?.status === 'Connected' && cf?.data;
+    const d = cf?.data || {};
+    const lp = d.latestProduction;
+    if (notice) {
+      notice.innerHTML = ok
+        ? `<div class="alert-banner is-success"><strong>Connected to Cloudflare Pages (${escapeHtml(cf.projectName)}):</strong> Latest production deployment <code>${escapeHtml(lp?.id || '—')}</code> (${escapeHtml(lp?.status || '—')}).</div>`
+        : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}):</strong> ${escapeHtml(cf?.error || 'Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Cloudflare Pages Secrets.')}</div>`;
+    }
+    const tr = d.traffic?.totals;
+    renderStatCards('overviewInfraCards', [
+      ['Latest Prod Status', ok && lp ? lp.status : 'Unavailable', ok ? 'Cloudflare API' : 'Not configured', ok && lp ? `Commit ${lp.commitHash}` : ''],
+      ['Failed Deploys (last 10)', ok ? d.failedDeployments : 'Unavailable', ok ? 'Cloudflare API' : 'Not configured'],
+      ['Edge Requests', tr ? tr.requests : 'Unavailable', tr ? 'CF GraphQL' : 'Optional Zone ID'],
+      ['Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', tr ? 'CF GraphQL' : 'Optional Zone ID']
+    ]);
+    const el = document.getElementById('overviewInfraDeployments');
+    if (el) {
+      const deps = d.deployments || [];
+      el.innerHTML = deps.length
+        ? `<table><thead><tr><th>Deploy ID</th><th>Env</th><th>Commit</th><th>Message</th><th>Status</th><th>Created</th></tr></thead><tbody>${deps.slice(0, 6).map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td>${escapeHtml(dp.environment)}</td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.commitMessage)}</td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : (dp.status === 'failure' ? 'status-error' : 'status-unavailable')}">${escapeHtml(dp.status)}</span></td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>`
+        : '<div class="empty-state">Connect Cloudflare API token to inspect live Pages deployment history and edge bandwidth.</div>';
+    }
+  }
+
+  function renderHealthOverviewSection(health) {
+    const pill = document.getElementById('overviewHealthStatusPill');
+    if (pill) {
+      pill.className = `status-pill ${integrationStatusClass(health?.status || 'Data unavailable')}`;
+      pill.textContent = health?.data?.allHealthy ? 'Healthy' : (health?.status || 'Unavailable');
+    }
+    const hd = health?.data || {};
+    renderStatCards('overviewHealthCards', [
+      ['Production Routes', `${hd.healthyCount ?? 0} / ${hd.totalCount ?? 0} OK`, 'Live Probe'],
+      ['Avg HTTP Latency', hd.avgLatencyMs != null ? `${hd.avgLatencyMs} ms` : 'Unavailable', 'Live Probe'],
+      ['Broken Endpoints', (hd.endpoints || []).filter((e) => !e.ok).length, 'Live Probe'],
+      ['Last Health Check', hd.checkedAt ? new Date(hd.checkedAt).toLocaleTimeString() : 'Never', 'UTC/Local']
+    ]);
+    const el = document.getElementById('overviewSystemHealth');
+    if (el) {
+      const eps = hd.endpoints || [];
+      el.innerHTML = eps.length
+        ? `<table><thead><tr><th>Route</th><th>HTTP Status</th><th>Latency</th><th>Result</th></tr></thead><tbody>${eps.map((ep) => `<tr><td><strong>${escapeHtml(ep.name)}</strong></td><td>${ep.status || 'ERR'}</td><td>${ep.latencyMs} ms</td><td><span class="status-pill ${ep.ok ? 'status-connected' : 'status-error'}">${ep.ok ? 'Available' : 'Failed'}</span></td></tr>`).join('')}</tbody></table>`
+        : '<div class="empty-state">Endpoint health probes have not completed yet.</div>';
     }
   }
 
   async function loadOverview() {
     const cards = document.getElementById('overviewCards');
     const status = document.getElementById('overviewStatus');
-    cards.innerHTML = '<div class="empty-state">Loading verified counts...</div>';
+    const alertsEl = document.getElementById('overviewAlerts');
+    cards.innerHTML = '<div class="empty-state">Synchronizing PrepWise Control Center...</div>';
     try {
       const period = document.getElementById('overviewPeriod')?.value || '7';
+      const granularity = document.getElementById('overviewGranularity')?.value || 'daily';
       const params = analyticsQuery(period, 'overviewFrom', 'overviewTo');
-      const result = await api(`/api/admin/overview?${params}`);
+
+      const [result, intRes] = await Promise.all([
+        api(`/api/admin/overview?${params}`),
+        api(`/api/admin/integrations?service=all&${params}`).catch(() => null)
+      ]);
+
+      state.overviewReport = result;
+      if (intRes?.data) state.integrationsReport = intRes.data;
+
       const d = result.data || {};
       if (d.currentUser) {
         state.currentUser = d.currentUser;
         state.isOwner = Boolean(d.currentUser.isOwner);
         updateUserIdentity();
       }
-      const db = d.databaseRecords || {};
+
+      const ints = state.integrationsReport?.integrations || {};
+      const ga4 = ints.ga4;
+      const ga4Ok = ga4?.status === 'Connected' && ga4.data;
       const m = d.metrics || {};
+      const gt = ga4?.data?.totals || {};
 
-      const cardEntries = [
-        ['Page views', m.pageViews ?? 0],
-        ['Visitor sessions', m.visitorSessions ?? 0],
-        ['Unique visitors', m.uniqueVisitors ?? 0],
-        ['Quiz attempts', m.quizAttempts ?? 0],
-        ['Quiz completions', m.quizCompletions ?? 0],
-        ['Completion rate', m.completionRate != null ? `${m.completionRate}%` : 'Unavailable'],
-        ['Total companies', db.companies ?? 'Unavailable'],
-        ['Total questions', db.questions ?? 'Unavailable']
-      ];
-      cards.innerHTML = cardEntries.map(([label, val]) => `<article class="stat-card"><span class="muted">${escapeHtml(label)}</span><span class="number">${typeof val === 'string' ? escapeHtml(val) : formatValue(val)}</span></article>`).join('');
+      const srcTag = document.getElementById('websiteSourceTag');
+      if (srcTag) srcTag.textContent = ga4Ok ? 'GA4 Data API + Supabase' : 'First-Party Supabase Telemetry';
 
-      document.getElementById('overviewNote').textContent = `Showing verified records from ${new Date(result.range.from).toLocaleDateString()} to ${new Date(result.range.to).toLocaleDateString()}. Generated at ${new Date(result.generatedAt).toLocaleTimeString()}.`;
-
-      if (state.chart) {
-        state.chart.destroy();
-        state.chart = null;
-      }
-      const canvas = document.getElementById('overviewChart');
-      if (canvas && window.Chart) {
-        canvas.removeAttribute('style');
-        canvas.style.maxHeight = '180px';
-        canvas.style.maxWidth = '100%';
-        state.chart = new Chart(canvas, {
-          type: 'bar',
-          data: {
-            labels: ['Page views', 'Sessions', 'Unique visitors', 'Quiz starts', 'Quiz completions'],
-            datasets: [{
-              label: 'Event count',
-              data: [m.pageViews || 0, m.visitorSessions || 0, m.uniqueVisitors || 0, m.quizStarts || 0, m.quizCompletions || 0],
-              backgroundColor: '#2563eb'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 250 },
-            plugins: { legend: { display: false } }
-          }
-        });
+      // Alerts banner if any integration has an auth/connection error
+      if (alertsEl) {
+        const failedInts = Object.values(ints).filter((i) => i.status === 'Connection error' || i.status === 'Authentication required');
+        alertsEl.innerHTML = failedInts.length
+          ? `<div class="alert-banner is-error"><strong>Integration Alerts:</strong> ${failedInts.map((i) => `${escapeHtml(i.name)} (${escapeHtml(i.status)}: ${escapeHtml(i.error || '')})`).join(' &bull; ')}</div>`
+          : '';
       }
 
+      // Section A: Website Overview Cards
+      renderStatCards('overviewCards', [
+        ['Total Visitors', ga4Ok ? gt.activeUsers : (m.uniqueVisitors ?? 0), ga4Ok ? 'GA4' : 'First-party'],
+        ['Active Users', ga4Ok ? gt.activeUsers : (m.uniqueVisitors ?? 0), ga4Ok ? 'GA4' : 'First-party'],
+        ['Page Views', ga4Ok ? gt.views : (m.pageViews ?? 0), ga4Ok ? 'GA4' : 'First-party'],
+        ['Sessions', ga4Ok ? gt.sessions : (m.visitorSessions ?? 0), ga4Ok ? 'GA4' : 'First-party'],
+        ['Avg Engagement Time', ga4Ok ? formatDurationSeconds(gt.avgEngagementSeconds) : 'GA4 Required', ga4Ok ? 'GA4' : 'Pending GA4 API'],
+        ['Quiz Starts', m.quizStarts ?? m.quizAttempts ?? 0, 'Supabase'],
+        ['Quiz Completions', m.quizCompletions ?? m.completedAttempts ?? 0, 'Supabase'],
+        ['Quiz Completion Rate', m.completionRate != null ? `${m.completionRate}%` : 'Unavailable', 'Supabase']
+      ]);
+
+      document.getElementById('overviewNote').textContent = `Period: ${new Date(result.range.from).toLocaleDateString()} – ${new Date(result.range.to).toLocaleDateString()} | Granularity: ${granularity}`;
+      const luEl = document.getElementById('overviewLastUpdated');
+      if (luEl) luEl.textContent = `Last updated: ${new Date(result.generatedAt).toLocaleTimeString()}`;
+
+      // Website Traffic Chart (Daily/Weekly/Monthly)
+      const trafficRows = ga4Ok
+        ? aggregateDailyByGranularity(ga4.data.daily, granularity, 'date', ['views', 'sessions', 'activeUsers'])
+        : aggregateDailyByGranularity(d.dailyActivity || [], granularity, 'date', ['pageViews', 'quizStarts', 'totalEvents']);
+
+      renderMultiChart('overviewTraffic', 'overviewChart', 'line',
+        trafficRows.map((r) => r.date),
+        ga4Ok
+          ? [
+              { label: 'Views', data: trafficRows.map((r) => r.views), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.2 },
+              { label: 'Sessions', data: trafficRows.map((r) => r.sessions), borderColor: '#09090b', tension: 0.2 }
+            ]
+          : [
+              { label: 'Page Views', data: trafficRows.map((r) => r.pageViews), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.2 },
+              { label: 'Quiz Starts', data: trafficRows.map((r) => r.quizStarts), borderColor: '#eab308', tension: 0.2 }
+            ]
+      );
+
+      // Visitor vs Revenue Comparison Chart
+      const adDaily = aggregateDailyByGranularity(ints.adsterra?.data?.daily || [], granularity, 'date', ['revenue']);
+      const adMap = new Map(adDaily.map((r) => [r.date, r.revenue]));
+      renderMultiChart('overviewComp', 'overviewComparisonChart', 'bar',
+        trafficRows.map((r) => r.date),
+        [
+          { label: ga4Ok ? 'Active Users' : 'Page Views', data: trafficRows.map((r) => (ga4Ok ? r.activeUsers : r.pageViews)), backgroundColor: '#2563eb' },
+          { label: 'Ad Revenue ($)', data: trafficRows.map((r) => adMap.get(r.date) || 0), backgroundColor: '#facc15' }
+        ]
+      );
+
+      renderSimpleTable('overviewPopularPages', d.popularPages || [], 'No page view paths recorded for this period.');
       renderSimpleTable('overviewPopularCompanies', d.popularCompanies || [], 'No company visits recorded for this period.');
       renderSimpleTable('overviewPopularCategories', d.popularCategories || [], 'No category visits recorded for this period.');
 
@@ -570,18 +971,222 @@
         activityContainer.innerHTML = `<table><thead><tr><th>Event</th><th>Path</th><th>Time</th></tr></thead><tbody>${activities.map((a) => `<tr><td><strong>${escapeHtml(a.event)}</strong></td><td>${escapeHtml(a.path)}</td><td>${escapeHtml(new Date(a.timestamp).toLocaleTimeString())}</td></tr>`).join('')}</tbody></table>`;
       }
 
-      const healthContainer = document.getElementById('overviewSystemHealth');
-      const health = d.systemHealth || {};
-      healthContainer.innerHTML = `<table><tbody>
-        <tr><td><strong>Backend API</strong></td><td><span class="badge badge-approved">${escapeHtml(health.backend || 'operational')}</span></td></tr>
-        <tr><td><strong>Database Status</strong></td><td><span class="badge ${health.database === 'reachable' ? 'badge-approved' : 'badge-draft'}">${escapeHtml(health.database || 'standby')}</span></td></tr>
-        <tr><td><strong>Checked At</strong></td><td>${escapeHtml(new Date(health.checkedAt || Date.now()).toLocaleTimeString())}</td></tr>
-      </tbody></table>`;
+      // Blocks B - F
+      renderAdOverviewSection(ints.adsterra, granularity);
+      renderSeoOverviewSection(ints.gsc);
+      renderDbOverviewSection(ints.supabase);
+      renderInfraOverviewSection(ints.cloudflare);
+      renderHealthOverviewSection(ints.health);
 
       if (status) status.textContent = '';
     } catch (error) {
       cards.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
       if (status) setStatus(status, error.message);
+    }
+  }
+
+  function openIntegrationSetupModal(serviceKey) {
+    const modal = document.getElementById('integrationSetupModal');
+    const title = document.getElementById('setupModalTitle');
+    const body = document.getElementById('setupModalBody');
+    if (!modal || !body) return;
+    state.activeSetupService = serviceKey;
+    const item = state.integrationsReport?.integrations?.[serviceKey];
+    title.textContent = `Configure / Reconnect: ${item?.name || serviceKey}`;
+
+    const envVarsList = (item?.missingCredentials && item.missingCredentials.length)
+      ? `<p><strong>Missing Server Environment Variables:</strong></p><ul>${item.missingCredentials.map((c) => `<li><code>${escapeHtml(c)}</code></li>`).join('')}</ul>`
+      : '<p><strong>Required secrets:</strong> Currently configured in server environment (values remain hidden).</p>';
+
+    body.innerHTML = `
+      <div class="alert-banner ${item?.status === 'Connected' ? 'is-success' : 'is-warning'}" style="margin-top:8px;">
+        <strong>Current Status:</strong> ${escapeHtml(item?.status || 'Not configured')}
+        ${item?.error ? `<br><span>${escapeHtml(item.error)}</span>` : ''}
+      </div>
+      ${envVarsList}
+      <p style="font-size:13px; line-height:1.55;"><strong>How to configure securely:</strong><br>${escapeHtml(item?.setupInstructions || 'Provision the required read-only API token in Cloudflare Dashboard -> Workers & Pages -> prepwise-7ij -> Settings -> Environment variables (encrypted secret).')}</p>
+      <div class="code-block">Cloudflare Dashboard -> Pages -> prepwise-7ij -> Settings -> Variables & Secrets -> Add Secret</div>
+    `;
+    modal.hidden = false;
+  }
+
+  async function loadIntegrations(targetService = 'all') {
+    const grid = document.getElementById('integrationsGrid');
+    if (grid && targetService === 'all') {
+      grid.innerHTML = '<div class="empty-state">Probing configured service integrations...</div>';
+    }
+    try {
+      const res = await api(`/api/admin/integrations?service=${encodeURIComponent(targetService)}`);
+      if (targetService === 'all' || !state.integrationsReport) {
+        state.integrationsReport = res.data;
+      } else if (res.data?.integrations?.[targetService]) {
+        state.integrationsReport.integrations[targetService] = res.data.integrations[targetService];
+      }
+      const ints = state.integrationsReport?.integrations || {};
+      const order = ['ga4', 'adsterra', 'gsc', 'supabase', 'cloudflare', 'health'];
+      const icons = { ga4: 'GA4', adsterra: 'AD', gsc: 'GSC', supabase: 'DB', cloudflare: 'CF', health: 'OK' };
+
+      if (grid) {
+        grid.innerHTML = order.map((key) => {
+          const item = ints[key];
+          if (!item) return '';
+          const isBad = item.status === 'Connection error' || item.status === 'Authentication required';
+          return `
+            <article class="integration-card">
+              <div class="integration-card-head">
+                <div class="integration-title-wrap">
+                  <div class="integration-icon">${icons[key] || 'API'}</div>
+                  <div>
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <span class="muted" style="font-size:11px;">${escapeHtml(key.toUpperCase())}</span>
+                  </div>
+                </div>
+                ${renderStatusPill(item.status)}
+              </div>
+              <div class="integration-meta-row">
+                <span>Last sync: <strong>${item.lastSyncedAt ? escapeHtml(new Date(item.lastSyncedAt).toLocaleString()) : 'Never'}</strong></span>
+                ${item.latencyMs != null ? `<span>${item.latencyMs} ms</span>` : ''}
+              </div>
+              ${item.error ? `<div class="integration-error-box ${isBad ? 'is-err' : ''}">${escapeHtml(item.error)}</div>` : ''}
+              <div class="metric-chips">
+                ${(item.availableMetrics || []).map((mName) => `<span class="metric-chip">${escapeHtml(mName)}</span>`).join('')}
+              </div>
+              <div class="integration-actions">
+                <button type="button" class="primary btn-sm" data-test-integration="${escapeHtml(key)}">Test Connection</button>
+                <button type="button" class="secondary btn-sm" data-setup-integration="${escapeHtml(key)}">Configure / Details</button>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('[data-test-integration]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+            await loadIntegrations(btn.dataset.testIntegration);
+          });
+        });
+        grid.querySelectorAll('[data-setup-integration]').forEach((btn) => {
+          btn.addEventListener('click', () => openIntegrationSetupModal(btn.dataset.setupIntegration));
+        });
+      }
+    } catch (error) {
+      if (grid) grid.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  async function loadAdvertising() {
+    const banner = document.getElementById('advertisingApiBanner');
+    try {
+      const res = await api('/api/admin/integrations?service=adsterra');
+      const ad = res?.data?.integrations?.adsterra;
+      if (!state.integrationsReport) state.integrationsReport = { integrations: {} };
+      state.integrationsReport.integrations.adsterra = ad;
+      state.lastAdReport = ad;
+      const ok = ad?.status === 'Connected' && ad?.data;
+      const t = ad?.data?.totals || {};
+      if (banner) {
+        banner.innerHTML = ok
+          ? '<div class="alert-banner is-success"><strong>Connected:</strong> Authenticated Adsterra Publisher API telemetry loaded. Popunder Unit <code>32172757</code> remains permanently disabled.</div>'
+          : `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(ad?.status || 'Not configured')}):</strong> ${escapeHtml(ad?.error || 'Set ADSTERRA_API_TOKEN to view live earnings & impressions.')}</div>`;
+      }
+      renderStatCards('advertisingSummaryCards', [
+        ['Impressions', ok ? t.impressions : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
+        ['Clicks & CTR', ok ? `${t.clicks} (${t.ctr}%)` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
+        ['CPM', ok ? `$${Number(t.cpm || 0).toFixed(2)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
+        ['Est. Revenue', ok ? `$${Number(t.revenue || 0).toFixed(3)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
+        ['Popunder (32172757)', 'DISABLED', 'Safety Rule', 'Permanently turned off']
+      ]);
+      const daily = ad?.data?.daily || [];
+      renderMultiChart('adDetRev', 'adDetailRevenueChart', 'line', daily.map((r) => r.date), [{ label: 'Revenue ($)', data: daily.map((r) => r.revenue), borderColor: '#16a34a', tension: 0.2 }]);
+      renderMultiChart('adDetImp', 'adDetailImpressionsChart', 'bar', daily.map((r) => r.date), [{ label: 'Impressions', data: daily.map((r) => r.impressions), backgroundColor: '#2563eb' }]);
+      renderAdvertisingPlacements();
+    } catch (error) {
+      if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  async function loadSeo() {
+    const banner = document.getElementById('seoApiBanner');
+    try {
+      const res = await api('/api/admin/integrations?service=gsc');
+      const gsc = res?.data?.integrations?.gsc;
+      state.lastSeoReport = gsc;
+      const ok = gsc?.status === 'Connected' && gsc?.data;
+      const t = gsc?.data?.totals || {};
+      if (banner) {
+        banner.innerHTML = ok
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console metrics for <code>${escapeHtml(gsc.data.siteUrl)}</code>.</div>`
+          : `<div class="alert-banner is-warning"><strong>Google Search Console (${escapeHtml(gsc?.status || 'Not configured')}):</strong> ${escapeHtml(gsc?.error || 'Missing Search Console credentials.')}</div>`;
+      }
+      renderStatCards('seoCards', [
+        ['Clicks', ok ? t.clicks : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Impressions', ok ? t.impressions : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Average CTR', ok ? `${t.ctr}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Average Position', ok && t.avgPosition != null ? t.avgPosition : 'Unavailable', ok ? 'GSC API' : 'Not configured']
+      ]);
+      const daily = gsc?.data?.daily || [];
+      renderMultiChart('seoDet', 'seoDetailChart', 'line', daily.map((d) => d.date), [
+        { label: 'Clicks', data: daily.map((d) => d.clicks), borderColor: '#2563eb', tension: 0.2 },
+        { label: 'Impressions', data: daily.map((d) => d.impressions), borderColor: '#facc15', tension: 0.2 }
+      ]);
+      const qEl = document.getElementById('seoQueriesTable');
+      const pEl = document.getElementById('seoPagesTable');
+      const sEl = document.getElementById('seoSitemapsTable');
+      if (qEl) qEl.innerHTML = ok && gsc.data.topQueries.length ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topQueries.map((r) => `<tr><td>${escapeHtml(r.query)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No Search Console query data available.</div>';
+      if (pEl) pEl.innerHTML = ok && gsc.data.topPages.length ? `<table><thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topPages.map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No Search Console landing page data available.</div>';
+      if (sEl) sEl.innerHTML = ok && gsc.data.sitemaps.length ? `<table><thead><tr><th>Sitemap</th><th>Last Submitted</th><th>Pending</th><th>Warnings</th><th>Errors</th></tr></thead><tbody>${gsc.data.sitemaps.map((m) => `<tr><td><code>${escapeHtml(m.path)}</code></td><td>${m.lastSubmitted ? escapeHtml(new Date(m.lastSubmitted).toLocaleString()) : '—'}</td><td>${m.isPending ? 'Yes' : 'No'}</td><td>${m.warnings}</td><td>${m.errors}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No sitemap index telemetry available.</div>';
+    } catch (error) {
+      if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  async function loadDatabaseMonitoring() {
+    try {
+      const res = await api('/api/admin/integrations?service=supabase');
+      const supa = res?.data?.integrations?.supabase;
+      const d = supa?.data || {};
+      renderStatCards('databaseCards', [
+        ['Project Health', supa?.status || 'Unavailable', 'Supabase', `Latency ${supa?.latencyMs ?? 0} ms`],
+        ['Total Records', d.totalRows ?? 'Unavailable', 'Supabase'],
+        ['Tables Verified', `${(d.tablesCount ?? 0) - (d.errorTables ?? 0)} / ${d.tablesCount ?? 0}`, 'Supabase'],
+        ['Storage Buckets', Array.isArray(d.storageBuckets) ? d.storageBuckets.length : 'Unavailable', 'Storage API'],
+        ['Auth Accounts', d.authUsersCount != null ? d.authUsersCount : 'Unavailable', 'Auth API']
+      ]);
+      const tEl = document.getElementById('databaseTablesTable');
+      const eEl = document.getElementById('databaseExtrasTable');
+      if (tEl) tEl.innerHTML = (d.tables || []).length ? `<table><thead><tr><th>Table Name</th><th>Row Count</th><th>Status</th></tr></thead><tbody>${d.tables.map((t) => `<tr><td><code>${escapeHtml(t.table)}</code></td><td>${t.rows != null ? t.rows.toLocaleString() : '—'}</td><td><span class="status-pill ${t.status === 'reachable' ? 'status-connected' : 'status-error'}">${escapeHtml(t.status)}</span></td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No table metrics available.</div>';
+      if (eEl) eEl.innerHTML = (d.recentAdminActivity || []).length ? `<table><thead><tr><th>Admin Action</th><th>Resource</th><th>Timestamp</th></tr></thead><tbody>${d.recentAdminActivity.map((a) => `<tr><td><strong>${escapeHtml(a.action)}</strong></td><td>${escapeHtml(a.resource)}</td><td>${escapeHtml(new Date(a.created_at).toLocaleString())}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No recent admin audit log rows.</div>';
+    } catch (error) {
+      renderStatCards('databaseCards', [['Database Status', 'Connection error', 'Error', error.message]]);
+    }
+  }
+
+  async function loadInfrastructureMonitoring() {
+    const banner = document.getElementById('infraApiBanner');
+    try {
+      const res = await api('/api/admin/integrations?service=cloudflare');
+      const cf = res?.data?.integrations?.cloudflare;
+      const ok = cf?.status === 'Connected' && cf?.data;
+      const d = cf?.data || {};
+      const tr = d.traffic?.totals;
+      if (banner) {
+        banner.innerHTML = ok
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Cloudflare Pages project <code>${escapeHtml(cf.projectName)}</code>.</div>`
+          : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}):</strong> ${escapeHtml(cf?.error || 'Missing Cloudflare credentials.')}</div>`;
+      }
+      renderStatCards('infrastructureCards', [
+        ['Latest Prod Deploy', ok && d.latestProduction ? d.latestProduction.status : 'Unavailable', ok ? 'Cloudflare' : 'Not configured'],
+        ['Failed Deploys (10)', ok ? d.failedDeployments : 'Unavailable', ok ? 'Cloudflare' : 'Not configured'],
+        ['Edge Requests', tr ? tr.requests : 'Unavailable', tr ? 'CF GraphQL' : 'Zone ID needed'],
+        ['Total Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', tr ? 'CF GraphQL' : 'Zone ID needed']
+      ]);
+      const daily = d.traffic?.daily || [];
+      renderMultiChart('infraTraf', 'infraTrafficChart', 'line', daily.map((r) => r.date), [{ label: 'Requests', data: daily.map((r) => r.requests), borderColor: '#2563eb', tension: 0.2 }]);
+      const depEl = document.getElementById('infrastructureDeploymentsTable');
+      if (depEl) depEl.innerHTML = ok && (d.deployments || []).length ? `<table><thead><tr><th>Deploy</th><th>Env</th><th>Commit</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody>${d.deployments.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td>${escapeHtml(dp.environment)}</td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.commitMessage)}</td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : 'status-error'}">${escapeHtml(dp.status)}</span></td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">Connect Cloudflare API token to inspect deployments.</div>';
+    } catch (error) {
+      if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
     }
   }
 
@@ -1712,7 +2317,82 @@
     loadQuiz();
   });
 
+  function activateSection(section) {
+    document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.section === section));
+    document.querySelectorAll('.panel').forEach((panel) => {
+      const isActive = panel.id === `section-${section}`;
+      panel.classList.toggle('active', isActive);
+      if (isActive) panel.removeAttribute('hidden');
+    });
+    if (section === 'overview') loadOverview();
+    else if (section === 'integrations') loadIntegrations('all');
+    else if (section === 'feedback') { state.resource = 'feedback'; loadResource(); }
+    else if (section === 'settings') { state.resource = 'website_settings'; loadResource(); }
+    else if (section === 'activity') { state.resource = 'admin_activity_logs'; loadResource(); }
+    else if (section === 'content') { state.resource = 'companies'; loadContentSummary(); loadResource(); }
+    else if (section === 'advertising') loadAdvertising();
+    else if (section === 'seo') loadSeo();
+    else if (section === 'database') loadDatabaseMonitoring();
+    else if (section === 'infrastructure') loadInfrastructureMonitoring();
+    else if (section === 'analytics' || section === 'companies') loadAnalytics();
+    else if (section === 'quiz') loadQuiz();
+    else if (section === 'visitors') loadActivity();
+    else if (section === 'system') loadHealth();
+    else if (section === 'security') renderSecurityStatus();
+    else if (section === 'administrators') loadAdministrators();
+  }
+
+  document.getElementById('overviewGranularity')?.addEventListener('change', loadOverview);
   document.getElementById('refreshContentSummary')?.addEventListener('click', loadContentSummary);
+  document.getElementById('testAllIntegrationsBtn')?.addEventListener('click', () => loadIntegrations('all'));
+  document.getElementById('refreshAdvertising')?.addEventListener('click', loadAdvertising);
+  document.getElementById('refreshSeo')?.addEventListener('click', loadSeo);
+  document.getElementById('refreshDatabase')?.addEventListener('click', loadDatabaseMonitoring);
+  document.getElementById('refreshInfrastructure')?.addEventListener('click', loadInfrastructureMonitoring);
+
+  document.getElementById('closeSetupModal')?.addEventListener('click', () => {
+    document.getElementById('integrationSetupModal').hidden = true;
+  });
+  document.getElementById('setupModalDoneBtn')?.addEventListener('click', () => {
+    document.getElementById('integrationSetupModal').hidden = true;
+  });
+  document.getElementById('setupModalTestBtn')?.addEventListener('click', async () => {
+    if (!state.activeSetupService) return;
+    await loadIntegrations(state.activeSetupService);
+    openIntegrationSetupModal(state.activeSetupService);
+  });
+
+  document.getElementById('exportOverviewCsv')?.addEventListener('click', () => {
+    const daily = state.overviewReport?.data?.dailyActivity || [];
+    const adMap = new Map((state.integrationsReport?.integrations?.adsterra?.data?.daily || []).map((r) => [r.date, r]));
+    const rows = daily.map((d) => ({
+      date: d.date,
+      pageViews: d.pageViews,
+      quizStarts: d.quizStarts,
+      quizCompletions: d.quizCompletions,
+      totalEvents: d.totalEvents,
+      adImpressions: adMap.get(d.date)?.impressions ?? '',
+      adRevenueUsd: adMap.get(d.date)?.revenue ?? ''
+    }));
+    downloadCsv('prepwise-overview-report.csv', rows, ['date', 'pageViews', 'quizStarts', 'quizCompletions', 'totalEvents', 'adImpressions', 'adRevenueUsd']);
+  });
+
+  document.getElementById('exportAnalyticsCsv')?.addEventListener('click', () => {
+    const res = state.lastAnalyticsResult?.data;
+    if (!res) return;
+    const rows = (res.popularPages || []).map((p) => ({ page: p.label, views: p.count }));
+    downloadCsv('prepwise-popular-pages.csv', rows, ['page', 'views']);
+  });
+
+  document.getElementById('exportAdRevenueCsv')?.addEventListener('click', () => {
+    const daily = state.lastAdReport?.data?.daily || state.integrationsReport?.integrations?.adsterra?.data?.daily || [];
+    downloadCsv('prepwise-adsterra-revenue.csv', daily, ['date', 'impressions', 'clicks', 'ctr', 'cpm', 'revenue']);
+  });
+
+  document.getElementById('exportSeoCsv')?.addEventListener('click', () => {
+    const qs = state.lastSeoReport?.data?.topQueries || state.integrationsReport?.integrations?.gsc?.data?.topQueries || [];
+    downloadCsv('prepwise-seo-queries.csv', qs, ['query', 'clicks', 'impressions', 'ctr', 'position']);
+  });
 
   document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => {
     if (button.dataset.refresh === 'overview') loadOverview();
@@ -1725,23 +2405,11 @@
   }));
 
   document.querySelectorAll('.nav-item').forEach((button) => button.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item === button));
-    document.querySelectorAll('.panel').forEach((panel) => {
-      const isActive = panel.id === `section-${button.dataset.section}`;
-      panel.classList.toggle('active', isActive);
-      if (isActive) panel.removeAttribute('hidden');
-    });
-    if (button.dataset.section === 'feedback') { state.resource = 'feedback'; loadResource(); }
-    else if (button.dataset.section === 'settings') { state.resource = 'website_settings'; loadResource(); }
-    else if (button.dataset.section === 'activity') { state.resource = 'admin_activity_logs'; loadResource(); }
-    else if (button.dataset.section === 'content') { state.resource = 'companies'; loadContentSummary(); loadResource(); }
-    else if (button.dataset.section === 'advertising') renderAdvertisingPlacements();
-    else if (button.dataset.section === 'analytics' || button.dataset.section === 'companies') loadAnalytics();
-    else if (button.dataset.section === 'quiz') loadQuiz();
-    else if (button.dataset.section === 'visitors') loadActivity();
-    else if (button.dataset.section === 'system') loadHealth();
-    else if (button.dataset.section === 'security') renderSecurityStatus();
-    else if (button.dataset.section === 'administrators') loadAdministrators();
+    activateSection(button.dataset.section);
+  }));
+
+  document.querySelectorAll('[data-jump]').forEach((button) => button.addEventListener('click', () => {
+    activateSection(button.dataset.jump);
   }));
 
   document.getElementById('resourceSearch').addEventListener('input', (event) => {
