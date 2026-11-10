@@ -25,7 +25,145 @@
   const config = window.PREPWISE_ADSTERRA_CONFIG;
   const loadedScripts = new Set();
   const renderedPlacements = new Set();
+  const RUNTIME_CONFIG_TIMEOUT_MS = 1500;
   let clickGuardInstalled = false;
+  let runtimeControls = null;
+  let runtimeConfigLoaded = false;
+  let runtimeControlsPromise = null;
+  let autoInitInFlight = null;
+
+  function getBaselineControls() {
+    return {
+      masterEnabled: config ? config.enabled !== false : true,
+      units: {
+        '32172757': false, // Popunder strictly OFF in baseline and all fail-open states
+        '32172758': Boolean(config?.units?.['32172758']?.enabled ?? true),
+        '32172759': Boolean(config?.units?.['32172759']?.enabled ?? true),
+        '32172760': Boolean(config?.units?.['32172760']?.enabled ?? true),
+        '32172761': Boolean(config?.units?.['32172761']?.enabled ?? true),
+        '32172762': Boolean(config?.units?.['32172762']?.enabled ?? true)
+      }
+    };
+  }
+
+  function isValidRuntimeControlsShape(rawControls) {
+    return Boolean(
+      rawControls &&
+      typeof rawControls === 'object' &&
+      typeof rawControls.masterEnabled === 'boolean' &&
+      rawControls.units &&
+      typeof rawControls.units === 'object'
+    );
+  }
+
+  function normalizeRuntimeControls(rawControls) {
+    const baseline = getBaselineControls();
+    if (!isValidRuntimeControlsShape(rawControls)) {
+      return { controls: baseline, valid: false };
+    }
+    const units = { ...baseline.units };
+    ['32172758', '32172759', '32172760', '32172761', '32172762'].forEach((id) => {
+      if (typeof rawControls.units[id] === 'boolean') {
+        units[id] = rawControls.units[id];
+      }
+    });
+    // Popunder (32172757) is eligible ONLY when validated runtime config explicitly sets
+    // masterEnabled === true and units['32172757'] === true.
+    units['32172757'] = Boolean(rawControls.masterEnabled === true && rawControls.units['32172757'] === true);
+
+    return {
+      controls: {
+        masterEnabled: rawControls.masterEnabled,
+        units
+      },
+      valid: true
+    };
+  }
+
+  function ensureRuntimeAdControls() {
+    if (runtimeControls) {
+      return Promise.resolve(runtimeControls);
+    }
+    if (runtimeControlsPromise) {
+      return runtimeControlsPromise;
+    }
+
+    const fallback = getBaselineControls();
+    if (typeof fetch !== 'function') {
+      runtimeConfigLoaded = false;
+      runtimeControls = fallback;
+      return Promise.resolve(runtimeControls);
+    }
+
+    runtimeControlsPromise = new Promise((resolve) => {
+      let settled = false;
+      const controller = typeof AbortController === 'function' ? new AbortController() : null;
+      const finish = (controls, isValidRemote = false) => {
+        if (settled) return;
+        settled = true;
+        runtimeConfigLoaded = Boolean(isValidRemote);
+        runtimeControls = controls;
+        resolve(controls);
+      };
+      const timer = setTimeout(() => {
+        if (controller) {
+          try { controller.abort(); } catch {}
+        }
+        finish(fallback, false);
+      }, RUNTIME_CONFIG_TIMEOUT_MS);
+
+      fetch('/api/config', {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+        ...(controller ? { signal: controller.signal } : {})
+      })
+        .then((resp) => (resp && resp.ok ? resp.json() : null))
+        .then((payload) => {
+          clearTimeout(timer);
+          if (payload && typeof payload === 'object' && payload.adControls) {
+            const parsed = normalizeRuntimeControls(payload.adControls);
+            finish(parsed.controls, parsed.valid);
+          } else {
+            finish(fallback, false);
+          }
+        })
+        .catch(() => {
+          clearTimeout(timer);
+          finish(fallback, false);
+        });
+    });
+
+    return runtimeControlsPromise;
+  }
+
+  function isMasterEnabled() {
+    if (!config || !config.enabled) return false;
+    if (runtimeControls && runtimeControls.masterEnabled === false) return false;
+    return true;
+  }
+
+  function isUnitEnabled(unitId) {
+    if (!isMasterEnabled()) return false;
+    if (String(unitId) === '32172757') {
+      return Boolean(runtimeConfigLoaded && runtimeControls?.units?.['32172757'] === true);
+    }
+    if (runtimeControls?.units && typeof runtimeControls.units[unitId] === 'boolean') {
+      return runtimeControls.units[unitId];
+    }
+    const cfgUnit = config?.units?.[unitId];
+    return cfgUnit ? Boolean(cfgUnit.enabled) : true;
+  }
+
+  function hasAnyEligibleUnitEnabled() {
+    return ['32172758', '32172759', '32172760', '32172761', '32172762'].some((id) => isUnitEnabled(id));
+  }
+
+  function resolvePlacementUnitId(placementConfig, device) {
+    if (!placementConfig) return null;
+    return device === 'mobile'
+      ? (placementConfig.mobileUnitId || placementConfig.desktopUnitId || placementConfig.unitId || null)
+      : (placementConfig.desktopUnitId || placementConfig.unitId || null);
+  }
 
   function getDeviceType() {
     const w = window.innerWidth;
@@ -101,137 +239,140 @@
      */
     request({ placement, element }) {
       return new Promise((resolve, reject) => {
-        // 1. Consent Gate
-        if (!hasAdvertisingConsent()) {
-          return reject(new Error('Advertising consent not granted by user'));
-        }
-
-        // 2. Global & Placement Config Checks
-        if (!config || !config.enabled) {
-          return reject(new Error('Adsterra monetization is globally disabled pending verification'));
-        }
-
-        const placementConfig = config.placements?.[placement.id];
-        if (!placementConfig || !placementConfig.enabled) {
-          return reject(new Error(`Adsterra placement "${placement.id}" is disabled`));
-        }
-
-        if (placementConfig.prohibited) {
-          return reject(new Error(`Placement "${placement.id}" is prohibited under educational safety policy`));
-        }
-
-        // 3. Resolve Device & Target Unit
-        const device = getDeviceType();
-        const unitId = device === 'mobile'
-          ? (placementConfig.mobileUnitId || placementConfig.desktopUnitId)
-          : placementConfig.desktopUnitId;
-        const unit = config.units?.[unitId] || placementConfig;
-
-        // 4. Code Verification
-        const scriptSrc = unit.scriptSrc || placementConfig.scriptSrc;
-        const adsterraKey = unit.key || placementConfig.adsterraKey;
-
-        if (!scriptSrc && !unit.rawSnippet) {
-          return reject(new Error(`Adsterra genuine code is not yet configured for unit "${unitId || placement.id}"`));
-        }
-
-        // 5. Duplicate Render Guard
-        if (renderedPlacements.has(placement.id)) {
-          return resolve({ status: 'already-rendered', placementId: placement.id });
-        }
-
-        // 6. Layout Stability & Accessible Label
-        element.classList.add('is-enabled');
-        const size = unit.width && unit.height
-          ? [unit.width, unit.height]
-          : (unit.format === 'native-banner' ? [728, 120] : (device === 'mobile' ? [320, 50] : [728, 90]));
-
-        element.style.minHeight = `${size[1] + 24}px`;
-        element.style.setProperty('--ad-slot-width', `${size[0]}px`);
-
-        if (!element.querySelector('.ad-label')) {
-          const label = document.createElement('div');
-          label.className = 'ad-label';
-          label.setAttribute('aria-hidden', 'true');
-          label.textContent = placementConfig.label || 'Advertisement';
-          element.appendChild(label);
-        }
-
-        let container = element.querySelector('.ad-content-box');
-        if (!container) {
-          container = document.createElement('div');
-          container.className = 'ad-content-box';
-          container.id = `adsterra-box-${placement.id}`;
-          container.style.width = '100%';
-          container.style.maxWidth = `${size[0]}px`;
-          container.style.minHeight = `${size[1]}px`;
-          container.style.margin = '0 auto';
-          container.style.overflow = 'hidden';
-          container.style.display = 'flex';
-          container.style.justifyContent = 'center';
-          container.style.alignItems = 'center';
-          element.appendChild(container);
-        }
-
-        // 7. Render Format (Native Banner vs. Iframe Banner)
-        if (unit.format === 'native-banner') {
-          const containerId = unit.containerId || 'container-cf54b7a35f5f1b688587f9f9b2590912';
-          if (!container.querySelector(`#${containerId}`)) {
-            const nativeDiv = document.createElement('div');
-            nativeDiv.id = containerId;
-            container.appendChild(nativeDiv);
+        ensureRuntimeAdControls().then(() => {
+          // 1. Consent Gate
+          if (!hasAdvertisingConsent()) {
+            return reject(new Error('Advertising consent not granted by user'));
           }
 
-          const scriptId = `adsterra-script-${unitId}`;
-          if (!document.getElementById(scriptId) && !loadedScripts.has(scriptSrc)) {
-            const script = document.createElement('script');
-            script.id = scriptId;
-            script.async = true;
-            script.setAttribute('data-cfasync', 'false');
-            script.src = scriptSrc;
+          // 2. Global & Placement Config Checks
+          if (!isMasterEnabled()) {
+            return reject(new Error('Adsterra monetization is disabled via master control'));
+          }
 
-            script.onload = () => {
-              loadedScripts.add(scriptSrc);
+          const placementConfig = config.placements?.[placement.id];
+          if (!placementConfig || !placementConfig.enabled) {
+            return reject(new Error(`Adsterra placement "${placement.id}" is disabled`));
+          }
+
+          if (placementConfig.prohibited) {
+            return reject(new Error(`Placement "${placement.id}" is prohibited under educational safety policy`));
+          }
+
+          // 3. Resolve Device & Target Unit + Runtime Unit Control Check
+          const device = getDeviceType();
+          const unitId = resolvePlacementUnitId(placementConfig, device);
+          if (unitId && !isUnitEnabled(unitId)) {
+            return reject(new Error(`Adsterra unit "${unitId}" is disabled in admin controls`));
+          }
+          const unit = config.units?.[unitId] || placementConfig;
+
+          // 4. Code Verification
+          const scriptSrc = unit.scriptSrc || placementConfig.scriptSrc;
+          const adsterraKey = unit.key || placementConfig.adsterraKey;
+
+          if (!scriptSrc && !unit.rawSnippet) {
+            return reject(new Error(`Adsterra genuine code is not yet configured for unit "${unitId || placement.id}"`));
+          }
+
+          // 5. Duplicate Render Guard
+          if (renderedPlacements.has(placement.id)) {
+            return resolve({ status: 'already-rendered', placementId: placement.id });
+          }
+
+          // 6. Layout Stability & Accessible Label
+          element.classList.add('is-enabled');
+          const size = unit.width && unit.height
+            ? [unit.width, unit.height]
+            : (unit.format === 'native-banner' ? [728, 120] : (device === 'mobile' ? [320, 50] : [728, 90]));
+
+          element.style.minHeight = `${size[1] + 24}px`;
+          element.style.setProperty('--ad-slot-width', `${size[0]}px`);
+
+          if (!element.querySelector('.ad-label')) {
+            const label = document.createElement('div');
+            label.className = 'ad-label';
+            label.setAttribute('aria-hidden', 'true');
+            label.textContent = placementConfig.label || 'Advertisement';
+            element.appendChild(label);
+          }
+
+          let container = element.querySelector('.ad-content-box');
+          if (!container) {
+            container = document.createElement('div');
+            container.className = 'ad-content-box';
+            container.id = `adsterra-box-${placement.id}`;
+            container.style.width = '100%';
+            container.style.maxWidth = `${size[0]}px`;
+            container.style.minHeight = `${size[1]}px`;
+            container.style.margin = '0 auto';
+            container.style.overflow = 'hidden';
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+            element.appendChild(container);
+          }
+
+          // 7. Render Format (Native Banner vs. Iframe Banner)
+          if (unit.format === 'native-banner') {
+            const containerId = unit.containerId || 'container-cf54b7a35f5f1b688587f9f9b2590912';
+            if (!container.querySelector(`#${containerId}`)) {
+              const nativeDiv = document.createElement('div');
+              nativeDiv.id = containerId;
+              container.appendChild(nativeDiv);
+            }
+
+            const scriptId = `adsterra-script-${unitId}`;
+            if (!document.getElementById(scriptId) && !loadedScripts.has(scriptSrc)) {
+              const script = document.createElement('script');
+              script.id = scriptId;
+              script.async = true;
+              script.setAttribute('data-cfasync', 'false');
+              script.src = scriptSrc;
+
+              script.onload = () => {
+                loadedScripts.add(scriptSrc);
+                renderedPlacements.add(placement.id);
+                element.classList.add('adsterra-active');
+                resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
+              };
+
+              script.onerror = (err) => {
+                reject(new Error(`Failed to load Adsterra native banner: ${err?.message || 'Network error'}`));
+              };
+
+              container.appendChild(script);
+            } else {
               renderedPlacements.add(placement.id);
               element.classList.add('adsterra-active');
               resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
-            };
-
-            script.onerror = (err) => {
-              reject(new Error(`Failed to load Adsterra native banner: ${err?.message || 'Network error'}`));
-            };
-
-            container.appendChild(script);
+            }
           } else {
+            // Standard Iframe Banners (300x250, 320x50, 728x90)
+            // Loads through dedicated origin frame (/ad-frame.html) to preserve prepwises.online domain verification
+            // and prevent window.atOptions collisions between multiple units.
+            const frame = document.createElement('iframe');
+            frame.width = `${size[0]}`;
+            frame.height = `${size[1]}`;
+            frame.style.width = `${size[0]}px`;
+            frame.style.height = `${size[1]}px`;
+            frame.style.border = 'none';
+            frame.style.overflow = 'hidden';
+            frame.scrolling = 'no';
+            frame.title = placementConfig.label || 'Sponsored';
+            frame.style.display = 'block';
+            frame.loading = 'eager';
+            const targetKey = unit.key || adsterraKey;
+            frame.src = `ad-frame?key=${encodeURIComponent(targetKey)}&w=${size[0]}&h=${size[1]}`;
+
+            container.appendChild(frame);
+
+            loadedScripts.add(scriptSrc);
             renderedPlacements.add(placement.id);
             element.classList.add('adsterra-active');
             resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
           }
-        } else {
-          // Standard Iframe Banners (300x250, 320x50, 728x90)
-          // Loads through dedicated origin frame (/ad-frame.html) to preserve prepwises.online domain verification
-          // and prevent window.atOptions collisions between multiple units.
-          const frame = document.createElement('iframe');
-          frame.width = `${size[0]}`;
-          frame.height = `${size[1]}`;
-          frame.style.width = `${size[0]}px`;
-          frame.style.height = `${size[1]}px`;
-          frame.style.border = 'none';
-          frame.style.overflow = 'hidden';
-          frame.scrolling = 'no';
-          frame.title = placementConfig.label || 'Sponsored';
-          frame.style.display = 'block';
-          frame.loading = 'eager';
-          const targetKey = unit.key || adsterraKey;
-          frame.src = `ad-frame?key=${encodeURIComponent(targetKey)}&w=${size[0]}&h=${size[1]}`;
-          
-          container.appendChild(frame);
-
-          loadedScripts.add(scriptSrc);
-          renderedPlacements.add(placement.id);
-          element.classList.add('adsterra-active');
-          resolve({ status: 'rendered', placementId: placement.id, unitId, format: unit.format });
-        }
+        }).catch(reject);
       });
     },
 
@@ -250,26 +391,46 @@
      * Social Bar (Unit 32172758) — Active In-Page Notification Format
      */
     initSocialBar() {
-      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
-      if (!config.units?.['32172758']?.enabled) return;
-      if (isQuizPageActive()) return; // strictly disabled on active timed quiz
-      if (document.getElementById('adsterra-social-bar')) return;
+      ensureRuntimeAdControls().then(() => {
+        if (!hasAdvertisingConsent() || !isMasterEnabled()) return;
+        if (!isUnitEnabled('32172758')) return;
+        if (isQuizPageActive()) return; // strictly disabled on active timed quiz
+        if (document.getElementById('adsterra-social-bar')) return;
 
-      setupEducationalClickProtection();
+        setupEducationalClickProtection();
 
-      const script = document.createElement('script');
-      script.id = 'adsterra-social-bar';
-      script.dataset.cfasync = 'false';
-      script.src = config.units['32172758'].scriptSrc;
-      document.body.appendChild(script);
-      loadedScripts.add(script.src);
+        const script = document.createElement('script');
+        script.id = 'adsterra-social-bar';
+        script.dataset.cfasync = 'false';
+        script.src = config.units['32172758'].scriptSrc;
+        document.body.appendChild(script);
+        loadedScripts.add(script.src);
+      });
     },
 
     /**
-     * Popunder (Unit 32172757) — Strictly and permanently disabled
+     * Popunder (Unit 32172757) — Strictly Owner-controlled via runtime config, OFF by default
      */
     initPopunder() {
-      return;
+      return ensureRuntimeAdControls().then(() => {
+        if (!runtimeConfigLoaded) return;
+        if (!hasAdvertisingConsent() || !isMasterEnabled()) return;
+        if (!isUnitEnabled('32172757')) return;
+        if (isQuizPageActive()) return; // strictly disabled on active timed quiz
+        const popUnit = config?.units?.['32172757'];
+        const scriptSrc = popUnit?.scriptSrc;
+        if (!scriptSrc) return;
+        if (document.getElementById('adsterra-popunder') || loadedScripts.has(scriptSrc)) return;
+
+        setupEducationalClickProtection();
+
+        const script = document.createElement('script');
+        script.id = 'adsterra-popunder';
+        script.dataset.cfasync = 'false';
+        script.src = scriptSrc;
+        loadedScripts.add(scriptSrc);
+        document.body.appendChild(script);
+      });
     },
 
     /**
@@ -277,66 +438,90 @@
      */
     autoInit() {
       if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (autoInitInFlight) return autoInitInFlight;
 
-      setupEducationalClickProtection();
+      autoInitInFlight = ensureRuntimeAdControls().then(() => {
+        if (!hasAdvertisingConsent() || !isMasterEnabled()) return;
 
-      const device = getDeviceType();
+        setupEducationalClickProtection();
 
-      // Enable active display placements on their respective pages
-      if (typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
-        const slotsToEnable = [
-          'ad-homepage-leaderboard',
-          'ad-homepage-stream',
-          'ad-homepage-inline-secondary',
-          'ad-homepage-inline-tertiary',
-          'ad-company-sidebar',
-          'ad-company-roles-inline',
-          'ad-content-page'
-        ];
+        const device = getDeviceType();
+        const isSlotUnitEnabled = (slotId) => {
+          const pc = config.placements?.[slotId];
+          if (!pc || !pc.enabled || pc.prohibited) return false;
+          const uid = resolvePlacementUnitId(pc, device);
+          return uid ? isUnitEnabled(uid) : true;
+        };
 
-        // Quiz results ad is ONLY enabled after quiz completion, never during active questions
-        if (!isQuizPageActive() && document.getElementById('ad-quiz-results')) {
-          slotsToEnable.push('ad-quiz-results');
-        }
+        // Enable active display placements on their respective pages
+        if (typeof window.PREPWISE_ADS !== 'undefined' && typeof window.PREPWISE_ADS.enable === 'function') {
+          const slotsToEnable = [
+            'ad-homepage-leaderboard',
+            'ad-homepage-stream',
+            'ad-homepage-inline-secondary',
+            'ad-homepage-inline-tertiary',
+            'ad-company-sidebar',
+            'ad-company-roles-inline',
+            'ad-content-page'
+          ];
 
-        slotsToEnable.forEach(slotId => {
-          if (document.getElementById(slotId)) {
-            try {
-              window.PREPWISE_ADS.enable(slotId, { lazy: false });
-            } catch (err) {
-              // Gracefully handle slot if not registered in engine
+          // Quiz results ad is ONLY enabled after quiz completion, never during active questions
+          if (!isQuizPageActive() && document.getElementById('ad-quiz-results')) {
+            slotsToEnable.push('ad-quiz-results');
+          }
+
+          slotsToEnable.forEach(slotId => {
+            if (document.getElementById(slotId) && isSlotUnitEnabled(slotId)) {
+              try {
+                window.PREPWISE_ADS.enable(slotId, { lazy: false });
+              } catch (err) {
+                // Gracefully handle slot if not registered in engine
+              }
+            }
+          });
+
+          // Bottom sticky banners (non-blocking, dismissible)
+          if (device === 'mobile') {
+            if (document.getElementById('ad-sticky-bottom-mobile') && isSlotUnitEnabled('ad-sticky-bottom-mobile')) {
+              try { window.PREPWISE_ADS.enable('ad-sticky-bottom-mobile', { lazy: false }); } catch (e) {}
+            }
+          } else {
+            if (document.getElementById('ad-sticky-bottom-desktop') && isSlotUnitEnabled('ad-sticky-bottom-desktop')) {
+              try { window.PREPWISE_ADS.enable('ad-sticky-bottom-desktop', { lazy: false }); } catch (e) {}
             }
           }
+        }
+
+        // Close button handler for dismissible sticky banners (only on enabled sticky slots)
+        document.querySelectorAll('.ad-slot-sticky.is-enabled .ad-slot-close').forEach(btn => {
+          btn.removeAttribute('hidden');
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            const slot = btn.closest('.ad-slot-sticky');
+            if (slot) slot.style.display = 'none';
+          };
         });
 
-        // Bottom sticky banners (non-blocking, dismissible)
-        if (device === 'mobile') {
-          if (document.getElementById('ad-sticky-bottom-mobile')) {
-            try { window.PREPWISE_ADS.enable('ad-sticky-bottom-mobile', { lazy: false }); } catch (e) {}
+        // Initialize Social Bar, Popunder (if explicitly Owner-enabled), & secondary placements (outside active timed quiz)
+        if (!isQuizPageActive()) {
+          if (isUnitEnabled('32172758')) {
+            AdsterraProvider.initSocialBar();
           }
-        } else {
-          if (document.getElementById('ad-sticky-bottom-desktop')) {
-            try { window.PREPWISE_ADS.enable('ad-sticky-bottom-desktop', { lazy: false }); } catch (e) {}
+          if (isUnitEnabled('32172757')) {
+            AdsterraProvider.initPopunder();
+          }
+          if (isSlotUnitEnabled('ad-promo-floater')) {
+            AdsterraProvider.initTimedPromotionalPlacement();
+          }
+          if (hasAnyEligibleUnitEnabled()) {
+            AdsterraProvider.initAdblockNotice();
           }
         }
-      }
-
-      // Close button handler for dismissible sticky banners
-      document.querySelectorAll('.ad-slot-sticky .ad-slot-close').forEach(btn => {
-        btn.removeAttribute('hidden');
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const slot = btn.closest('.ad-slot-sticky');
-          if (slot) slot.style.display = 'none';
-        };
+      }).finally(() => {
+        autoInitInFlight = null;
       });
 
-      // Initialize Social Bar & secondary non-redirecting placements (outside active timed quiz)
-      if (!isQuizPageActive()) {
-        AdsterraProvider.initSocialBar();
-        AdsterraProvider.initTimedPromotionalPlacement();
-        AdsterraProvider.initAdblockNotice();
-      }
+      return autoInitInFlight;
     },
 
     /**
@@ -347,16 +532,20 @@
      * - Remembers session dismissal
      */
     initTimedPromotionalPlacement() {
-      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (!hasAdvertisingConsent() || !isMasterEnabled()) return;
       if (isQuizPageActive()) return;
       // Dedicated sticky bottom banner handles mobile (#ad-sticky-bottom-mobile) without overlapping popups
       if (getDeviceType() === 'mobile') return;
+      const floaterUnit = resolvePlacementUnitId(config.placements?.['ad-promo-floater'], getDeviceType());
+      if (floaterUnit && !isUnitEnabled(floaterUnit)) return;
       if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
       if (document.getElementById('ad-promo-floater-container')) return;
 
       setTimeout(() => {
-        if (!hasAdvertisingConsent() || isQuizPageActive()) return;
+        if (!hasAdvertisingConsent() || !isMasterEnabled() || isQuizPageActive()) return;
         if (getDeviceType() === 'mobile') return;
+        const unitNow = resolvePlacementUnitId(config.placements?.['ad-promo-floater'], getDeviceType());
+        if (unitNow && !isUnitEnabled(unitNow)) return;
         if (sessionStorage.getItem('prepwise_promo_dismissed') === 'true') return;
         if (document.getElementById('ad-promo-floater-container')) return;
 
@@ -422,13 +611,13 @@
      * Never blocks educational access or forces browser settings changes.
      */
     initAdblockNotice() {
-      if (!hasAdvertisingConsent() || !config || !config.enabled) return;
+      if (!hasAdvertisingConsent() || !isMasterEnabled() || !hasAnyEligibleUnitEnabled()) return;
       if (isQuizPageActive()) return;
       if (sessionStorage.getItem('prepwise_adblock_dismissed') === 'true') return;
       if (document.getElementById('prepwiseAdblockNotice')) return;
 
       setTimeout(() => {
-        if (!hasAdvertisingConsent() || isQuizPageActive()) return;
+        if (!hasAdvertisingConsent() || !isMasterEnabled() || !hasAnyEligibleUnitEnabled() || isQuizPageActive()) return;
         if (sessionStorage.getItem('prepwise_adblock_dismissed') === 'true') return;
         if (document.getElementById('prepwiseAdblockNotice')) return;
 

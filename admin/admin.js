@@ -17,22 +17,53 @@
     if (!container) return;
     const placements = window.PREPWISE_AD_REGISTRY?.placements || [];
     const cfg = window.PREPWISE_ADSTERRA_CONFIG;
+    const controls = state.adControls;
+    const permissions = state.adControlsPermissions || { canToggleUnits: true, canTogglePopunder: state.isOwner };
     const adApi = state.integrationsReport?.integrations?.adsterra;
     const apiStatsMap = new Map();
     if (adApi?.status === 'Connected' && Array.isArray(adApi.data?.byPlacement)) {
       adApi.data.byPlacement.forEach((p) => apiStatsMap.set(String(p.placementId), p));
     }
 
+    const masterSwitchEl = document.getElementById('adMasterSwitch');
+    const masterLabelEl = document.getElementById('adMasterLabel');
+    const masterOn = typeof controls?.masterEnabled === 'boolean' ? controls.masterEnabled : Boolean(cfg?.enabled);
+    if (masterSwitchEl) masterSwitchEl.checked = masterOn;
+    if (masterLabelEl) masterLabelEl.textContent = masterOn ? 'ON' : 'OFF';
+
     const unitsRows = getAdsterraConfigUnits().map((u) => {
       const apiRow = apiStatsMap.get(String(u.unitId));
       const isPopunder = u.unitId === '32172757';
-      const statusPill = isPopunder
-        ? '<span class="status-pill status-inactive">Permanently Disabled</span>'
-        : (u.enabled ? '<span class="status-pill status-connected">Active</span>' : '<span class="status-pill status-unavailable">Disabled</span>');
+      const unitEnabled = typeof controls?.units?.[u.unitId] === 'boolean'
+        ? controls.units[u.unitId]
+        : Boolean(u.enabled);
+      const effectiveOn = masterOn && unitEnabled;
+      const canToggleThis = isPopunder ? Boolean(permissions.canTogglePopunder) : Boolean(permissions.canToggleUnits);
+
+      let statusPill;
+      if (!unitEnabled) {
+        statusPill = `<span class="status-pill status-inactive">${isPopunder ? 'OFF (Safe Default)' : 'OFF'}</span>`;
+      } else if (!masterOn) {
+        statusPill = '<span class="status-pill status-unavailable">Paused (Master OFF)</span>';
+      } else {
+        statusPill = `<span class="status-pill ${isPopunder ? 'status-error' : 'status-connected'}">${isPopunder ? 'ON (High Risk)' : 'ON'}</span>`;
+      }
+
+      const toggleControl = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label class="switch-toggle" title="${isPopunder && !canToggleThis ? 'Owner approval required for Popunder unit 32172757' : 'Toggle unit state'}">
+            <input type="checkbox" class="ad-unit-toggle" data-unit-id="${escapeHtml(u.unitId)}" ${unitEnabled ? 'checked' : ''} ${canToggleThis ? '' : 'disabled'}>
+            <span class="switch-slider"></span>
+          </label>
+          ${isPopunder ? `<span class="muted" style="font-size:11px;">${canToggleThis ? 'Owner Confirm' : 'Owner Only'}</span>` : ''}
+        </div>
+      `;
+
       return `
         <tr>
           <td><strong>Unit ${escapeHtml(u.unitId)}</strong><br><span class="muted" style="font-size:11px;">${escapeHtml(u.name || u.format)}</span></td>
           <td>${escapeHtml(u.format)}</td>
+          <td>${toggleControl}</td>
           <td>${statusPill}</td>
           <td>${apiRow ? apiRow.impressions.toLocaleString() : '—'}</td>
           <td>${apiRow ? apiRow.clicks.toLocaleString() : '—'}</td>
@@ -62,14 +93,27 @@
 
     container.innerHTML = `
       <table style="margin-bottom: 18px;">
-        <thead><tr><th>Adsterra Unit</th><th>Format</th><th>Policy Status</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Est. Revenue</th></tr></thead>
-        <tbody>${unitsRows || '<tr><td colspan="7" class="muted">No Adsterra units found in config.</td></tr>'}</tbody>
+        <thead><tr><th>Adsterra Unit</th><th>Format</th><th>Control</th><th>State</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Est. Revenue</th></tr></thead>
+        <tbody>${unitsRows || '<tr><td colspan="8" class="muted">No Adsterra units found in config.</td></tr>'}</tbody>
       </table>
       <table>
         <thead><tr><th>DOM Placement Slot</th><th>Page</th><th>Format</th><th>Devices</th><th>Mapped Unit</th><th>Slot Status</th></tr></thead>
         <tbody>${placementRows}</tbody>
       </table>
     `;
+
+    container.querySelectorAll('.ad-unit-toggle').forEach((checkbox) => {
+      checkbox.addEventListener('change', (event) => {
+        const unitId = event.currentTarget.dataset.unitId;
+        const targetEnabled = event.currentTarget.checked;
+        if (unitId === '32172757' && targetEnabled) {
+          event.currentTarget.checked = false;
+          openPopunderConfirmModal();
+          return;
+        }
+        submitAdControlMutation({ action: 'toggle_unit', unitId, enabled: targetEnabled });
+      });
+    });
   }
 
   const loginView = document.getElementById('loginView');
@@ -86,7 +130,11 @@
     analytics: { period: '7', page: 1 },
     integrationsReport: null,
     overviewReport: null,
-    activeSetupService: null
+    activeSetupService: null,
+    adControls: null,
+    adControlsPermissions: null,
+    deployReport: null,
+    deployPollTimer: null
   };
   const resources = ['companies', 'interview_questions', 'hiring_news', 'feedback', 'website_settings', 'admin_activity_logs'];
 
@@ -365,13 +413,17 @@
     const params = new URLSearchParams();
     if (period === 'today') {
       const today = new Date();
-      params.set('from', today.toISOString().slice(0, 10));
+      params.set('from', `${today.toISOString().slice(0, 10)}T00:00:00.000Z`);
     } else if (period === 'custom') {
-      params.set('from', document.getElementById(fromId).value);
-      params.set('to', `${document.getElementById(toId).value}T23:59:59.999Z`);
+      const fromVal = document.getElementById(fromId)?.value;
+      const toVal = document.getElementById(toId)?.value;
+      if (fromVal) params.set('from', `${fromVal}T00:00:00.000Z`);
+      if (toVal) params.set('to', `${toVal}T23:59:59.999Z`);
     } else {
       const days = Number(period) || 7;
-      params.set('from', new Date(Date.now() - (days - 1) * 86400000).toISOString());
+      const startDate = new Date(Date.now() - (days - 1) * 86400000);
+      startDate.setUTCHours(0, 0, 0, 0);
+      params.set('from', startDate.toISOString());
     }
     params.set('to', params.get('to') || new Date().toISOString());
     return params;
@@ -420,20 +472,22 @@
 
   function renderAnalytics(result) {
     const totals = result.data.totals;
-    const cards = [
-      ['Visitors', totals.visitors],
-      ['Unique visitors', totals.uniqueVisitors],
-      ['Page views', totals.pageViews],
-      ['Quiz starts', totals.quizStarts],
-      ['Quiz completions', totals.quizCompletions],
-      ['Completion rate', formatValue(totals.completionRate, '%')],
-      ['Quiz attempts', totals.quizAttempts],
-      ['Completed attempts', totals.completedAttempts],
-      ['Average score', totals.averageScore]
-    ];
-    document.getElementById('analyticsCards').innerHTML = cards.map(([label, value]) => `<article class="stat-card"><span class="muted">${label}</span><span class="number">${typeof value === 'string' ? value : formatValue(value)}</span></article>`).join('');
-    renderChart('daily', 'dailyActivityChart', 'line', result.data.dailyActivity.map((item) => item.label), result.data.dailyActivity.map((item) => item.count), 'Events');
-    renderChart('quiz', 'quizActivityChart', 'bar', result.data.eventTypes.filter((item) => item.label.startsWith('quiz_')).map((item) => item.label), result.data.eventTypes.filter((item) => item.label.startsWith('quiz_')).map((item) => item.count), 'Quiz events');
+    const scoreDisplay = totals.averageScore != null
+      ? (totals.averageScorePercentage != null ? `${totals.averageScore} pts (${totals.averageScorePercentage}%)` : `${totals.averageScore} pts`)
+      : 'Unavailable';
+    renderStatCards('analyticsCards', [
+      ['First-Party Sessions', totals.visitors, 'Supabase', 'visitor_sessions rows'],
+      ['First-Party Unique Visitors', totals.uniqueVisitors, 'Supabase', 'distinct anonymous_id'],
+      ['First-Party Page Views', totals.pageViews, 'Supabase', 'page_view events'],
+      ['Quiz Starts', totals.quizStarts, 'Supabase', 'quiz_start events'],
+      ['Quiz Completions', totals.quizCompletions, 'Supabase', 'quiz_complete events'],
+      ['Completion Rate', totals.completionRate != null ? `${totals.completionRate}%` : 'Unavailable', 'Supabase', 'completions / starts'],
+      ['Logged Attempts (DB)', totals.quizAttempts, 'Supabase', 'recorded at completion'],
+      ['Completed Attempts (DB)', totals.completedAttempts, 'Supabase', 'non-abandoned rows'],
+      ['Average Score', scoreDisplay, 'Supabase', 'completed attempts']
+    ]);
+    renderChart('daily', 'dailyActivityChart', 'line', result.data.dailyActivity.map((item) => item.label), result.data.dailyActivity.map((item) => item.count), 'All First-Party Events');
+    renderChart('quiz', 'quizActivityChart', 'bar', result.data.eventTypes.filter((item) => item.label.startsWith('quiz_')).map((item) => item.label), result.data.eventTypes.filter((item) => item.label.startsWith('quiz_')).map((item) => item.count), 'Quiz Events');
     renderChart('pages', 'pagePopularityChart', 'bar', result.data.popularPages.slice(0, 10).map((item) => item.label), result.data.popularPages.slice(0, 10).map((item) => item.count), 'Page views');
     renderSimpleTable('popularCompanies', result.data.popularCompanies);
     renderSimpleTable('popularCategories', result.data.popularCategories);
@@ -563,11 +617,13 @@
       if (ga4Wrap) {
         if (ga4?.status === 'Connected' && ga4.data) {
           const t = ga4.data.totals || {};
+          const dr = ga4.data.dateRange;
+          const drLabel = dr ? ` &bull; GA4 Range: ${escapeHtml(dr.startDate)} to ${escapeHtml(dr.endDate)}` : '';
           ga4Wrap.innerHTML = `
             <div class="cc-block" style="margin-bottom:16px;">
               <div class="cc-block-header">
                 <div class="cc-block-title"><h3>Google Analytics 4 Live Reporting (Property connected)</h3>${renderStatusPill(ga4.status)}</div>
-                <span class="muted" style="font-size:12px;">Measurement ID: ${escapeHtml(ga4.measurementId)} &bull; GTM: ${escapeHtml(ga4.gtmContainerId)}</span>
+                <span class="muted" style="font-size:12px;">Measurement ID: ${escapeHtml(ga4.measurementId)} &bull; GTM: ${escapeHtml(ga4.gtmContainerId)}${drLabel}</span>
               </div>
               <div class="cards">
                 <article class="stat-card"><span class="stat-meta">GA4 Active Users</span><span class="number">${Number(t.activeUsers || 0).toLocaleString()}</span></article>
@@ -576,6 +632,7 @@
                 <article class="stat-card"><span class="stat-meta">GA4 Sessions</span><span class="number">${Number(t.sessions || 0).toLocaleString()}</span></article>
                 <article class="stat-card"><span class="stat-meta">Avg Engagement Time</span><span class="number">${formatDurationSeconds(t.avgEngagementSeconds)}</span></article>
               </div>
+              <p class="muted" style="font-size:12px; margin:8px 0 12px;">Source comparison: GA4 reports consented traffic where Google tags were not blocked (ad blockers/CSP history) in property timezone, whereas First-Party Supabase metrics below capture consented same-origin telemetry.</p>
               <div class="analytics-columns">
                 <div><h4>GA4 Landing Pages</h4><div class="table-wrap"><table><thead><tr><th>Landing Page</th><th>Sessions</th><th>Users</th></tr></thead><tbody>${(ga4.data.landingPages || []).map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.sessions}</td><td>${r.activeUsers}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">No rows</td></tr>'}</tbody></table></div></div>
                 <div><h4>GA4 Traffic Sources</h4><div class="table-wrap"><table><thead><tr><th>Channel</th><th>Sessions</th><th>Users</th></tr></thead><tbody>${(ga4.data.trafficSources || []).map((r) => `<tr><td>${escapeHtml(r.channel)}</td><td>${r.sessions}</td><td>${r.activeUsers}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">No rows</td></tr>'}</tbody></table></div></div>
@@ -633,27 +690,38 @@
 
   function renderQuiz(result) {
     const totals = result.data?.totals || {};
-    const cards = [
-      ['Total attempts', totals.quizAttempts ?? 'Unavailable'],
-      ['Completed attempts', totals.completedAttempts ?? 'Unavailable'],
-      ['Completion rate', totals.completionRate != null ? `${totals.completionRate}%` : 'Unavailable'],
-      ['Quiz starts', totals.quizStarts ?? 'Unavailable'],
-      ['Quiz completions', totals.quizCompletions ?? 'Unavailable'],
-      ['Average score', totals.averageScore != null ? totals.averageScore : 'Unavailable']
-    ];
-    document.getElementById('quizCards').innerHTML = cards.map(([label, value]) => `<article class="stat-card"><span class="muted">${escapeHtml(label)}</span><span class="number">${typeof value === 'string' ? escapeHtml(value) : formatValue(value)}</span></article>`).join('');
+    const scoreDisplay = totals.averageScore != null
+      ? (totals.averageScorePercentage != null ? `${totals.averageScore} pts (${totals.averageScorePercentage}%)` : `${totals.averageScore} pts`)
+      : 'Unavailable';
+    renderStatCards('quizCards', [
+      ['Quiz starts', totals.quizStarts ?? 0, 'Events', 'quiz_start events'],
+      ['Quiz completions', totals.quizCompletions ?? 0, 'Events', 'quiz_complete events'],
+      ['Completion rate', totals.completionRate != null ? `${totals.completionRate}%` : 'Unavailable', 'Events', 'completions / starts'],
+      ['Recorded attempts (DB)', totals.quizAttempts ?? 0, 'quiz_attempts', 'logged on quiz completion'],
+      ['Completed attempts (DB)', totals.completedAttempts ?? 0, 'quiz_attempts', 'non-abandoned submissions'],
+      ['Average score', scoreDisplay, 'quiz_attempts', 'completed attempts']
+    ]);
 
     const scores = result.data?.scoreDistribution || [];
-    renderChart('quizScore', 'quizScoreChart', 'bar', scores.map((item) => item.label), scores.map((item) => item.count), 'Score distribution');
+    renderChart('quizScore', 'quizScoreChart', 'bar', scores.map((item) => item.label), scores.map((item) => item.count), 'Completed Attempts');
 
-    const dailyTrends = (result.data?.dailyActivity || []).map((item) => ({ label: item.label, count: item.count }));
-    renderChart('quizDaily', 'quizDailyChart', 'line', dailyTrends.map((item) => item.label), dailyTrends.map((item) => item.count), 'Daily activity');
+    const dailyQuiz = result.data?.dailyQuizActivity || [];
+    renderMultiChart(
+      'quizDaily',
+      'quizDailyChart',
+      'line',
+      dailyQuiz.map((item) => item.label),
+      [
+        { label: 'Quiz Starts', data: dailyQuiz.map((item) => item.starts ?? 0), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.2 },
+        { label: 'Quiz Completions', data: dailyQuiz.map((item) => item.completions ?? 0), borderColor: '#09090b', tension: 0.2 }
+      ]
+    );
 
     const quizEvents = (result.data?.eventTypes || []).filter((item) => item.label.startsWith('quiz_'));
     renderChart('quizEvents', 'quizEventsChart', 'bar', quizEvents.map((item) => item.label), quizEvents.map((item) => item.count), 'Quiz events');
 
-    renderSimpleTable('quizCategoriesTable', result.data?.popularCategories || [], 'No quiz category data available for this period.');
-    renderSimpleTable('quizCompaniesTable', result.data?.popularQuizCompanies || [], 'No quiz company data available for this period.');
+    renderSimpleTable('quizCategoriesTable', result.data?.popularCategories || [], 'No completed quiz category data available for this period.');
+    renderSimpleTable('quizCompaniesTable', result.data?.popularQuizCompanies || [], 'No quiz start company data available for this period.');
   }
 
   async function loadQuiz() {
@@ -765,16 +833,18 @@
     }
     const ok = gsc?.status === 'Connected' && gsc?.data;
     const t = gsc?.data?.totals || {};
+    const dr = gsc?.data?.dateRange;
+    const rangeText = dr ? `${dr.startDate} to ${dr.endDate}` : 'selected period';
     if (notice) {
       notice.innerHTML = ok
-        ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console property <code>${escapeHtml(gsc.data.siteUrl)}</code> verified.</div>`
+        ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console property <code>${escapeHtml(gsc.data.siteUrl)}</code> verified (${escapeHtml(rangeText)} &middot; GSC search analytics normally lags 2–3 days).</div>`
         : `<div class="alert-banner is-warning"><strong>Google Search Console (${escapeHtml(gsc?.status || 'Not configured')}):</strong> ${escapeHtml(gsc?.error || 'Missing server-side Search Console OAuth/Service Account credentials.')}</div>`;
     }
     renderStatCards('overviewSeoCards', [
-      ['Search Clicks', ok ? t.clicks : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-      ['Search Impressions', ok ? t.impressions : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-      ['CTR', ok ? `${t.ctr}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-      ['Avg Position', ok && t.avgPosition != null ? t.avgPosition : 'Unavailable', ok ? 'GSC API' : 'Not configured']
+      ['Search Clicks', ok ? (t.clicks ?? 0) : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['Search Impressions', ok ? (t.impressions ?? 0) : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['CTR', ok ? `${t.ctr ?? 0}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+      ['Avg Position', ok ? (t.avgPosition != null ? t.avgPosition : '— (0 impr.)') : 'Unavailable', ok ? 'GSC API' : 'Not configured']
     ]);
 
     const qEl = document.getElementById('overviewSeoQueries');
@@ -783,7 +853,7 @@
       const qs = gsc?.data?.topQueries || [];
       qEl.innerHTML = qs.length
         ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>Pos</th></tr></thead><tbody>${qs.slice(0, 8).map((r) => `<tr><td>${escapeHtml(r.query)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.position}</td></tr>`).join('')}</tbody></table>`
-        : '<div class="empty-state">Connect Google Search Console to view top search queries.</div>';
+        : `<div class="empty-state">${ok ? `Connected — 0 search queries recorded for ${escapeHtml(rangeText)} (normal if recent or lagging 2–3 days).` : 'Connect Google Search Console to view top search queries.'}</div>`;
     }
     if (pEl) {
       const pgs = gsc?.data?.topPages || [];
@@ -791,7 +861,7 @@
       if (pgs.length || maps.length) {
         pEl.innerHTML = `<table><thead><tr><th>Landing Page / Sitemap</th><th>Clicks</th><th>Impressions / Status</th></tr></thead><tbody>${pgs.slice(0, 6).map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.clicks}</td><td>${r.impressions}</td></tr>`).join('')}${maps.map((m) => `<tr><td><strong>Sitemap:</strong> ${escapeHtml(m.path)}</td><td>—</td><td>Errors: ${m.errors}, Warnings: ${m.warnings}</td></tr>`).join('')}</tbody></table>`;
       } else {
-        pEl.innerHTML = '<div class="empty-state">Connect Google Search Console to view landing pages &amp; sitemap indexing.</div>';
+        pEl.innerHTML = `<div class="empty-state">${ok ? `Connected — 0 landing page impressions or sitemaps reported for ${escapeHtml(rangeText)}.` : 'Connect Google Search Console to view landing pages &amp; sitemap indexing.'}</div>`;
       }
     }
   }
@@ -819,6 +889,14 @@
     }
   }
 
+  function getCloudflareZoneMeta(ok, d) {
+    const zoneTag = !ok
+      ? 'Not connected'
+      : (d.zoneStatus === 'connected' ? 'CF GraphQL' : (d.zoneStatus === 'error' ? 'GraphQL / Permission Error' : 'CLOUDFLARE_ZONE_ID needed'));
+    const zoneSub = ok && !d.traffic && d.zoneError ? d.zoneError : '';
+    return { zoneTag, zoneSub };
+  }
+
   function renderInfraOverviewSection(cf) {
     const pill = document.getElementById('overviewInfraStatusPill');
     const notice = document.getElementById('overviewInfraNotice');
@@ -829,17 +907,18 @@
     const ok = cf?.status === 'Connected' && cf?.data;
     const d = cf?.data || {};
     const lp = d.latestProduction;
+    const { zoneTag, zoneSub } = getCloudflareZoneMeta(ok, d);
     if (notice) {
       notice.innerHTML = ok
-        ? `<div class="alert-banner is-success"><strong>Connected to Cloudflare Pages (${escapeHtml(cf.projectName)}):</strong> Latest production deployment <code>${escapeHtml(lp?.id || '—')}</code> (${escapeHtml(lp?.status || '—')}).</div>`
+        ? `<div class="alert-banner is-success"><strong>Connected to Cloudflare Pages (${escapeHtml(cf.projectName)}):</strong> Latest production deployment <code>${escapeHtml(lp?.id || '—')}</code> (${escapeHtml(lp?.status || '—')}).${zoneSub ? ` <span style="display:block;margin-top:4px;font-size:12px;">Zone Traffic: ${escapeHtml(zoneSub)}</span>` : ''}</div>`
         : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}${cf?.projectName ? ` · ${escapeHtml(cf.projectName)}` : ''}):</strong> ${escapeHtml(cf?.error || 'Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Cloudflare Pages Secrets.')}</div>`;
     }
     const tr = d.traffic?.totals;
     renderStatCards('overviewInfraCards', [
       ['Latest Prod Status', ok && lp ? lp.status : 'Unavailable', ok ? 'Cloudflare API' : 'Not configured', ok && lp ? `Commit ${lp.commitHash}` : ''],
       ['Failed Deploys (last 10)', ok ? d.failedDeployments : 'Unavailable', ok ? 'Cloudflare API' : 'Not configured'],
-      ['Edge Requests', tr ? tr.requests : 'Unavailable', tr ? 'CF GraphQL' : 'Optional Zone ID'],
-      ['Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', tr ? 'CF GraphQL' : 'Optional Zone ID']
+      ['Edge Requests', tr ? tr.requests : 'Unavailable', zoneTag, zoneSub],
+      ['Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', zoneTag, zoneSub]
     ]);
     const el = document.getElementById('overviewInfraDeployments');
     if (el) {
@@ -914,19 +993,29 @@
           : '';
       }
 
-      // Section A: Website Overview Cards
-      renderStatCards('overviewCards', [
-        ['Total Visitors', ga4Ok ? gt.activeUsers : (m.uniqueVisitors ?? 0), ga4Ok ? 'GA4' : 'First-party'],
-        ['Active Users', ga4Ok ? gt.activeUsers : (m.uniqueVisitors ?? 0), ga4Ok ? 'GA4' : 'First-party'],
-        ['Page Views', ga4Ok ? gt.views : (m.pageViews ?? 0), ga4Ok ? 'GA4' : 'First-party'],
-        ['Sessions', ga4Ok ? gt.sessions : (m.visitorSessions ?? 0), ga4Ok ? 'GA4' : 'First-party'],
-        ['Avg Engagement Time', ga4Ok ? formatDurationSeconds(gt.avgEngagementSeconds) : 'GA4 Required', ga4Ok ? 'GA4' : 'Pending GA4 API'],
-        ['Quiz Starts', m.quizStarts ?? m.quizAttempts ?? 0, 'Supabase'],
-        ['Quiz Completions', m.quizCompletions ?? m.completedAttempts ?? 0, 'Supabase'],
-        ['Quiz Completion Rate', m.completionRate != null ? `${m.completionRate}%` : 'Unavailable', 'Supabase']
+      // Section A: Website Overview Cards (keep GA4 & First-Party sources separately identifiable)
+      const ga4Dr = ga4?.data?.dateRange;
+      renderStatCards('overviewCards', ga4Ok ? [
+        ['GA4 Active Users', gt.activeUsers ?? 0, 'GA4 API', `${gt.newUsers ?? 0} new users`],
+        ['GA4 Page Views', gt.views ?? 0, 'GA4 API', `${gt.sessions ?? 0} GA4 sessions`],
+        ['GA4 Avg Engagement', formatDurationSeconds(gt.avgEngagementSeconds), 'GA4 API', 'Per active user'],
+        ['First-Party Unique Visitors', m.uniqueVisitors ?? 0, 'First-Party (Supabase)', `${m.visitorSessions ?? 0} sessions`],
+        ['First-Party Page Views', m.pageViews ?? 0, 'First-Party (Supabase)', 'Consented non-admin views'],
+        ['Quiz Starts', m.quizStarts ?? 0, 'First-Party (Supabase)', `${m.quizAttempts ?? 0} DB attempt rows`],
+        ['Quiz Completions', m.quizCompletions ?? 0, 'First-Party (Supabase)', 'quiz_complete events'],
+        ['Quiz Completion Rate', m.completionRate != null ? `${m.completionRate}%` : 'Unavailable', 'First-Party (Supabase)', 'completions / starts']
+      ] : [
+        ['First-Party Unique Visitors', m.uniqueVisitors ?? 0, 'First-Party (Supabase)', `${m.visitorSessions ?? 0} sessions`],
+        ['First-Party Page Views', m.pageViews ?? 0, 'First-Party (Supabase)', 'Consented non-admin views'],
+        ['GA4 Data API', ga4?.status || 'Not configured', 'GA4 API', 'See Integrations'],
+        ['Avg Engagement Time', 'GA4 Required', 'GA4 API', 'Pending GA4 API'],
+        ['Quiz Starts', m.quizStarts ?? 0, 'First-Party (Supabase)', `${m.quizAttempts ?? 0} DB attempt rows`],
+        ['Quiz Completions', m.quizCompletions ?? 0, 'First-Party (Supabase)', 'quiz_complete events'],
+        ['Quiz Completion Rate', m.completionRate != null ? `${m.completionRate}%` : 'Unavailable', 'First-Party (Supabase)', 'completions / starts']
       ]);
 
-      document.getElementById('overviewNote').textContent = `Period: ${new Date(result.range.from).toLocaleDateString()} – ${new Date(result.range.to).toLocaleDateString()} | Granularity: ${granularity}`;
+      const ga4WindowText = ga4Ok && ga4Dr ? ` | GA4: ${ga4Dr.startDate} – ${ga4Dr.endDate} (GA4 excludes ad-blocked/pre-CSP visits)` : '';
+      document.getElementById('overviewNote').textContent = `First-Party Range (UTC): ${new Date(result.range.from).toLocaleDateString()} – ${new Date(result.range.to).toLocaleDateString()} | Granularity: ${granularity}${ga4WindowText}`;
       const luEl = document.getElementById('overviewLastUpdated');
       if (luEl) luEl.textContent = `Last updated: ${new Date(result.generatedAt).toLocaleTimeString()}`;
 
@@ -1075,19 +1164,101 @@
     }
   }
 
+  function openPopunderConfirmModal() {
+    const modal = document.getElementById('popunderConfirmModal');
+    const cb = document.getElementById('popunderAckCheckbox');
+    const btn = document.getElementById('confirmPopunderBtn');
+    if (cb) cb.checked = false;
+    if (btn) btn.disabled = true;
+    if (modal) modal.hidden = false;
+  }
+
+  function renderAdControlsAudit(logs) {
+    const el = document.getElementById('adControlsAuditTable');
+    if (!el) return;
+    const rows = Array.isArray(logs) ? logs : [];
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state">No advertising control changes recorded yet.</div>';
+      return;
+    }
+    el.innerHTML = `
+      <table>
+        <thead><tr><th>Timestamp</th><th>Administrator</th><th>Unit / Action</th><th>Previous State</th><th>New State</th><th>Result</th></tr></thead>
+        <tbody>${rows.map((r) => {
+          const m = r.metadata || {};
+          const who = m.administrator?.displayName || m.administrator?.email || r.admin_user_id || 'Admin';
+          const unitOrAction = m.unitId || r.action || 'ad_controls';
+          const prevStr = typeof m.previousState === 'boolean' ? (m.previousState ? 'ON' : 'OFF') : (m.previousState ? JSON.stringify(m.previousState.masterEnabled ? 'Master ON' : 'Master OFF') : '—');
+          const nextRaw = m.newState !== undefined ? m.newState : m.attemptedState;
+          const nextStr = typeof nextRaw === 'boolean' ? (nextRaw ? 'ON' : 'OFF') : (nextRaw && typeof nextRaw.masterEnabled === 'boolean' ? (nextRaw.masterEnabled ? 'Master ON' : 'Master OFF') : '—');
+          const ok = m.success !== false;
+          return `<tr>
+            <td>${escapeHtml(new Date(r.created_at).toLocaleString())}</td>
+            <td>${escapeHtml(who)}</td>
+            <td><code>${escapeHtml(String(unitOrAction))}</code> <span class="muted" style="font-size:11px;">(${escapeHtml(m.action || r.action || '')})</span></td>
+            <td>${escapeHtml(String(prevStr))}</td>
+            <td>${escapeHtml(String(nextStr))}</td>
+            <td><span class="status-pill ${ok ? 'status-connected' : 'status-error'}">${ok ? 'Success' : 'Blocked / Failed'}</span></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    `;
+  }
+
+  async function submitAdControlMutation(payload) {
+    const statusEl = document.getElementById('adControlsStatus');
+    setStatus(statusEl, 'Saving change...', false);
+    try {
+      const res = await api('/api/admin/ad-controls', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      if (res?.data?.controls) {
+        state.adControls = res.data.controls;
+      }
+      renderAdvertisingPlacements();
+      const refreshRes = await api('/api/admin/ad-controls').catch(() => null);
+      if (refreshRes?.data) {
+        state.adControls = refreshRes.data.controls;
+        state.adControlsPermissions = refreshRes.data.permissions;
+        renderAdvertisingPlacements();
+        renderAdControlsAudit(refreshRes.data.auditLogs);
+      }
+      setStatus(statusEl, 'Saved to Supabase & audit logged. Takes effect on fresh page loads (already-loaded ads remain until refresh).', false);
+    } catch (err) {
+      setStatus(statusEl, err.message, true);
+      renderAdvertisingPlacements();
+    }
+  }
+
   async function loadAdvertising() {
     const banner = document.getElementById('advertisingApiBanner');
+    const controlsNotice = document.getElementById('adControlsNotice');
     try {
-      const res = await api('/api/admin/integrations?service=adsterra');
+      const [res, ctrlRes] = await Promise.all([
+        api('/api/admin/integrations?service=adsterra'),
+        api('/api/admin/ad-controls').catch(() => null)
+      ]);
       const ad = res?.data?.integrations?.adsterra;
       if (!state.integrationsReport) state.integrationsReport = { integrations: {} };
       state.integrationsReport.integrations.adsterra = ad;
       state.lastAdReport = ad;
+
+      if (ctrlRes?.data) {
+        state.adControls = ctrlRes.data.controls;
+        state.adControlsPermissions = ctrlRes.data.permissions;
+        if (controlsNotice && ctrlRes.data.runtimeEnforcement?.note) {
+          controlsNotice.innerHTML = `<div class="alert-banner is-info" style="margin-bottom:12px;"><strong>Runtime Persistence:</strong> ${escapeHtml(ctrlRes.data.runtimeEnforcement.note)}</div>`;
+        }
+        renderAdControlsAudit(ctrlRes.data.auditLogs);
+      }
+
       const ok = ad?.status === 'Connected' && ad?.data;
       const t = ad?.data?.totals || {};
+      const popOn = Boolean(state.adControls?.units?.['32172757']);
       if (banner) {
         banner.innerHTML = ok
-          ? '<div class="alert-banner is-success"><strong>Connected:</strong> Authenticated Adsterra Publisher API telemetry loaded. Popunder Unit <code>32172757</code> remains permanently disabled.</div>'
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Authenticated Adsterra Publisher API telemetry loaded. Popunder Unit <code>32172757</code> is ${popOn ? 'ENABLED (Owner override)' : 'disabled'}.</div>`
           : `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(ad?.status || 'Not configured')}):</strong> ${escapeHtml(ad?.error || 'Set ADSTERRA_API_TOKEN to view live earnings & impressions.')}</div>`;
       }
       renderStatCards('advertisingSummaryCards', [
@@ -1095,7 +1266,7 @@
         ['Clicks & CTR', ok ? `${t.clicks} (${t.ctr}%)` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
         ['CPM', ok ? `$${Number(t.cpm || 0).toFixed(2)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
         ['Est. Revenue', ok ? `$${Number(t.revenue || 0).toFixed(3)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
-        ['Popunder (32172757)', 'DISABLED', 'Safety Rule', 'Permanently turned off']
+        ['Popunder (32172757)', popOn ? 'ENABLED' : 'OFF (Safe)', 'Owner Guard', popOn ? 'Owner confirmed override' : 'Requires Owner confirmation']
       ]);
       const daily = ad?.data?.daily || [];
       renderMultiChart('adDetRev', 'adDetailRevenueChart', 'line', daily.map((r) => r.date), [{ label: 'Revenue ($)', data: daily.map((r) => r.revenue), borderColor: '#16a34a', tension: 0.2 }]);
@@ -1109,21 +1280,24 @@
   async function loadSeo() {
     const banner = document.getElementById('seoApiBanner');
     try {
-      const res = await api('/api/admin/integrations?service=gsc');
+      const params = analyticsQuery(document.getElementById('overviewPeriod')?.value || '7', 'overviewFrom', 'overviewTo');
+      const res = await api(`/api/admin/integrations?service=gsc&${params}`);
       const gsc = res?.data?.integrations?.gsc;
       state.lastSeoReport = gsc;
       const ok = gsc?.status === 'Connected' && gsc?.data;
       const t = gsc?.data?.totals || {};
+      const dr = gsc?.data?.dateRange;
+      const rangeText = dr ? `${dr.startDate} to ${dr.endDate}` : 'selected period';
       if (banner) {
         banner.innerHTML = ok
-          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console metrics for <code>${escapeHtml(gsc.data.siteUrl)}</code>.</div>`
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Search Console property <code>${escapeHtml(gsc.data.siteUrl)}</code> &middot; Range: ${escapeHtml(rangeText)} (Search Console data normally lags 2–3 days).</div>`
           : `<div class="alert-banner is-warning"><strong>Google Search Console (${escapeHtml(gsc?.status || 'Not configured')}):</strong> ${escapeHtml(gsc?.error || 'Missing Search Console credentials.')}</div>`;
       }
       renderStatCards('seoCards', [
-        ['Clicks', ok ? t.clicks : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-        ['Impressions', ok ? t.impressions : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-        ['Average CTR', ok ? `${t.ctr}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
-        ['Average Position', ok && t.avgPosition != null ? t.avgPosition : 'Unavailable', ok ? 'GSC API' : 'Not configured']
+        ['Clicks', ok ? (t.clicks ?? 0) : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Impressions', ok ? (t.impressions ?? 0) : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Average CTR', ok ? `${t.ctr ?? 0}%` : 'Unavailable', ok ? 'GSC API' : 'Not configured'],
+        ['Average Position', ok ? (t.avgPosition != null ? t.avgPosition : '— (0 impr.)') : 'Unavailable', ok ? 'GSC API' : 'Not configured']
       ]);
       const daily = gsc?.data?.daily || [];
       renderMultiChart('seoDet', 'seoDetailChart', 'line', daily.map((d) => d.date), [
@@ -1133,9 +1307,9 @@
       const qEl = document.getElementById('seoQueriesTable');
       const pEl = document.getElementById('seoPagesTable');
       const sEl = document.getElementById('seoSitemapsTable');
-      if (qEl) qEl.innerHTML = ok && gsc.data.topQueries.length ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topQueries.map((r) => `<tr><td>${escapeHtml(r.query)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No Search Console query data available.</div>';
-      if (pEl) pEl.innerHTML = ok && gsc.data.topPages.length ? `<table><thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topPages.map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No Search Console landing page data available.</div>';
-      if (sEl) sEl.innerHTML = ok && gsc.data.sitemaps.length ? `<table><thead><tr><th>Sitemap</th><th>Last Submitted</th><th>Pending</th><th>Warnings</th><th>Errors</th></tr></thead><tbody>${gsc.data.sitemaps.map((m) => `<tr><td><code>${escapeHtml(m.path)}</code></td><td>${m.lastSubmitted ? escapeHtml(new Date(m.lastSubmitted).toLocaleString()) : '—'}</td><td>${m.isPending ? 'Yes' : 'No'}</td><td>${m.warnings}</td><td>${m.errors}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">No sitemap index telemetry available.</div>';
+      if (qEl) qEl.innerHTML = ok && gsc.data.topQueries.length ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topQueries.map((r) => `<tr><td>${escapeHtml(r.query)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state">${ok ? `Connected — 0 search queries recorded for ${escapeHtml(rangeText)} (normal if recent or lagging 2–3 days).` : 'No Search Console query data available.'}</div>`;
+      if (pEl) pEl.innerHTML = ok && gsc.data.topPages.length ? `<table><thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${gsc.data.topPages.map((r) => `<tr><td>${escapeHtml(r.page)}</td><td>${r.clicks}</td><td>${r.impressions}</td><td>${r.ctr}%</td><td>${r.position}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state">${ok ? `Connected — 0 landing page impressions recorded for ${escapeHtml(rangeText)}.` : 'No Search Console landing page data available.'}</div>`;
+      if (sEl) sEl.innerHTML = ok && gsc.data.sitemaps.length ? `<table><thead><tr><th>Sitemap</th><th>Last Submitted</th><th>Pending</th><th>Warnings</th><th>Errors</th></tr></thead><tbody>${gsc.data.sitemaps.map((m) => `<tr><td><code>${escapeHtml(m.path)}</code></td><td>${m.lastSubmitted ? escapeHtml(new Date(m.lastSubmitted).toLocaleString()) : '—'}</td><td>${m.isPending ? 'Yes' : 'No'}</td><td>${m.warnings}</td><td>${m.errors}</td></tr>`).join('')}</tbody></table>` : `<div class="empty-state">${ok ? 'Connected — no sitemap index entries reported yet for this property.' : 'No sitemap index telemetry available.'}</div>`;
     } catch (error) {
       if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
     }
@@ -1165,21 +1339,23 @@
   async function loadInfrastructureMonitoring() {
     const banner = document.getElementById('infraApiBanner');
     try {
-      const res = await api('/api/admin/integrations?service=cloudflare');
+      const params = analyticsQuery(document.getElementById('overviewPeriod')?.value || '7', 'overviewFrom', 'overviewTo');
+      const res = await api(`/api/admin/integrations?service=cloudflare&${params}`);
       const cf = res?.data?.integrations?.cloudflare;
       const ok = cf?.status === 'Connected' && cf?.data;
       const d = cf?.data || {};
       const tr = d.traffic?.totals;
+      const { zoneTag, zoneSub } = getCloudflareZoneMeta(ok, d);
       if (banner) {
         banner.innerHTML = ok
-          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Cloudflare Pages project <code>${escapeHtml(cf.projectName)}</code>.</div>`
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Cloudflare Pages project <code>${escapeHtml(cf.projectName)}</code>.${zoneSub ? ` <span style="display:block;margin-top:4px;font-size:12px;">Zone Analytics: ${escapeHtml(zoneSub)}</span>` : ''}</div>`
           : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}${cf?.projectName ? ` · ${escapeHtml(cf.projectName)}` : ''}):</strong> ${escapeHtml(cf?.error || 'Missing Cloudflare credentials.')}</div>`;
       }
       renderStatCards('infrastructureCards', [
         ['Latest Prod Deploy', ok && d.latestProduction ? d.latestProduction.status : 'Unavailable', ok ? 'Cloudflare' : 'Not configured'],
         ['Failed Deploys (10)', ok ? d.failedDeployments : 'Unavailable', ok ? 'Cloudflare' : 'Not configured'],
-        ['Edge Requests', tr ? tr.requests : 'Unavailable', tr ? 'CF GraphQL' : 'Zone ID needed'],
-        ['Total Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', tr ? 'CF GraphQL' : 'Zone ID needed']
+        ['Edge Requests', tr ? tr.requests : 'Unavailable', zoneTag, zoneSub],
+        ['Total Bandwidth', tr ? formatBytes(tr.bytes) : 'Unavailable', zoneTag, zoneSub]
       ]);
       const daily = d.traffic?.daily || [];
       renderMultiChart('infraTraf', 'infraTrafficChart', 'line', daily.map((r) => r.date), [{ label: 'Requests', data: daily.map((r) => r.requests), borderColor: '#2563eb', tension: 0.2 }]);
@@ -1187,6 +1363,196 @@
       if (depEl) depEl.innerHTML = ok && (d.deployments || []).length ? `<table><thead><tr><th>Deploy</th><th>Env</th><th>Commit</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody>${d.deployments.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td>${escapeHtml(dp.environment)}</td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.commitMessage)}</td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : 'status-error'}">${escapeHtml(dp.status)}</span></td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>` : '<div class="empty-state">Connect Cloudflare API token to inspect deployments.</div>';
     } catch (error) {
       if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  async function loadDeploymentCenter() {
+    const banner = document.getElementById('deployBanner');
+    const preflightEl = document.getElementById('deployPreflightGrid');
+    const deployBtn = document.getElementById('deployToProductionBtn');
+    const histEl = document.getElementById('deployHistoryTable');
+    const failEl = document.getElementById('deployFailedTable');
+
+    if (banner) banner.innerHTML = '<div class="alert-banner is-info">Running live pre-deployment verification checks...</div>';
+    try {
+      const res = await api('/api/admin/deploy');
+      const d = res?.data || {};
+      state.deployReport = d;
+      const pf = d.preflight || {};
+      const lp = d.latestProduction;
+      const cfOk = Boolean(pf.cloudflareConfigured);
+
+      if (deployBtn) {
+        deployBtn.hidden = !d.canDeploy;
+        deployBtn.disabled = !pf.readyToDeploy;
+      }
+
+      if (banner) {
+        if (!cfOk) {
+          banner.innerHTML = `<div class="alert-banner is-warning"><strong>Cloudflare Pages (${escapeHtml(pf.cloudflareStatus || 'Not configured')}):</strong> ${escapeHtml(pf.cloudflareError || 'Configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.')}</div>`;
+        } else if (!pf.repositoriesSynchronized) {
+          banner.innerHTML = `<div class="alert-banner is-error"><strong>Deployment Blocked — Repository Synchronization Check:</strong> ${escapeHtml(pf.repoSync?.error || 'Primary and backup main branches do not match.')}</div>`;
+        } else if (!d.canDeploy) {
+          banner.innerHTML = `<div class="alert-banner is-info"><strong>View-Only Access:</strong> Connected to Cloudflare Pages <code>${escapeHtml(d.project?.name || 'prepwise-7ij')}</code> (${escapeHtml(d.project?.productionBranch || 'main')}). Only the verified Owner can trigger production deployments.</div>`;
+        } else {
+          banner.innerHTML = `<div class="alert-banner is-success"><strong>Ready for Production Release Review:</strong> Project <code>${escapeHtml(d.project?.name || 'prepwise-7ij')}</code> (${escapeHtml(d.project?.productionBranch || 'main')}), primary &amp; backup GitHub <code>main</code> synced at <code>${escapeHtml(pf.repoSync?.primary?.shortSha || '—')}</code>.</div>`;
+        }
+      }
+
+      renderStatCards('deploySummaryCards', [
+        ['Project Name', d.project?.name || pf.projectName || 'prepwise-7ij', cfOk ? 'Cloudflare Pages' : 'Unverified'],
+        ['Production Branch', d.project?.productionBranch || 'Unavailable', pf.branchVerified ? 'Verified: main' : 'Mismatch'],
+        ['Latest Prod Deploy', lp ? `${lp.id} (${lp.status})` : 'Unavailable', cfOk ? 'Cloudflare API' : 'Not connected', lp?.createdOn ? new Date(lp.createdOn).toLocaleString() : ''],
+        ['Latest Commit SHA', lp?.commitHash || pf.repoSync?.primary?.shortSha || 'Unavailable', 'GitHub / CF', lp?.commitMessage || pf.repoSync?.primary?.message || ''],
+        ['Failed Deploys (last 10)', cfOk ? (d.failedCount ?? 0) : 'Unavailable', cfOk ? 'Cloudflare API' : 'Not connected']
+      ]);
+
+      if (preflightEl) {
+        const checks = [
+          ['Owner Authorization', pf.ownerAuthorized, pf.ownerAuthorized ? 'Verified Owner' : 'Full Admin (View Only)', true],
+          ['Cloudflare API Credentials', pf.cloudflareConfigured, pf.cloudflareConfigured ? 'Authenticated' : (pf.cloudflareError || 'Missing'), false],
+          ['Pages Project Slug', pf.projectVerified, pf.projectName || 'prepwise-7ij', false],
+          ['Production Branch', pf.branchVerified, pf.productionBranch || 'Unknown', false],
+          ['Primary & Backup Sync', pf.repositoriesSynchronized, pf.repositoriesSynchronized ? `Synced (${pf.repoSync?.primary?.shortSha || ''})` : (pf.repoSync?.error || 'Not synced'), false],
+          ['Local Working Tree', null, 'Confirm clean before trigger', true]
+        ];
+        preflightEl.innerHTML = checks.map(([label, pass, detail]) => {
+          const pillCls = pass === true ? 'status-connected' : (pass === false ? 'status-error' : 'status-unavailable');
+          const pillTxt = pass === true ? 'Pass' : (pass === false ? 'Blocked' : 'Manual Confirm');
+          return `<div class="deploy-check-item"><div><strong>${escapeHtml(label)}</strong><br><span class="muted" style="font-size:12px;">${escapeHtml(detail || '')}</span></div><span class="status-pill ${pillCls}">${escapeHtml(pillTxt)}</span></div>`;
+        }).join('');
+      }
+
+      const deps = d.deployments || [];
+      if (histEl) {
+        histEl.innerHTML = deps.length
+          ? `<table><thead><tr><th>Deploy</th><th>Env</th><th>Commit</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody>${deps.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td>${escapeHtml(dp.environment)}</td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.commitMessage)}</td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : (dp.status === 'failure' || dp.status === 'failed' ? 'status-error' : 'status-unavailable')}">${escapeHtml(dp.status)}</span></td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>`
+          : '<div class="empty-state">No Cloudflare Pages deployments retrieved.</div>';
+      }
+
+      const failed = d.failedDeployments || [];
+      const audit = d.auditLogs || [];
+      if (failEl) {
+        const failedHtml = failed.length
+          ? `<table style="margin-bottom:14px;"><thead><tr><th>Failed Deploy</th><th>Commit</th><th>Stage</th><th>Date</th></tr></thead><tbody>${failed.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.stage || 'deploy')}</td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>`
+          : '<div class="empty-state" style="margin-bottom:14px;">0 failed deployments in recent history.</div>';
+        const auditHtml = audit.length
+          ? `<table><thead><tr><th>Deploy Action</th><th>Commit / Target</th><th>Admin</th><th>Result</th><th>Time</th></tr></thead><tbody>${audit.map((a) => {
+              const m = a.metadata || {};
+              return `<tr><td>${escapeHtml(a.action)}</td><td><code>${escapeHtml(String(m.commitSha || '').slice(0, 7) || m.project || '—')}</code></td><td>${escapeHtml(m.administrator?.email || a.admin_user_id || 'Owner')}</td><td><span class="status-pill ${m.success === false ? 'status-error' : 'status-connected'}">${m.success === false ? 'Failed / Denied' : 'Triggered'}</span></td><td>${escapeHtml(new Date(a.created_at).toLocaleString())}</td></tr>`;
+            }).join('')}</tbody></table>`
+          : '<div class="empty-state">No deployment center triggers audited yet.</div>';
+        failEl.innerHTML = failedHtml + auditHtml;
+      }
+    } catch (error) {
+      if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  function openDeployConfirmModal() {
+    const d = state.deployReport;
+    const pf = d?.preflight;
+    if (!d?.canDeploy || !pf?.readyToDeploy) return;
+    const modal = document.getElementById('deployConfirmModal');
+    const summary = document.getElementById('deployModalSummary');
+    const cb = document.getElementById('deployCleanTreeCheckbox');
+    const btn = document.getElementById('confirmDeployBtn');
+    if (cb) cb.checked = false;
+    if (btn) btn.disabled = true;
+    if (summary) {
+      summary.innerHTML = `
+        <div class="alert-banner is-warning">
+          <strong>Target:</strong> Cloudflare Pages <code>${escapeHtml(pf.projectName)}</code> &bull; Branch: <code>${escapeHtml(pf.productionBranch)}</code><br>
+          <strong>Commit SHA:</strong> <code>${escapeHtml(pf.repoSync?.primary?.sha || '—')}</code><br>
+          <strong>Message:</strong> ${escapeHtml(pf.repoSync?.primary?.message || '—')}<br>
+          <strong>Primary &amp; Backup Repos:</strong> Synchronized (${escapeHtml(pf.repoSync?.primary?.shortSha || '')} == ${escapeHtml(pf.repoSync?.backup?.shortSha || '')})
+        </div>
+      `;
+    }
+    if (modal) modal.hidden = false;
+  }
+
+  async function pollDeploymentProgress(deploymentFullId) {
+    const box = document.getElementById('deployProgressBox');
+    if (!box) return;
+    if (state.deployPollTimer) {
+      clearTimeout(state.deployPollTimer);
+      state.deployPollTimer = null;
+    }
+
+    let attempts = 0;
+    const step = async () => {
+      attempts += 1;
+      try {
+        const res = await api(`/api/admin/deploy?deploymentId=${encodeURIComponent(deploymentFullId)}&verifySite=true`);
+        const dep = res?.data?.deployment;
+        const siteHealth = res?.data?.siteHealth;
+        const stages = dep?.stages || [];
+        const stageChips = stages.map((s) => `<span class="status-pill ${s.status === 'success' ? 'status-connected' : (s.status === 'failure' ? 'status-error' : 'status-unavailable')}">${escapeHtml(s.name)}: ${escapeHtml(s.status)}</span>`).join('');
+        const healthHtml = siteHealth?.data
+          ? `<div style="margin-top:10px; font-size:13px;"><strong>Post-Deploy Live Site Verification:</strong> ${siteHealth.data.healthyCount}/${siteHealth.data.totalCount} endpoints healthy (avg ${siteHealth.data.avgLatencyMs} ms).</div>`
+          : '';
+
+        box.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <strong>Cloudflare Deployment <code>${escapeHtml(dep?.id || deploymentFullId)}</code>: ${escapeHtml(dep?.status || 'running')} (stage: ${escapeHtml(dep?.stage || 'queued')})</strong>
+            <span class="muted" style="font-size:12px;">Poll #${attempts}</span>
+          </div>
+          <div class="deploy-stage-list">${stageChips}</div>
+          ${healthHtml}
+        `;
+
+        if (dep?.status === 'success' || dep?.status === 'failure' || dep?.status === 'failed' || attempts >= 24) {
+          await loadDeploymentCenter();
+          return;
+        }
+        state.deployPollTimer = setTimeout(step, 5000);
+      } catch (err) {
+        box.innerHTML = `<div class="alert-banner is-error">Progress polling stopped: ${escapeHtml(err.message)}</div>`;
+      }
+    };
+    await step();
+  }
+
+  async function triggerProductionDeploy() {
+    const modal = document.getElementById('deployConfirmModal');
+    const box = document.getElementById('deployProgressBox');
+    const expectedCommitSha = state.deployReport?.preflight?.repoSync?.primary?.sha || '';
+    const confirmBtn = document.getElementById('confirmDeployBtn');
+    if (confirmBtn) {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Triggering...';
+    }
+    try {
+      const res = await api('/api/admin/deploy', {
+        method: 'POST',
+        body: JSON.stringify({
+          confirm: true,
+          localCleanConfirmed: true,
+          expectedCommitSha
+        })
+      });
+      if (modal) modal.hidden = true;
+      const dep = res?.data?.deployment;
+      if (box) {
+        box.hidden = false;
+        box.innerHTML = `<div class="alert-banner is-info">Triggered Cloudflare Pages deployment <code>${escapeHtml(dep?.id || 'pending')}</code> for commit <code>${escapeHtml((res?.data?.commitSha || '').slice(0, 7))}</code>. Tracking build stages...</div>`;
+      }
+      if (dep?.fullId || dep?.id) {
+        await pollDeploymentProgress(dep.fullId || dep.id);
+      } else {
+        await loadDeploymentCenter();
+      }
+    } catch (err) {
+      if (modal) modal.hidden = true;
+      if (box) {
+        box.hidden = false;
+        box.innerHTML = `<div class="alert-banner is-error"><strong>Deployment failed to start:</strong> ${escapeHtml(err.message)}</div>`;
+      }
+    } finally {
+      if (confirmBtn) {
+        confirmBtn.textContent = 'Trigger Production Deployment';
+      }
     }
   }
 
@@ -2334,6 +2700,7 @@
     else if (section === 'seo') loadSeo();
     else if (section === 'database') loadDatabaseMonitoring();
     else if (section === 'infrastructure') loadInfrastructureMonitoring();
+    else if (section === 'deployment') loadDeploymentCenter();
     else if (section === 'analytics' || section === 'companies') loadAnalytics();
     else if (section === 'quiz') loadQuiz();
     else if (section === 'visitors') loadActivity();
@@ -2349,6 +2716,52 @@
   document.getElementById('refreshSeo')?.addEventListener('click', loadSeo);
   document.getElementById('refreshDatabase')?.addEventListener('click', loadDatabaseMonitoring);
   document.getElementById('refreshInfrastructure')?.addEventListener('click', loadInfrastructureMonitoring);
+  document.getElementById('refreshDeploymentCenter')?.addEventListener('click', loadDeploymentCenter);
+  document.getElementById('deployToProductionBtn')?.addEventListener('click', openDeployConfirmModal);
+
+  document.getElementById('adMasterSwitch')?.addEventListener('change', (event) => {
+    submitAdControlMutation({ action: 'master_toggle', enabled: event.currentTarget.checked });
+  });
+  document.getElementById('adEnableEligibleBtn')?.addEventListener('click', () => {
+    submitAdControlMutation({ action: 'enable_all_eligible' });
+  });
+  document.getElementById('adDisableAllBtn')?.addEventListener('click', () => {
+    submitAdControlMutation({ action: 'disable_all' });
+  });
+
+  document.getElementById('popunderAckCheckbox')?.addEventListener('change', (event) => {
+    const btn = document.getElementById('confirmPopunderBtn');
+    if (btn) btn.disabled = !event.currentTarget.checked;
+  });
+  const closePopModal = () => {
+    const modal = document.getElementById('popunderConfirmModal');
+    if (modal) modal.hidden = true;
+    renderAdvertisingPlacements();
+  };
+  document.getElementById('closePopunderModal')?.addEventListener('click', closePopModal);
+  document.getElementById('cancelPopunderBtn')?.addEventListener('click', closePopModal);
+  document.getElementById('confirmPopunderBtn')?.addEventListener('click', async () => {
+    const modal = document.getElementById('popunderConfirmModal');
+    if (modal) modal.hidden = true;
+    await submitAdControlMutation({
+      action: 'toggle_unit',
+      unitId: '32172757',
+      enabled: true,
+      popunderConfirmed: true
+    });
+  });
+
+  document.getElementById('deployCleanTreeCheckbox')?.addEventListener('change', (event) => {
+    const btn = document.getElementById('confirmDeployBtn');
+    if (btn) btn.disabled = !event.currentTarget.checked;
+  });
+  const closeDepModal = () => {
+    const modal = document.getElementById('deployConfirmModal');
+    if (modal) modal.hidden = true;
+  };
+  document.getElementById('closeDeployModal')?.addEventListener('click', closeDepModal);
+  document.getElementById('cancelDeployBtn')?.addEventListener('click', closeDepModal);
+  document.getElementById('confirmDeployBtn')?.addEventListener('click', triggerProductionDeploy);
 
   document.getElementById('closeSetupModal')?.addEventListener('click', () => {
     document.getElementById('integrationSetupModal').hidden = true;

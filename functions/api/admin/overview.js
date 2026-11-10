@@ -1,28 +1,12 @@
 import { json, requireAdmin, supabaseRequest, supabaseCount } from '../../_shared/supabase.js';
+import {
+  buildCompanyLookup,
+  canonicalizeCompanyLabel,
+  countCompletedQuizCategories,
+  parseAnalyticsDateRange
+} from '../../_shared/analytics-helpers.js';
 
 const DEFAULT_DAYS = 7;
-const MAX_DAYS = 366;
-
-function parseDate(value, fallback) {
-  if (!value) return fallback;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function dateRange(request) {
-  const url = new URL(request.url);
-  const now = new Date();
-  const end = parseDate(url.searchParams.get('to'), now);
-  const requestedFrom = url.searchParams.get('from');
-  const start = requestedFrom
-    ? parseDate(requestedFrom, null)
-    : new Date(now.getTime() - DEFAULT_DAYS * 86400000);
-  if (!start || !end || start > end) return { error: 'Invalid date range' };
-  if (end.getTime() - start.getTime() > MAX_DAYS * 86400000) {
-    return { error: `Date range cannot exceed ${MAX_DAYS} days` };
-  }
-  return { start, end };
-}
 
 function iso(value) {
   return encodeURIComponent(value.toISOString());
@@ -32,7 +16,7 @@ export async function onRequestGet(context) {
   const auth = await requireAdmin(context.request, context.env);
   if (auth.response) return auth.response;
 
-  const range = dateRange(context.request);
+  const range = parseAnalyticsDateRange(context.request, DEFAULT_DAYS);
   if (range.error) return json({ error: range.error }, 400);
 
   try {
@@ -46,14 +30,15 @@ export async function onRequestGet(context) {
       newsCount,
       events,
       sessions,
-      attempts
+      attempts,
+      companyRows
     ] = await Promise.all([
       supabaseCount(context.env, '/rest/v1/companies?select=id', auth.token).catch(() => 0),
       supabaseCount(context.env, '/rest/v1/interview_questions?select=id', auth.token).catch(() => 0),
       supabaseCount(context.env, '/rest/v1/hiring_news?select=id', auth.token).catch(() => 0),
       supabaseRequest(
         context.env,
-        `/rest/v1/analytics_events?select=event_name,path,properties,occurred_at&occurred_at=gte.${startIso}&occurred_at=lte.${endIso}&limit=5000`,
+        `/rest/v1/analytics_events?select=event_name,path,properties,occurred_at&occurred_at=gte.${startIso}&occurred_at=lte.${endIso}&order=occurred_at.asc&limit=5000`,
         { accessToken: auth.token }
       ).catch(() => []),
       supabaseRequest(
@@ -63,7 +48,12 @@ export async function onRequestGet(context) {
       ).catch(() => []),
       supabaseRequest(
         context.env,
-        `/rest/v1/quiz_attempts?select=score,is_abandoned,completed_at,started_at&started_at=gte.${startIso}&started_at=lte.${endIso}&limit=5000`,
+        `/rest/v1/quiz_attempts?select=score,is_abandoned,completed_at,started_at,category&started_at=gte.${startIso}&started_at=lte.${endIso}&limit=5000`,
+        { accessToken: auth.token }
+      ).catch(() => []),
+      supabaseRequest(
+        context.env,
+        '/rest/v1/companies?select=id,slug,short_name,name&limit=500',
         { accessToken: auth.token }
       ).catch(() => [])
     ]);
@@ -71,6 +61,7 @@ export async function onRequestGet(context) {
     const eventList = Array.isArray(events) ? events : [];
     const sessionList = Array.isArray(sessions) ? sessions : [];
     const attemptList = Array.isArray(attempts) ? attempts : [];
+    const companyLookup = buildCompanyLookup(companyRows);
 
     const pageViews = eventList.filter((e) => e.event_name === 'page_view').length;
     const quizStarts = eventList.filter((e) => e.event_name === 'quiz_start').length;
@@ -87,7 +78,6 @@ export async function onRequestGet(context) {
 
     // Aggregate popular companies, popular pages, and daily series from events
     const companyCounts = new Map();
-    const categoryCounts = new Map();
     const pageCounts = new Map();
     const dailyMap = new Map();
 
@@ -106,14 +96,11 @@ export async function onRequestGet(context) {
         pageCounts.set(e.path, (pageCounts.get(e.path) || 0) + 1);
       }
       if (e.event_name === 'company_view') {
-        const c = props.companyId || props.company_id;
-        if (c) companyCounts.set(c, (companyCounts.get(c) || 0) + 1);
-      }
-      if (e.event_name === 'quiz_start' || e.event_name === 'quiz_complete') {
-        const cat = props.category;
-        if (cat) categoryCounts.set(cat, (categoryCounts.get(cat) || 0) + 1);
+        const label = canonicalizeCompanyLabel(props.companyId || props.company_id, companyLookup);
+        if (label) companyCounts.set(label, (companyCounts.get(label) || 0) + 1);
       }
     });
+    const categoryCounts = countCompletedQuizCategories(attemptList, eventList);
 
     const dailyActivity = [];
     const cursor = new Date(range.start);
@@ -129,17 +116,17 @@ export async function onRequestGet(context) {
     }
 
     const popularPages = [...pageCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .slice(0, 10)
       .map(([label, count]) => ({ label, count }));
 
     const popularCompanies = [...companyCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .slice(0, 10)
       .map(([label, count]) => ({ label, count }));
 
     const popularCategories = [...categoryCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .slice(0, 5)
       .map(([label, count]) => ({ label, count }));
 

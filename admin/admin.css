@@ -507,3 +507,133 @@ td.actions { white-space: nowrap; }
   .filter-form label, .filter-form button { width: 100%; }
   .last-updated-tag { margin-left: 0; }
 }
+
+/* Safe Ad Controls & Deployment Center */
+.ad-controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.ad-controls-master-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ad-controls-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.switch-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.switch-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: #d4d4d8;
+  border-radius: 999px;
+  transition: background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.switch-slider::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease;
+}
+
+.switch-toggle input:checked + .switch-slider {
+  background: var(--primary);
+}
+
+.switch-toggle input:checked + .switch-slider::after {
+  transform: translateX(18px);
+}
+
+.switch-toggle input:disabled + .switch-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deploy-preflight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.deploy-check-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.deploy-progress-box {
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+}
+
+.deploy-stage-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+button.danger-btn {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+button.danger-btn:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+button.danger-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

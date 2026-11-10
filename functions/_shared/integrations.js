@@ -207,7 +207,22 @@ export async function fetchGa4Data(env, fromDate, toDate) {
   };
 
   try {
-    const [dailyResp, landingResp, sourceResp, eventResp] = await Promise.all([
+    const [summaryResp, dailyResp, landingResp, sourceResp, eventResp] = await Promise.all([
+      fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          dateRanges: [{ startDate, endDate }],
+          metrics: [
+            { name: 'activeUsers' },
+            { name: 'newUsers' },
+            { name: 'screenPageViews' },
+            { name: 'sessions' },
+            { name: 'userEngagementDuration' },
+            { name: 'eventCount' }
+          ]
+        })
+      }),
       fetch(endpoint, {
         method: 'POST',
         headers,
@@ -292,7 +307,9 @@ export async function fetchGa4Data(env, fromDate, toDate) {
       };
     });
 
-    const totals = daily.reduce(
+    const summaryJson = summaryResp.ok ? await summaryResp.json().catch(() => null) : null;
+    const summaryRow = summaryJson?.rows?.[0]?.metricValues;
+    const summedTotals = daily.reduce(
       (acc, d) => {
         acc.activeUsers += d.activeUsers;
         acc.newUsers += d.newUsers;
@@ -304,6 +321,16 @@ export async function fetchGa4Data(env, fromDate, toDate) {
       },
       { activeUsers: 0, newUsers: 0, views: 0, sessions: 0, engagementSeconds: 0, events: 0 }
     );
+    const totals = Array.isArray(summaryRow)
+      ? {
+          activeUsers: Number(summaryRow[0]?.value || 0),
+          newUsers: Number(summaryRow[1]?.value || 0),
+          views: Number(summaryRow[2]?.value || 0),
+          sessions: Number(summaryRow[3]?.value || 0),
+          engagementSeconds: Number(summaryRow[4]?.value || 0),
+          events: Number(summaryRow[5]?.value || 0)
+        }
+      : summedTotals;
 
     const avgEngagementSeconds = totals.activeUsers > 0
       ? Math.round(totals.engagementSeconds / totals.activeUsers)
@@ -316,6 +343,7 @@ export async function fetchGa4Data(env, fromDate, toDate) {
       error: null,
       missingCredentials: [],
       data: {
+        dateRange: { startDate, endDate },
         totals: { ...totals, avgEngagementSeconds },
         daily,
         landingPages: (landingJson.rows || []).map((r) => ({
@@ -595,6 +623,7 @@ export async function fetchSearchConsoleData(env, fromDate, toDate) {
       missingCredentials: [],
       data: {
         siteUrl,
+        dateRange: { startDate, endDate },
         totals: { clicks: totals.clicks, impressions: totals.impressions, ctr, avgPosition },
         daily,
         topQueries: (queryJson.rows || []).map((r) => ({
@@ -792,6 +821,11 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
     const failedCount = deployments.filter((d) => d.status === 'failure' || d.status === 'failed').length;
 
     let traffic = null;
+    let zoneStatus = zoneId ? 'error' : 'not_configured';
+    let zoneError = zoneId
+      ? null
+      : 'CLOUDFLARE_ZONE_ID is not configured in Cloudflare Pages Production Variables for prepwises.online.';
+
     if (zoneId) {
       const startDay = isoDay(fromDate);
       const endDay = isoDay(toDate);
@@ -813,30 +847,40 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
         method: 'POST',
         headers,
         body: JSON.stringify(gqlQuery)
-      }).catch(() => null);
+      }).catch((err) => ({ ok: false, _fetchError: err?.message }));
 
       if (gqlResp && gqlResp.ok) {
         const gqlPayload = await gqlResp.json().catch(() => ({}));
-        const groups = gqlPayload?.data?.viewer?.zones?.[0]?.httpRequests1dGroups || [];
-        const dailyTraffic = groups.map((g) => ({
-          date: g.dimensions?.date,
-          requests: g.sum?.requests || 0,
-          cachedRequests: g.sum?.cachedRequests || 0,
-          bytes: g.sum?.bytes || 0,
-          pageViews: g.sum?.pageViews || 0,
-          threats: g.sum?.threats || 0
-        }));
-        const totals = dailyTraffic.reduce(
-          (acc, row) => {
-            acc.requests += row.requests;
-            acc.cachedRequests += row.cachedRequests;
-            acc.bytes += row.bytes;
-            acc.pageViews += row.pageViews;
-            return acc;
-          },
-          { requests: 0, cachedRequests: 0, bytes: 0, pageViews: 0 }
-        );
-        traffic = { totals, daily: dailyTraffic };
+        if (Array.isArray(gqlPayload?.errors) && gqlPayload.errors.length > 0) {
+          zoneStatus = 'error';
+          zoneError = gqlPayload.errors[0]?.message || 'Cloudflare GraphQL query returned an error.';
+        } else {
+          const groups = gqlPayload?.data?.viewer?.zones?.[0]?.httpRequests1dGroups || [];
+          const dailyTraffic = groups.map((g) => ({
+            date: g.dimensions?.date,
+            requests: g.sum?.requests || 0,
+            cachedRequests: g.sum?.cachedRequests || 0,
+            bytes: g.sum?.bytes || 0,
+            pageViews: g.sum?.pageViews || 0,
+            threats: g.sum?.threats || 0
+          }));
+          const totals = dailyTraffic.reduce(
+            (acc, row) => {
+              acc.requests += row.requests;
+              acc.cachedRequests += row.cachedRequests;
+              acc.bytes += row.bytes;
+              acc.pageViews += row.pageViews;
+              return acc;
+            },
+            { requests: 0, cachedRequests: 0, bytes: 0, pageViews: 0 }
+          );
+          traffic = { totals, daily: dailyTraffic };
+          zoneStatus = 'connected';
+          zoneError = null;
+        }
+      } else {
+        zoneStatus = 'error';
+        zoneError = gqlResp?._fetchError || `Cloudflare GraphQL API returned HTTP ${gqlResp?.status || 'error'}. Check Zone:Analytics:Read permission and CLOUDFLARE_ZONE_ID.`;
       }
     }
 
@@ -850,6 +894,9 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
         latestProduction: latestProd,
         failedDeployments: failedCount,
         deployments,
+        zoneConfigured: Boolean(zoneId),
+        zoneStatus,
+        zoneError,
         traffic
       }
     };

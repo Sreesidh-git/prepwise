@@ -66,6 +66,7 @@
           <span class="nav-group-label">Platform &amp; Ops</span>
           <button class="nav-item" data-section="database">Database monitoring</button>
           <button class="nav-item" data-section="infrastructure">Infrastructure (CF)</button>
+          <button class="nav-item" data-section="deployment">Deployment Center</button>
           <button class="nav-item" data-section="system">Website health</button>
           <button class="nav-item" data-section="security">Security status</button>
 
@@ -598,7 +599,24 @@
               <div class="chart-card"><h4>Adsterra Daily Impressions</h4><canvas id="adDetailImpressionsChart" height="140"></canvas></div>
             </div>
             <h3 style="margin-bottom:10px;">Active Unit Configuration &amp; Placement Performance</h3>
+            <div id="adControlsNotice"></div>
+            <div class="ad-controls-bar" id="adControlsToolbar">
+              <div class="ad-controls-master-group">
+                <label class="switch-toggle" for="adMasterSwitch">
+                  <input type="checkbox" id="adMasterSwitch" checked>
+                  <span class="switch-slider"></span>
+                  <span>Master Advertising: <strong id="adMasterLabel">ON</strong></span>
+                </label>
+                <span class="status" id="adControlsStatus" role="status" style="margin:0;"></span>
+              </div>
+              <div class="ad-controls-actions">
+                <button class="secondary btn-sm" id="adEnableEligibleBtn" type="button">Enable All Eligible Units</button>
+                <button class="secondary btn-sm" id="adDisableAllBtn" type="button">Disable All Units</button>
+              </div>
+            </div>
             <div id="advertisingPlacements" class="table-wrap"></div>
+            <h3 style="margin-top:20px; margin-bottom:10px;">Advertising Control Audit Log</h3>
+            <div id="adControlsAuditTable" class="table-wrap"></div>
           </section>
 
           <section class="panel" id="section-seo">
@@ -642,6 +660,31 @@
             <div class="chart-card" style="margin-bottom:20px;"><h4>Zone Requests Trend</h4><canvas id="infraTrafficChart" height="140"></canvas></div>
             <h3 style="margin-bottom:10px;">Recent Cloudflare Pages Deployments</h3>
             <div id="infrastructureDeploymentsTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel" id="section-deployment">
+            <div class="section-heading">
+              <div><p class="eyebrow">Platform &amp; Ops &bull; Owner Controlled</p><h2>Deployment Center</h2></div>
+              <div class="section-actions">
+                <button class="secondary" id="refreshDeploymentCenter" type="button">Refresh Checks</button>
+                <button class="danger-btn" id="deployToProductionBtn" type="button" hidden disabled>DEPLOY TO PRODUCTION</button>
+              </div>
+            </div>
+            <div id="deployBanner"></div>
+            <div class="cards" id="deploySummaryCards"></div>
+            <h3 style="margin-bottom:10px;">Pre-Deployment Safety Checks</h3>
+            <div id="deployPreflightGrid" class="deploy-preflight-grid"></div>
+            <div id="deployProgressBox" class="deploy-progress-box" hidden></div>
+            <div class="analytics-columns">
+              <div>
+                <h3 style="margin-bottom:10px;">Deployment History</h3>
+                <div id="deployHistoryTable" class="table-wrap"></div>
+              </div>
+              <div>
+                <h3 style="margin-bottom:10px;">Failed Deployments &amp; Audit Log</h3>
+                <div id="deployFailedTable" class="table-wrap"></div>
+              </div>
+            </div>
           </section>
 
           <section class="panel" id="section-feedback"><div class="section-heading"><div><p class="eyebrow">Reports from visitors</p><h2>Feedback</h2></div><button class="secondary" data-refresh="feedback">Refresh</button></div><div id="feedbackTable" class="table-wrap"></div></section>
@@ -754,6 +797,59 @@
         <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:18px;">
           <button type="button" class="secondary" id="setupModalTestBtn">Test Connection Now</button>
           <button type="button" class="primary" id="setupModalDoneBtn">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Owner Popunder Explicit Safety Confirmation Modal -->
+    <div class="modal-backdrop" id="popunderConfirmModal" hidden>
+      <div class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="popunderModalTitle">
+        <div class="section-heading" style="margin-bottom: 12px;">
+          <div>
+            <p class="eyebrow">High-Risk Unit 32172757</p>
+            <h3 id="popunderModalTitle" style="margin:0;">Confirm Enabling Popunder?</h3>
+          </div>
+          <button type="button" class="secondary btn-sm" id="closePopunderModal">Cancel</button>
+        </div>
+        <div class="alert-banner is-error">
+          <strong>Warning — Popunder Impact &amp; Policy Notice:</strong> Enabling Popunder (Unit 32172757):
+          <ul style="margin:6px 0 0 18px; padding:0;">
+            <li>May open a new browser tab or window when visitors interact.</li>
+            <li>May surprise or interrupt students browsing or preparing on PrepWise.</li>
+            <li>May still be blocked automatically by browser popup protection.</li>
+            <li>Must comply with Adsterra policies and applicable advertising rules.</li>
+          </ul>
+        </div>
+        <p style="font-size:13px; line-height:1.55;">Only the Owner may authorize changing this setting. Changes take effect for fresh page loads (open pages keep their current state until refresh) and every change is permanently recorded in the administrator audit log.</p>
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin:12px 0;">
+          <input type="checkbox" id="popunderAckCheckbox" style="width:auto;">
+          <span>I understand the redirect/disruption risk and explicitly confirm enabling Unit 32172757.</span>
+        </label>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+          <button type="button" class="secondary" id="cancelPopunderBtn">Keep OFF</button>
+          <button type="button" class="danger-btn" id="confirmPopunderBtn" disabled>Confirm Enable Popunder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Owner Production Deployment Confirmation Modal -->
+    <div class="modal-backdrop" id="deployConfirmModal" hidden>
+      <div class="setup-modal" role="dialog" aria-modal="true" aria-labelledby="deployModalTitle">
+        <div class="section-heading" style="margin-bottom: 12px;">
+          <div>
+            <p class="eyebrow">Production Release Guard</p>
+            <h3 id="deployModalTitle" style="margin:0;">Confirm Production Deployment</h3>
+          </div>
+          <button type="button" class="secondary btn-sm" id="closeDeployModal">Cancel</button>
+        </div>
+        <div id="deployModalSummary"></div>
+        <label style="display:flex; align-items:flex-start; gap:8px; font-size:13px; margin:12px 0;">
+          <input type="checkbox" id="deployCleanTreeCheckbox" style="width:auto; margin-top:3px;">
+          <span>I confirm there are no uncommitted local changes and all approved commits have already been pushed cleanly to both <code>RayyanShajahan/prepwise</code> and <code>Sreesidh-git/prepwise</code> (<code>main</code>).</span>
+        </label>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+          <button type="button" class="secondary" id="cancelDeployBtn">Cancel</button>
+          <button type="button" class="danger-btn" id="confirmDeployBtn" disabled>Trigger Production Deployment</button>
         </div>
       </div>
     </div>

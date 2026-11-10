@@ -1,30 +1,15 @@
 import { json, requireAdmin, supabaseRequest } from '../../_shared/supabase.js';
+import {
+  buildCompanyLookup,
+  canonicalizeCompanyLabel,
+  countCompletedQuizCategories,
+  parseAnalyticsDateRange
+} from '../../_shared/analytics-helpers.js';
 
 const MAX_DAYS = 366;
 const MAX_ROWS = 10000;
 const DEFAULT_DAYS = 7;
 const EVENT_NAMES = new Set(['page_view', 'search', 'company_view', 'quiz_start', 'quiz_complete']);
-
-function parseDate(value, fallback) {
-  if (!value) return fallback;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function dateRange(request) {
-  const url = new URL(request.url);
-  const now = new Date();
-  const end = parseDate(url.searchParams.get('to'), now);
-  const requestedFrom = url.searchParams.get('from');
-  const start = requestedFrom
-    ? parseDate(requestedFrom, null)
-    : new Date(now.getTime() - DEFAULT_DAYS * 86400000);
-  if (!start || !end || start > end) return { error: 'Invalid date range' };
-  if (end.getTime() - start.getTime() > MAX_DAYS * 86400000) {
-    return { error: `Date range cannot exceed ${MAX_DAYS} days` };
-  }
-  return { start, end };
-}
 
 function iso(value) {
   return encodeURIComponent(value.toISOString());
@@ -45,13 +30,21 @@ function increment(map, key, amount = 1) {
 
 function chronologicalDailySeries(events, rangeStart, rangeEnd) {
   const counts = new Map();
+  const quizCounts = new Map();
   events.forEach((e) => {
     if (!e.occurred_at) return;
     const k = new Date(e.occurred_at).toISOString().slice(0, 10);
     counts.set(k, (counts.get(k) || 0) + 1);
+    if (e.event_name === 'quiz_start' || e.event_name === 'quiz_complete') {
+      const entry = quizCounts.get(k) || { starts: 0, completions: 0 };
+      if (e.event_name === 'quiz_start') entry.starts += 1;
+      else entry.completions += 1;
+      quizCounts.set(k, entry);
+    }
   });
 
   const timeline = [];
+  const quizTimeline = [];
   const current = new Date(rangeStart);
   current.setUTCHours(0, 0, 0, 0);
   const end = new Date(rangeEnd);
@@ -60,15 +53,22 @@ function chronologicalDailySeries(events, rangeStart, rangeEnd) {
   let iterations = 0;
   while (current <= end && iterations < 366) {
     const dayStr = current.toISOString().slice(0, 10);
+    const q = quizCounts.get(dayStr) || { starts: 0, completions: 0 };
     timeline.push({
       label: dayStr,
       count: counts.get(dayStr) || 0
+    });
+    quizTimeline.push({
+      label: dayStr,
+      starts: q.starts,
+      completions: q.completions,
+      count: q.starts + q.completions
     });
     current.setUTCDate(current.getUTCDate() + 1);
     iterations++;
   }
 
-  return timeline;
+  return { timeline, quizTimeline };
 }
 
 function sortedMap(map, limit = 20) {
@@ -88,17 +88,19 @@ function toCsv(rows, columns) {
 }
 
 async function loadData(env, range, token) {
-  const [events, sessions, views, attempts] = await Promise.all([
-    supabaseRequest(env, queryPath('analytics_events', 'event_name,path,properties,occurred_at,anonymous_id', 'occurred_at', range), { accessToken: token }),
+  const [events, sessions, views, attempts, companyRows] = await Promise.all([
+    supabaseRequest(env, queryPath('analytics_events', 'event_name,path,properties,occurred_at,anonymous_id', 'occurred_at', range, '&order=occurred_at.asc'), { accessToken: token }),
     supabaseRequest(env, queryPath('visitor_sessions', 'anonymous_id,first_seen_at,last_seen_at', 'last_seen_at', range), { accessToken: token }),
     supabaseRequest(env, queryPath('page_views', 'anonymous_id,path,title,referrer,device_category,occurred_at', 'occurred_at', range), { accessToken: token }),
-    supabaseRequest(env, queryPath('quiz_attempts', 'anonymous_id,started_at,completed_at,question_count,answered_count,score,category,level,is_abandoned', 'started_at', range), { accessToken: token })
+    supabaseRequest(env, queryPath('quiz_attempts', 'anonymous_id,started_at,completed_at,question_count,answered_count,score,category,level,is_abandoned', 'started_at', range), { accessToken: token }),
+    supabaseRequest(env, '/rest/v1/companies?select=id,slug,short_name,name&limit=500', { accessToken: token }).catch(() => [])
   ]);
   return {
     events: Array.isArray(events) ? events : [],
     sessions: Array.isArray(sessions) ? sessions : [],
     views: Array.isArray(views) ? views : [],
-    attempts: Array.isArray(attempts) ? attempts : []
+    attempts: Array.isArray(attempts) ? attempts : [],
+    companyLookup: buildCompanyLookup(companyRows)
   };
 }
 
@@ -112,7 +114,6 @@ function summarize(data, range) {
   const daily = new Map();
   const pages = new Map();
   const companies = new Map();
-  const categories = new Map();
   const quizCompanies = new Map();
   const eventTypes = new Map();
   const devices = new Map();
@@ -122,16 +123,16 @@ function summarize(data, range) {
     increment(daily, dayKey(event.occurred_at));
     if (event.event_name === 'page_view') increment(pages, event.path);
     const properties = event.properties && typeof event.properties === 'object' ? event.properties : {};
-    if (event.event_name === 'company_view') increment(companies, properties.companyId || properties.company_id);
+    if (event.event_name === 'company_view') {
+      const companyLabel = canonicalizeCompanyLabel(properties.companyId || properties.company_id, data.companyLookup);
+      increment(companies, companyLabel);
+    }
     if (event.event_name === 'quiz_start' || event.event_name === 'quiz_complete') {
-      increment(categories, properties.category || 'all');
-      const quizCompany = properties.companyId || properties.company_id;
-      if (quizCompany) increment(quizCompanies, quizCompany);
+      const quizCompanyLabel = canonicalizeCompanyLabel(properties.companyId || properties.company_id, data.companyLookup);
+      increment(quizCompanies, quizCompanyLabel);
     }
   });
-  data.attempts.forEach((attempt) => {
-    if (attempt.category) increment(categories, attempt.category);
-  });
+  const categories = countCompletedQuizCategories(data.attempts, data.events);
   data.views.forEach((view) => increment(devices, view.device_category || 'unknown'));
 
   const eligibleStarts = quizStarts > 0 ? quizStarts : quizAttempts;
@@ -143,10 +144,14 @@ function summarize(data, range) {
   const averageScore = scores.length
     ? Math.round((scores.reduce((total, attempt) => total + attempt.score, 0) / scores.length) * 100) / 100
     : null;
+  const pctScores = scores.filter((attempt) => Number.isFinite(attempt.question_count) && attempt.question_count > 0);
+  const averageScorePercentage = pctScores.length
+    ? Math.round((pctScores.reduce((total, attempt) => total + (attempt.score / attempt.question_count) * 100, 0) / pctScores.length) * 100) / 100
+    : null;
 
-  const dailyActivity = range?.start && range?.end
+  const series = range?.start && range?.end
     ? chronologicalDailySeries(data.events, range.start, range.end)
-    : sortedMap(daily, MAX_DAYS);
+    : { timeline: sortedMap(daily, MAX_DAYS), quizTimeline: [] };
 
   return {
     totals: {
@@ -158,9 +163,11 @@ function summarize(data, range) {
       completionRate,
       quizAttempts,
       completedAttempts,
-      averageScore
+      averageScore,
+      averageScorePercentage
     },
-    dailyActivity,
+    dailyActivity: series.timeline,
+    dailyQuizActivity: series.quizTimeline,
     eventTypes: sortedMap(eventTypes),
     popularPages: sortedMap(pages),
     popularCompanies: sortedMap(companies),
@@ -200,7 +207,7 @@ function activityRows(data) {
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context.request, context.env);
   if (auth.response) return auth.response;
-  const range = dateRange(context.request);
+  const range = parseAnalyticsDateRange(context.request, DEFAULT_DAYS);
   if (range.error) return json({ error: range.error }, 400);
 
   try {
