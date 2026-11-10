@@ -23,12 +23,54 @@ function getCfEnv(env) {
   };
 }
 
-async function fetchGitHubBranchHead(repo, branch, githubToken = '') {
+function formatGitHubError(repo, branch, resp, payload, hasToken, secretName) {
+  const msg = payload?.message || `GitHub API returned HTTP ${resp.status}`;
+  const remaining = resp.headers?.get?.('x-ratelimit-remaining');
+  const resetEpoch = Number(resp.headers?.get?.('x-ratelimit-reset') || 0);
+  const isRateLimit = (resp.status === 403 || resp.status === 429) &&
+    (remaining === '0' || /rate limit/i.test(msg));
+
+  if (isRateLimit) {
+    const resetText = resetEpoch > 0 ? ` (resets at ${new Date(resetEpoch * 1000).toISOString()})` : '';
+    return {
+      statusCategory: 'rate_limited',
+      error: hasToken
+        ? `GitHub API rate limit exceeded for ${repo}${resetText}: ${msg}. Check quota for ${secretName}.`
+        : `GitHub unauthenticated API rate limit exceeded for ${repo}${resetText}: ${msg}. Configure ${secretName} in Cloudflare Pages Secrets.`
+    };
+  }
+
+  if (resp.status === 401 || resp.status === 403) {
+    return {
+      statusCategory: 'auth_error',
+      error: hasToken
+        ? `GitHub authentication failed for ${repo} (HTTP ${resp.status}: ${msg}). Verify ${secretName} has Contents & Metadata Read-only access to ${repo}.`
+        : `GitHub authentication required for ${repo} (HTTP ${resp.status}: ${msg}). Configure ${secretName} in Cloudflare Pages Secrets.`
+    };
+  }
+
+  if (resp.status === 404) {
+    return {
+      statusCategory: hasToken ? 'auth_or_not_found' : 'auth_required_or_not_found',
+      error: hasToken
+        ? `GitHub repository or branch ${repo}/${branch} returned HTTP 404 (${msg}). Verify ${secretName} grants access to ${repo}.`
+        : `GitHub repository or branch ${repo}/${branch} returned HTTP 404 (${msg}). If private, configure ${secretName} in Cloudflare Pages Secrets.`
+    };
+  }
+
+  return {
+    statusCategory: 'api_error',
+    error: `GitHub API error for ${repo} (HTTP ${resp.status}): ${msg}`
+  };
+}
+
+async function fetchGitHubBranchHead(repo, branch, githubToken = '', secretName = '') {
+  const hasToken = Boolean(githubToken);
   const headers = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'PrepWise-Admin-Deploy-Center'
   };
-  if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
+  if (hasToken) headers.Authorization = `Bearer ${githubToken}`;
 
   const resp = await fetchWithTimeout(`https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`, { headers }).catch(() => null);
   if (!resp) {
@@ -36,22 +78,35 @@ async function fetchGitHubBranchHead(repo, branch, githubToken = '') {
       ok: false,
       repo,
       branch,
+      tokenConfigured: hasToken,
+      tokenSecretName: secretName,
+      statusCode: 0,
+      statusCategory: 'network_error',
       error: `Timed out or failed reaching GitHub API for ${repo}`
     };
   }
   const payload = await resp.json().catch(() => ({}));
   if (!resp.ok || !payload?.commit?.sha) {
+    const diag = formatGitHubError(repo, branch, resp, payload, hasToken, secretName);
     return {
       ok: false,
       repo,
       branch,
-      error: payload?.message || `GitHub API returned HTTP ${resp.status} for ${repo}`
+      tokenConfigured: hasToken,
+      tokenSecretName: secretName,
+      statusCode: resp.status,
+      statusCategory: diag.statusCategory,
+      error: diag.error
     };
   }
   return {
     ok: true,
     repo,
     branch,
+    tokenConfigured: hasToken,
+    tokenSecretName: secretName,
+    statusCode: resp.status,
+    statusCategory: 'ok',
     sha: payload.commit.sha,
     shortSha: payload.commit.sha.slice(0, 7),
     message: payload.commit.commit?.message?.split('\n')[0] || '—',
@@ -61,27 +116,34 @@ async function fetchGitHubBranchHead(repo, branch, githubToken = '') {
 }
 
 async function checkReposSync(env) {
-  const githubToken = (env.GITHUB_TOKEN || '').trim();
+  const primaryToken = (env.GITHUB_PRIMARY_TOKEN || '').trim();
+  const backupToken = (env.GITHUB_BACKUP_TOKEN || '').trim();
   try {
     const [primary, backup] = await Promise.all([
-      fetchGitHubBranchHead(PRIMARY_REPO, TARGET_BRANCH, githubToken),
-      fetchGitHubBranchHead(BACKUP_REPO, TARGET_BRANCH, githubToken)
+      fetchGitHubBranchHead(PRIMARY_REPO, TARGET_BRANCH, primaryToken, 'GITHUB_PRIMARY_TOKEN'),
+      fetchGitHubBranchHead(BACKUP_REPO, TARGET_BRANCH, backupToken, 'GITHUB_BACKUP_TOKEN')
     ]);
     const bothOk = Boolean(primary.ok && backup.ok);
     const synchronized = bothOk && primary.sha === backup.sha;
+    let error = null;
+    if (!bothOk) {
+      error = [primary, backup].filter((r) => !r.ok).map((r) => r.error).join(' | ');
+    } else if (!synchronized) {
+      error = `Repositories have diverged (${PRIMARY_REPO} @ ${primary.shortSha} vs ${BACKUP_REPO} @ ${backup.shortSha}).`;
+    }
     return {
       checked: bothOk,
       synchronized,
       primary,
       backup,
-      error: !primary.ok ? primary.error : (!backup.ok ? backup.error : (synchronized ? null : `Repositories have diverged (${primary.shortSha} vs ${backup.shortSha}).`))
+      error
     };
   } catch (err) {
     return {
       checked: false,
       synchronized: false,
-      primary: { ok: false, repo: PRIMARY_REPO },
-      backup: { ok: false, repo: BACKUP_REPO },
+      primary: { ok: false, repo: PRIMARY_REPO, tokenConfigured: Boolean(primaryToken), tokenSecretName: 'GITHUB_PRIMARY_TOKEN' },
+      backup: { ok: false, repo: BACKUP_REPO, tokenConfigured: Boolean(backupToken), tokenSecretName: 'GITHUB_BACKUP_TOKEN' },
       error: err.message || 'Unable to inspect GitHub repositories'
     };
   }
