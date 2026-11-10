@@ -6,6 +6,15 @@ const BACKUP_REPO = 'Sreesidh-git/prepwise';
 const TARGET_BRANCH = 'main';
 const EXPECTED_PROJECT = 'prepwise-7ij';
 
+function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  return fetch(url, { ...options, ...(controller ? { signal: controller.signal } : {}) })
+    .finally(() => {
+      if (timer) clearTimeout(timer);
+    });
+}
+
 function getCfEnv(env) {
   return {
     apiToken: (env.CLOUDFLARE_API_TOKEN || '').trim(),
@@ -21,7 +30,15 @@ async function fetchGitHubBranchHead(repo, branch, githubToken = '') {
   };
   if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
 
-  const resp = await fetch(`https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`, { headers });
+  const resp = await fetchWithTimeout(`https://api.github.com/repos/${repo}/branches/${encodeURIComponent(branch)}`, { headers }).catch(() => null);
+  if (!resp) {
+    return {
+      ok: false,
+      repo,
+      branch,
+      error: `Timed out or failed reaching GitHub API for ${repo}`
+    };
+  }
   const payload = await resp.json().catch(() => ({}));
   if (!resp.ok || !payload?.commit?.sha) {
     return {
@@ -74,7 +91,7 @@ async function verifyCloudflareToken(apiToken) {
   if (!apiToken) {
     return { checked: false, active: false, status: 'missing', error: 'CLOUDFLARE_API_TOKEN is missing.' };
   }
-  const resp = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+  const resp = await fetchWithTimeout('https://api.cloudflare.com/client/v4/user/tokens/verify', {
     headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' }
   }).catch(() => null);
   if (!resp) {
@@ -99,7 +116,7 @@ async function verifyCloudflareToken(apiToken) {
 }
 
 async function fetchPagesProjectDetails(apiToken, accountId, projectName) {
-  const resp = await fetch(
+  const resp = await fetchWithTimeout(
     `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(projectName)}`,
     { headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' } }
   ).catch(() => null);

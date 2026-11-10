@@ -741,12 +741,18 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
   };
 
   const fetchDeploymentsForProject = async (slug) => {
-    const resp = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(slug)}/deployments?per_page=10`,
-      { headers }
-    );
-    const payload = await resp.json().catch(() => ({}));
-    return { resp, payload };
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    try {
+      const resp = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(slug)}/deployments?per_page=10`,
+        { headers, ...(controller ? { signal: controller.signal } : {}) }
+      );
+      const payload = await resp.json().catch(() => ({}));
+      return { resp, payload };
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   };
 
   try {

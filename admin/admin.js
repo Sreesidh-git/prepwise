@@ -258,11 +258,27 @@
   }
 
   async function api(path, options = {}) {
-    const request = () => fetch(path, {
-      ...options,
-      headers: { ...(options.headers || {}), Authorization: 'Bearer ' + state.session.access_token, 'Content-Type': 'application/json' }
-    });
-    let response = await request();
+    const { timeoutMs = 20000, ...fetchOpts } = options;
+    const request = () => {
+      const controller = typeof AbortController === 'function' ? new AbortController() : null;
+      const timer = controller && timeoutMs > 0 ? setTimeout(() => controller.abort(), timeoutMs) : null;
+      return fetch(path, {
+        ...fetchOpts,
+        ...(controller && !fetchOpts.signal ? { signal: controller.signal } : {}),
+        headers: { ...(fetchOpts.headers || {}), Authorization: 'Bearer ' + state.session.access_token, 'Content-Type': 'application/json' }
+      }).finally(() => {
+        if (timer) clearTimeout(timer);
+      });
+    };
+    let response;
+    try {
+      response = await request();
+    } catch (err) {
+      if (err?.name === 'AbortError') {
+        throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s while loading ${path}`);
+      }
+      throw err;
+    }
     if (response.status === 401 && state.session.refresh_token) {
       try {
         const refreshed = await supabaseAuth('token?grant_type=refresh_token', { refresh_token: state.session.refresh_token });
@@ -1548,12 +1564,15 @@
 
     if (banner) banner.innerHTML = '<div class="alert-banner is-info">Running live pre-deployment verification checks...</div>';
     if (blockEl) { blockEl.hidden = true; blockEl.innerHTML = ''; }
+    if (preflightEl) preflightEl.innerHTML = '<div class="empty-state">Running live pre-deployment safety checks...</div>';
+    if (histEl) histEl.innerHTML = '<div class="empty-state">Loading deployment history...</div>';
+    if (failEl) failEl.innerHTML = '<div class="empty-state">Loading failed deployments &amp; audit log...</div>';
     if (deployBtn) {
       deployBtn.hidden = false;
       deployBtn.disabled = true;
     }
     try {
-      const res = await api('/api/admin/deploy');
+      const res = await api('/api/admin/deploy', { timeoutMs: 15000 });
       const d = res?.data || {};
       state.deployReport = d;
       const pf = d.preflight || {};
