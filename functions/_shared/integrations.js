@@ -634,12 +634,32 @@ export async function fetchSearchConsoleData(env, fromDate, toDate) {
   }
 }
 
+function normalizeCloudflareProjectSlug(rawValue, fallbackSlug = 'prepwise-7ij') {
+  let cleaned = String(rawValue || '').trim().replace(/^['"]+|['"]+$/g, '');
+  if (!cleaned) return fallbackSlug;
+  cleaned = cleaned.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+  if (/\.pages\.dev$/i.test(cleaned)) {
+    cleaned = cleaned.replace(/\.pages\.dev$/i, '');
+  }
+  return cleaned || fallbackSlug;
+}
+
+function getSiteHostname(env) {
+  const raw = (env.PUBLIC_SITE_URL || 'https://prepwises.online').trim();
+  try {
+    return new URL(raw).hostname.toLowerCase();
+  } catch {
+    return 'prepwises.online';
+  }
+}
+
 export async function fetchCloudflareData(env, fromDate, toDate) {
   const checkedAt = new Date().toISOString();
   const apiToken = (env.CLOUDFLARE_API_TOKEN || '').trim();
   const accountId = (env.CLOUDFLARE_ACCOUNT_ID || '').trim();
-  const project = (env.CLOUDFLARE_PAGES_PROJECT || 'prepwise-7ij').trim();
+  let project = normalizeCloudflareProjectSlug(env.CLOUDFLARE_PAGES_PROJECT, 'prepwise-7ij');
   const zoneId = (env.CLOUDFLARE_ZONE_ID || '').trim();
+  const siteHost = getSiteHostname(env);
 
   const baseMeta = {
     service: 'cloudflare',
@@ -651,7 +671,7 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
       'Failed deployments',
       'Zone requests & bandwidth (with CLOUDFLARE_ZONE_ID)'
     ],
-    setupInstructions: 'Create a read-only Cloudflare API Token with Account:Cloudflare Pages:Read and Zone:Analytics:Read. Add CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and optionally CLOUDFLARE_ZONE_ID in Cloudflare Pages Secrets.'
+    setupInstructions: 'Create a read-only Cloudflare API Token with Account:Cloudflare Pages:Read and Zone:Analytics:Read. Add CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and optionally CLOUDFLARE_ZONE_ID (plus optional CLOUDFLARE_PAGES_PROJECT, defaulting to prepwise-7ij) in Cloudflare Pages Secrets.'
   };
 
   const missing = [];
@@ -674,12 +694,17 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
     'Content-Type': 'application/json'
   };
 
-  try {
-    const depResp = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(project)}/deployments?per_page=10`,
+  const fetchDeploymentsForProject = async (slug) => {
+    const resp = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(slug)}/deployments?per_page=10`,
       { headers }
     );
-    const depPayload = await depResp.json().catch(() => ({}));
+    const payload = await resp.json().catch(() => ({}));
+    return { resp, payload };
+  };
+
+  try {
+    let { resp: depResp, payload: depPayload } = await fetchDeploymentsForProject(project);
 
     if (depResp.status === 401 || depResp.status === 403) {
       return {
@@ -692,12 +717,61 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
       };
     }
 
+    const isProjectNotFound =
+      depResp.status === 404 ||
+      depPayload?.errors?.some((err) => err?.code === 8000007 || /project not found/i.test(err?.message || ''));
+
+    // If the initial project slug is not found, inspect the account's Pages projects (Pages:Read)
+    // to match prepwise-7ij, prepwise-7ij.pages.dev, or prepwises.online and recover automatically.
+    if (isProjectNotFound) {
+      const listResp = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects`,
+        { headers }
+      ).catch(() => null);
+      const listPayload = listResp ? await listResp.json().catch(() => ({})) : {};
+      const projects = Array.isArray(listPayload?.result) ? listPayload.result : [];
+
+      const matched =
+        projects.find((p) => p?.name === 'prepwise-7ij') ||
+        projects.find((p) => (p?.subdomain || '').toLowerCase() === 'prepwise-7ij.pages.dev') ||
+        projects.find(
+          (p) =>
+            Array.isArray(p?.domains) &&
+            p.domains.some((dom) => {
+              const dLower = String(dom || '').toLowerCase();
+              return dLower === 'prepwise-7ij.pages.dev' || dLower === siteHost;
+            })
+        );
+
+      if (matched?.name && matched.name !== project) {
+        project = matched.name;
+        baseMeta.projectName = project;
+        ({ resp: depResp, payload: depPayload } = await fetchDeploymentsForProject(project));
+      } else if (!matched && listResp?.ok) {
+        const available = projects
+          .slice(0, 10)
+          .map((p) => (p?.subdomain ? `${p.name} (${p.subdomain})` : p?.name))
+          .filter(Boolean);
+        const origMsg = depPayload?.errors?.[0]?.message || `Cloudflare API error (HTTP ${depResp.status}).`;
+        return {
+          ...baseMeta,
+          status: 'Connection error',
+          lastSyncedAt: null,
+          error: available.length
+            ? `${origMsg} Requested project: "${project}". Available projects in configured account: ${available.join(', ')}.`
+            : `${origMsg} Requested project: "${project}". No Pages projects were returned for the configured CLOUDFLARE_ACCOUNT_ID.`,
+          missingCredentials: [],
+          data: null
+        };
+      }
+    }
+
     if (!depResp.ok || !depPayload.success) {
       return {
         ...baseMeta,
         status: 'Connection error',
         lastSyncedAt: null,
-        error: depPayload?.errors?.[0]?.message || `Cloudflare API error (HTTP ${depResp.status}).`,
+        error: `${depPayload?.errors?.[0]?.message || `Cloudflare API error (HTTP ${depResp.status}).`} (project: "${project}")`,
         missingCredentials: [],
         data: null
       };
@@ -722,7 +796,7 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
       const startDay = isoDay(fromDate);
       const endDay = isoDay(toDate);
       const gqlQuery = {
-        query: `query ($zoneTag: string!, $since: Date!, $until: Date!) {
+        query: `query ($zoneTag: String!, $since: Date!, $until: Date!) {
           viewer {
             zones(filter: { zoneTag: $zoneTag }) {
               httpRequests1dGroups(limit: 90, filter: { date_geq: $since, date_leq: $until }, orderBy: [date_ASC]) {
@@ -907,3 +981,4 @@ export async function gatherIntegrationsReport(context, options = {}) {
     integrations
   };
 }
+

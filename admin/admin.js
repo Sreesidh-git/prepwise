@@ -832,7 +832,7 @@
     if (notice) {
       notice.innerHTML = ok
         ? `<div class="alert-banner is-success"><strong>Connected to Cloudflare Pages (${escapeHtml(cf.projectName)}):</strong> Latest production deployment <code>${escapeHtml(lp?.id || '—')}</code> (${escapeHtml(lp?.status || '—')}).</div>`
-        : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}):</strong> ${escapeHtml(cf?.error || 'Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Cloudflare Pages Secrets.')}</div>`;
+        : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}${cf?.projectName ? ` · ${escapeHtml(cf.projectName)}` : ''}):</strong> ${escapeHtml(cf?.error || 'Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in Cloudflare Pages Secrets.')}</div>`;
     }
     const tr = d.traffic?.totals;
     renderStatCards('overviewInfraCards', [
@@ -1173,7 +1173,7 @@
       if (banner) {
         banner.innerHTML = ok
           ? `<div class="alert-banner is-success"><strong>Connected:</strong> Cloudflare Pages project <code>${escapeHtml(cf.projectName)}</code>.</div>`
-          : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}):</strong> ${escapeHtml(cf?.error || 'Missing Cloudflare credentials.')}</div>`;
+          : `<div class="alert-banner is-warning"><strong>Cloudflare API (${escapeHtml(cf?.status || 'Not configured')}${cf?.projectName ? ` · ${escapeHtml(cf.projectName)}` : ''}):</strong> ${escapeHtml(cf?.error || 'Missing Cloudflare credentials.')}</div>`;
       }
       renderStatCards('infrastructureCards', [
         ['Latest Prod Deploy', ok && d.latestProduction ? d.latestProduction.status : 'Unavailable', ok ? 'Cloudflare' : 'Not configured'],
