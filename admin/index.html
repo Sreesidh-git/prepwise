@@ -592,6 +592,21 @@
                 <button class="secondary" id="refreshAdvertising" type="button">Refresh</button>
               </div>
             </div>
+            <form class="filter-form" id="advertisingFilters">
+              <label>Reporting Window
+                <select id="advertisingPeriod">
+                  <option value="today">Today</option>
+                  <option value="7" selected>Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="custom">Custom range</option>
+                </select>
+              </label>
+              <label class="custom-date">From <input id="advertisingFrom" type="date"></label>
+              <label class="custom-date">To <input id="advertisingTo" type="date"></label>
+              <button class="primary" type="submit">Apply</button>
+              <span class="last-updated-tag" id="advertisingRangeLabel">Window: Last 7 days (UTC)</span>
+            </form>
             <div id="advertisingApiBanner"></div>
             <div class="cards" id="advertisingSummaryCards"></div>
             <div class="charts-grid">
@@ -667,22 +682,23 @@
               <div><p class="eyebrow">Platform &amp; Ops &bull; Owner Controlled</p><h2>Deployment Center</h2></div>
               <div class="section-actions">
                 <button class="secondary" id="refreshDeploymentCenter" type="button">Refresh Checks</button>
-                <button class="danger-btn" id="deployToProductionBtn" type="button" hidden disabled>DEPLOY TO PRODUCTION</button>
+                <button class="danger-btn" id="deployToProductionBtn" type="button" disabled>DEPLOY TO PRODUCTION</button>
               </div>
             </div>
-            <div id="deployBanner"></div>
+            <div id="deployBanner"><div class="empty-state" style="margin-bottom:14px;">Open Deployment Center or click Refresh Checks to run live pre-deployment verification.</div></div>
+            <div id="deployBlockReason" hidden></div>
             <div class="cards" id="deploySummaryCards"></div>
             <h3 style="margin-bottom:10px;">Pre-Deployment Safety Checks</h3>
-            <div id="deployPreflightGrid" class="deploy-preflight-grid"></div>
+            <div id="deployPreflightGrid" class="deploy-preflight-grid"><div class="empty-state">Pre-deployment checks have not run yet.</div></div>
             <div id="deployProgressBox" class="deploy-progress-box" hidden></div>
             <div class="analytics-columns">
               <div>
                 <h3 style="margin-bottom:10px;">Deployment History</h3>
-                <div id="deployHistoryTable" class="table-wrap"></div>
+                <div id="deployHistoryTable" class="table-wrap"><div class="empty-state">Loading deployment history...</div></div>
               </div>
               <div>
                 <h3 style="margin-bottom:10px;">Failed Deployments &amp; Audit Log</h3>
-                <div id="deployFailedTable" class="table-wrap"></div>
+                <div id="deployFailedTable" class="table-wrap"><div class="empty-state">Loading failed deployments &amp; audit log...</div></div>
               </div>
             </div>
           </section>

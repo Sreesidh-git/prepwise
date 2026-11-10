@@ -70,6 +70,34 @@ async function checkReposSync(env) {
   }
 }
 
+async function verifyCloudflareToken(apiToken) {
+  if (!apiToken) {
+    return { checked: false, active: false, status: 'missing', error: 'CLOUDFLARE_API_TOKEN is missing.' };
+  }
+  const resp = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+    headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' }
+  }).catch(() => null);
+  if (!resp) {
+    return { checked: false, active: false, status: 'unreachable', error: 'Unable to reach Cloudflare token verification endpoint.' };
+  }
+  const payload = await resp.json().catch(() => ({}));
+  if (!resp.ok || !payload?.success) {
+    return {
+      checked: true,
+      active: false,
+      status: resp.status === 401 || resp.status === 403 ? 'invalid' : 'error',
+      error: payload?.errors?.[0]?.message || `Token verification returned HTTP ${resp.status}.`
+    };
+  }
+  const tokenStatus = payload?.result?.status || 'active';
+  return {
+    checked: true,
+    active: tokenStatus === 'active',
+    status: tokenStatus,
+    error: tokenStatus === 'active' ? null : `Token status is "${tokenStatus}".`
+  };
+}
+
 async function fetchPagesProjectDetails(apiToken, accountId, projectName) {
   const resp = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/pages/projects/${encodeURIComponent(projectName)}`,
@@ -153,47 +181,101 @@ export async function onRequestGet(context) {
 
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 6 * 86400000);
-    const [cfReport, repoSync, logs] = await Promise.all([
+    let auditLogsError = null;
+    const [cfReport, repoSync, logs, tokenInfo] = await Promise.all([
       fetchCloudflareData(context.env, weekAgo, now),
       checkReposSync(context.env),
       supabaseRequest(
         context.env,
         '/rest/v1/admin_activity_logs?select=id,admin_user_id,action,entity_type,metadata,created_at&entity_type=eq.deployment&order=created_at.desc&limit=15',
         { accessToken: auth.token }
-      ).catch(() => [])
+      ).catch((err) => {
+        auditLogsError = err?.message || 'Unable to load deployment audit logs';
+        return [];
+      }),
+      verifyCloudflareToken(cfEnv.apiToken)
     ]);
 
     const resolvedProject = cfReport?.projectName || cfEnv.project;
     let projectDetails = null;
-    if (cfReport?.status === 'Connected' && cfEnv.apiToken && cfEnv.accountId) {
-      const pRes = await fetchPagesProjectDetails(cfEnv.apiToken, cfEnv.accountId, resolvedProject);
-      if (pRes.ok) projectDetails = pRes.project;
+    let projectDetailsRes = { ok: false, error: null };
+    if (cfEnv.apiToken && cfEnv.accountId && (cfReport?.status === 'Connected' || tokenInfo.active)) {
+      projectDetailsRes = await fetchPagesProjectDetails(cfEnv.apiToken, cfEnv.accountId, resolvedProject);
+      if (projectDetailsRes.ok) projectDetails = projectDetailsRes.project;
     }
 
     const latestProd = cfReport?.data?.latestProduction || null;
     const deployments = cfReport?.data?.deployments || [];
     const failedList = deployments.filter((d) => d.status === 'failure' || d.status === 'failed');
 
-    const productionBranch = projectDetails?.productionBranch || (cfReport?.status === 'Connected' ? TARGET_BRANCH : null);
+    const productionBranch = projectDetails?.productionBranch || null;
     const projectVerified = Boolean(
       cfReport?.status === 'Connected' &&
+      projectDetailsRes.ok &&
       (resolvedProject === EXPECTED_PROJECT || projectDetails?.subdomain === `${EXPECTED_PROJECT}.pages.dev`)
     );
-    const branchVerified = productionBranch === TARGET_BRANCH;
+    const branchVerified = Boolean(projectDetailsRes.ok && productionBranch === TARGET_BRANCH);
+
+    const pagesReadOk = Boolean(cfReport?.status === 'Connected' && projectDetailsRes.ok);
+    const zoneAnalyticsStatus = cfReport?.data?.zoneStatus || (cfReport?.status === 'Connected' ? 'not_configured' : 'unavailable');
+    const blockingReasons = [];
+    if (!auth.isOwner) blockingReasons.push('Owner authorization is required to trigger production deployments.');
+    if (cfReport?.status !== 'Connected') {
+      blockingReasons.push(cfReport?.error || `Cloudflare Pages connection is ${cfReport?.status || 'Not configured'}.`);
+    } else if (!projectDetailsRes.ok) {
+      blockingReasons.push(projectDetailsRes.error || 'Unable to inspect Cloudflare Pages project configuration (check Account: Cloudflare Pages: Read).');
+    } else if (!projectVerified) {
+      blockingReasons.push(`Cloudflare Pages project "${resolvedProject}" does not match expected "${EXPECTED_PROJECT}".`);
+    }
+    if (projectDetailsRes.ok && !branchVerified) {
+      blockingReasons.push(`Production branch is "${productionBranch || 'unknown'}", expected "${TARGET_BRANCH}".`);
+    }
+    if (!repoSync.checked || !repoSync.synchronized) {
+      blockingReasons.push(repoSync.error || 'Primary and backup GitHub main branches could not be verified as synchronized.');
+    }
 
     const preflight = {
       ownerAuthorized: auth.isOwner,
       cloudflareConfigured: cfReport?.status === 'Connected',
       cloudflareStatus: cfReport?.status || 'Not configured',
-      cloudflareError: cfReport?.error || null,
+      cloudflareError: cfReport?.error || projectDetailsRes.error || null,
+      cloudflareToken: tokenInfo,
+      cloudflarePermissions: {
+        pagesRead: {
+          ok: pagesReadOk,
+          status: pagesReadOk ? 'verified' : (cfReport?.status === 'Authentication required' || projectDetailsRes.status === 401 || projectDetailsRes.status === 403 ? 'missing_permission' : 'unavailable'),
+          detail: pagesReadOk
+            ? 'Verified (project & deployment history readable)'
+            : (cfReport?.error || projectDetailsRes.error || 'Account: Cloudflare Pages: Read could not be verified')
+        },
+        pagesEdit: {
+          ok: null,
+          status: tokenInfo.active && pagesReadOk ? 'ready_to_trigger' : 'blocked',
+          detail: tokenInfo.active && pagesReadOk
+            ? 'Required when triggering POST /deployments (403 surfaces if scope missing)'
+            : 'Requires valid active token with Account: Cloudflare Pages: Edit'
+        },
+        zoneAnalyticsRead: {
+          ok: zoneAnalyticsStatus === 'connected',
+          status: zoneAnalyticsStatus,
+          detail: zoneAnalyticsStatus === 'connected'
+            ? 'Verified (Zone: Analytics: Read GraphQL active)'
+            : (cfReport?.data?.zoneError || 'CLOUDFLARE_ZONE_ID or Zone: Analytics: Read not verified')
+        }
+      },
       projectVerified,
       projectName: resolvedProject,
       productionBranch,
       branchVerified,
+      currentCommitSha: latestProd?.commitFullHash || null,
+      currentCommitShortSha: latestProd?.commitHash || null,
+      expectedCommitSha: repoSync.primary?.sha || null,
+      expectedCommitShortSha: repoSync.primary?.shortSha || null,
       repositoriesSynchronized: repoSync.synchronized,
       repoSync,
       workingTreeCheck: 'edge_unverifiable_confirm_required',
-      readyToDeploy: Boolean(auth.isOwner && cfReport?.status === 'Connected' && projectVerified && branchVerified && repoSync.synchronized)
+      blockingReasons,
+      readyToDeploy: blockingReasons.length === 0
     };
 
     return json({
@@ -205,7 +287,8 @@ export async function onRequestGet(context) {
         failedDeployments: failedList,
         deployments,
         preflight,
-        auditLogs: Array.isArray(logs) ? logs : []
+        auditLogs: Array.isArray(logs) ? logs : [],
+        auditLogsError
       }
     });
   } catch (err) {
@@ -214,14 +297,24 @@ export async function onRequestGet(context) {
   }
 }
 
+function formatDeployAdmin(auth) {
+  return {
+    id: auth.user.id,
+    email: auth.user.email || null,
+    displayName: auth.profile?.display_name || auth.user.email || auth.user.id,
+    role: auth.role
+  };
+}
+
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context.request, context.env);
   if (auth.response) return auth.response;
 
+  const adminInfo = formatDeployAdmin(auth);
   const timestamp = new Date().toISOString();
   if (!auth.isOwner) {
     await writeActivityLog(context.env, auth.token, auth.user.id, 'cloudflare_deploy_denied', 'deployment', EXPECTED_PROJECT, {
-      administrator: { id: auth.user.id, email: auth.user.email, role: auth.role },
+      administrator: adminInfo,
       timestamp,
       success: false,
       reason: 'Only the Owner can initiate production deployments.'
@@ -269,7 +362,7 @@ export async function onRequestPost(context) {
   const repoSync = await checkReposSync(context.env);
   if (!repoSync.checked || !repoSync.synchronized) {
     await writeActivityLog(context.env, auth.token, auth.user.id, 'cloudflare_deploy_blocked_sync', 'deployment', resolvedProject, {
-      administrator: { id: auth.user.id, email: auth.user.email, role: auth.role },
+      administrator: adminInfo,
       timestamp,
       success: false,
       reason: repoSync.error || 'Repositories not synchronized'
@@ -305,7 +398,7 @@ export async function onRequestPost(context) {
       ? ' Note: Triggering deployments requires Account:Cloudflare Pages:Edit permission on CLOUDFLARE_API_TOKEN.'
       : '';
     await writeActivityLog(context.env, auth.token, auth.user.id, 'cloudflare_deploy_failed', 'deployment', resolvedProject, {
-      administrator: { id: auth.user.id, email: auth.user.email, role: auth.role },
+      administrator: adminInfo,
       commitSha: repoSync.primary.sha,
       timestamp,
       success: false,
@@ -316,7 +409,7 @@ export async function onRequestPost(context) {
 
   const triggered = mapDeployment(triggerPayload.result);
   await writeActivityLog(context.env, auth.token, auth.user.id, 'cloudflare_deploy_triggered', 'deployment', resolvedProject, {
-    administrator: { id: auth.user.id, email: auth.user.email, role: auth.role },
+    administrator: adminInfo,
     project: resolvedProject,
     branch: TARGET_BRANCH,
     commitSha: repoSync.primary.sha,

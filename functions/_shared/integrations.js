@@ -1,5 +1,6 @@
 import { envValue, supabaseCount, supabaseRequest } from './supabase.js';
 import { getGoogleAccessToken } from './google-auth.js';
+import { loadStoredAdControls } from './ad-controls.js';
 
 function isoDay(value) {
   return new Date(value).toISOString().slice(0, 10);
@@ -375,7 +376,22 @@ export async function fetchGa4Data(env, fromDate, toDate) {
   }
 }
 
-export async function fetchAdsterraData(env, fromDate, toDate) {
+function formatPopunderStatusText(adControls) {
+  if (!adControls || typeof adControls !== 'object') {
+    return 'Unit 32172757 OFF by default (Owner-controlled; saved state unavailable)';
+  }
+  const masterOn = adControls.masterEnabled !== false;
+  const popOn = adControls.units?.['32172757'] === true;
+  if (!popOn) {
+    return 'Unit 32172757 OFF (default; Owner-controlled)';
+  }
+  if (!masterOn) {
+    return 'Unit 32172757 saved ON (paused while Master Advertising is OFF; Owner-controlled)';
+  }
+  return 'Unit 32172757 ON (explicitly enabled by Owner)';
+}
+
+export async function fetchAdsterraData(env, fromDate, toDate, adControls = null) {
   const checkedAt = new Date().toISOString();
   const apiToken = (env.ADSTERRA_API_TOKEN || '').trim();
   const baseMeta = {
@@ -487,10 +503,11 @@ export async function fetchAdsterraData(env, fromDate, toDate) {
       error: null,
       missingCredentials: [],
       data: {
+        dateRange: { startDate, endDate: finishDate },
         totals,
         daily,
         byPlacement,
-        popunderStatus: 'Unit 32172757 permanently disabled'
+        popunderStatus: formatPopunderStatusText(adControls)
       }
     };
   } catch (err) {
@@ -740,7 +757,7 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
         ...baseMeta,
         status: 'Authentication required',
         lastSyncedAt: null,
-        error: depPayload?.errors?.[0]?.message || `Cloudflare API authentication error (HTTP ${depResp.status}).`,
+        error: `${depPayload?.errors?.[0]?.message || `Cloudflare API authentication error (HTTP ${depResp.status}).`} Verify CLOUDFLARE_API_TOKEN (requires Account: Cloudflare Pages: Read) and CLOUDFLARE_ACCOUNT_ID.`,
         missingCredentials: [],
         data: null
       };
@@ -806,16 +823,30 @@ export async function fetchCloudflareData(env, fromDate, toDate) {
       };
     }
 
-    const deployments = (depPayload.result || []).map((d) => ({
-      id: d.short_id || d.id?.slice(0, 8),
-      environment: d.environment,
-      url: d.url,
-      status: d.latest_stage?.status || 'unknown',
-      stage: d.latest_stage?.name || 'deploy',
-      commitHash: d.deployment_trigger?.metadata?.commit_hash?.slice(0, 7) || '—',
-      commitMessage: d.deployment_trigger?.metadata?.commit_message || '—',
-      createdOn: d.created_on
-    }));
+    const deployments = (depPayload.result || []).map((d) => {
+      const stages = Array.isArray(d.stages) ? d.stages : [];
+      const failedStage = stages.find((s) => s.status === 'failure' || s.status === 'failed');
+      const lastEndedStage = [...stages].reverse().find((s) => s.ended_on);
+      const status = d.latest_stage?.status || 'unknown';
+      const isFailed = status === 'failure' || status === 'failed';
+      return {
+        id: d.short_id || d.id?.slice(0, 8),
+        fullId: d.id || null,
+        environment: d.environment,
+        branch: d.deployment_trigger?.metadata?.branch || (d.environment === 'production' ? 'main' : null),
+        url: d.url,
+        status,
+        stage: d.latest_stage?.name || 'deploy',
+        failureReason: isFailed
+          ? (d.latest_stage?.message || failedStage?.message || `Failed during ${failedStage?.name || d.latest_stage?.name || 'deploy'} stage`)
+          : null,
+        commitHash: d.deployment_trigger?.metadata?.commit_hash?.slice(0, 7) || '—',
+        commitFullHash: d.deployment_trigger?.metadata?.commit_hash || null,
+        commitMessage: d.deployment_trigger?.metadata?.commit_message || '—',
+        createdOn: d.created_on,
+        completedOn: lastEndedStage?.ended_on || d.modified_on || null
+      };
+    });
 
     const latestProd = deployments.find((d) => d.environment === 'production') || deployments[0] || null;
     const failedCount = deployments.filter((d) => d.status === 'failure' || d.status === 'failed').length;
@@ -1000,7 +1031,9 @@ export async function gatherIntegrationsReport(context, options = {}) {
     tasks.ga4 = fetchGa4Data(context.env, range.from, range.to);
   }
   if (targetService === 'all' || targetService === 'adsterra') {
-    tasks.adsterra = fetchAdsterraData(context.env, range.from, range.to);
+    tasks.adsterra = loadStoredAdControls(context.env, context.auth?.token)
+      .catch(() => null)
+      .then((adControls) => fetchAdsterraData(context.env, range.from, range.to, adControls));
   }
   if (targetService === 'all' || targetService === 'gsc') {
     tasks.gsc = fetchSearchConsoleData(context.env, range.from, range.to);

@@ -12,14 +12,98 @@
     return Object.values(cfg.units);
   }
 
+  function getUnitPolicyStatusMeta(unitId, controls, controlsError, opts = {}) {
+    const isPop = String(unitId) === '32172757';
+    if (!controls || !controls.units) {
+      return {
+        pillClass: 'status-unavailable',
+        label: controlsError ? 'Unavailable' : (opts.loadingLabel || 'Checking...'),
+        unitEnabled: false,
+        masterOn: false,
+        loaded: false
+      };
+    }
+    const masterOn = controls.masterEnabled !== false;
+    const unitEnabled = controls.units[String(unitId)] === true;
+    if (!unitEnabled) {
+      return {
+        pillClass: 'status-inactive',
+        label: isPop ? 'OFF (Default, Owner-Controlled)' : 'OFF',
+        unitEnabled: false,
+        masterOn,
+        loaded: true
+      };
+    }
+    if (!masterOn) {
+      return {
+        pillClass: 'status-unavailable',
+        label: 'Paused (Master OFF)',
+        unitEnabled: true,
+        masterOn: false,
+        loaded: true
+      };
+    }
+    return {
+      pillClass: isPop ? 'status-error' : 'status-connected',
+      label: isPop ? 'ON (Owner Enabled)' : 'ON',
+      unitEnabled: true,
+      masterOn: true,
+      loaded: true
+    };
+  }
+
+  function getPopunderPolicySummary(controls, controlsError) {
+    if (!controls || !controls.units) {
+      return controlsError
+        ? 'Popunder unit <code>32172757</code> is OFF by default and Owner-controlled (saved controls unavailable).'
+        : 'Popunder unit <code>32172757</code> is OFF by default and Owner-controlled (loading saved controls...).';
+    }
+    const masterOn = controls.masterEnabled !== false;
+    const popOn = controls.units['32172757'] === true;
+    if (!popOn) {
+      return 'Popunder unit <code>32172757</code> is OFF (default; Owner-controlled).';
+    }
+    if (!masterOn) {
+      return 'Popunder unit <code>32172757</code> is saved ON by Owner, currently paused while Master Advertising is OFF.';
+    }
+    return 'Popunder unit <code>32172757</code> is ON (explicitly enabled by Owner).';
+  }
+
+  function syncAdvertisingFilterFromOverview() {
+    const ovPeriod = document.getElementById('overviewPeriod')?.value || '7';
+    const adPeriodEl = document.getElementById('advertisingPeriod');
+    const adFromEl = document.getElementById('advertisingFrom');
+    const adToEl = document.getElementById('advertisingTo');
+    const adForm = document.getElementById('advertisingFilters');
+    if (adPeriodEl) adPeriodEl.value = ovPeriod;
+    if (adFromEl) adFromEl.value = document.getElementById('overviewFrom')?.value || '';
+    if (adToEl) adToEl.value = document.getElementById('overviewTo')?.value || '';
+    if (adForm) adForm.classList.toggle('is-custom', ovPeriod === 'custom');
+  }
+
+  function formatAdReportingRange(adsterra, fallbackParams = null) {
+    const dr = adsterra?.data?.dateRange;
+    if (dr?.startDate && dr?.endDate) {
+      return `${dr.startDate} to ${dr.endDate} (UTC)`;
+    }
+    if (fallbackParams) {
+      const from = fallbackParams.get('from')?.slice(0, 10);
+      const to = fallbackParams.get('to')?.slice(0, 10);
+      if (from && to) return `${from} to ${to} (UTC)`;
+    }
+    return 'selected period';
+  }
+
   function renderAdvertisingPlacements() {
     const container = document.getElementById('advertisingPlacements');
     if (!container) return;
     const placements = window.PREPWISE_AD_REGISTRY?.placements || [];
     const cfg = window.PREPWISE_ADSTERRA_CONFIG;
     const controls = state.adControls;
+    const controlsError = state.adControlsError;
+    const controlsLoaded = Boolean(controls && controls.units);
     const permissions = state.adControlsPermissions || { canToggleUnits: true, canTogglePopunder: state.isOwner };
-    const adApi = state.integrationsReport?.integrations?.adsterra;
+    const adApi = state.lastAdReport || state.integrationsReport?.integrations?.adsterra;
     const apiStatsMap = new Map();
     if (adApi?.status === 'Connected' && Array.isArray(adApi.data?.byPlacement)) {
       adApi.data.byPlacement.forEach((p) => apiStatsMap.set(String(p.placementId), p));
@@ -27,49 +111,57 @@
 
     const masterSwitchEl = document.getElementById('adMasterSwitch');
     const masterLabelEl = document.getElementById('adMasterLabel');
-    const masterOn = typeof controls?.masterEnabled === 'boolean' ? controls.masterEnabled : Boolean(cfg?.enabled);
-    if (masterSwitchEl) masterSwitchEl.checked = masterOn;
-    if (masterLabelEl) masterLabelEl.textContent = masterOn ? 'ON' : 'OFF';
+    const enableEligibleBtn = document.getElementById('adEnableEligibleBtn');
+    const disableAllBtn = document.getElementById('adDisableAllBtn');
+    const masterOn = controlsLoaded ? controls.masterEnabled !== false : false;
+    if (masterSwitchEl) {
+      masterSwitchEl.checked = masterOn;
+      masterSwitchEl.disabled = !controlsLoaded;
+    }
+    if (masterLabelEl) {
+      masterLabelEl.textContent = controlsLoaded ? (masterOn ? 'ON' : 'OFF') : (controlsError ? 'Unavailable' : 'Loading...');
+    }
+    if (enableEligibleBtn) enableEligibleBtn.disabled = !controlsLoaded;
+    if (disableAllBtn) disableAllBtn.disabled = !controlsLoaded;
 
-    const unitsRows = getAdsterraConfigUnits().map((u) => {
+    const unitCardsHtml = getAdsterraConfigUnits().map((u) => {
       const apiRow = apiStatsMap.get(String(u.unitId));
       const isPopunder = u.unitId === '32172757';
-      const unitEnabled = typeof controls?.units?.[u.unitId] === 'boolean'
-        ? controls.units[u.unitId]
-        : Boolean(u.enabled);
-      const effectiveOn = masterOn && unitEnabled;
-      const canToggleThis = isPopunder ? Boolean(permissions.canTogglePopunder) : Boolean(permissions.canToggleUnits);
-
-      let statusPill;
-      if (!unitEnabled) {
-        statusPill = `<span class="status-pill status-inactive">${isPopunder ? 'OFF (Safe Default)' : 'OFF'}</span>`;
-      } else if (!masterOn) {
-        statusPill = '<span class="status-pill status-unavailable">Paused (Master OFF)</span>';
-      } else {
-        statusPill = `<span class="status-pill ${isPopunder ? 'status-error' : 'status-connected'}">${isPopunder ? 'ON (High Risk)' : 'ON'}</span>`;
-      }
-
-      const toggleControl = `
-        <div style="display:flex; align-items:center; gap:8px;">
-          <label class="switch-toggle" title="${isPopunder && !canToggleThis ? 'Owner approval required for Popunder unit 32172757' : 'Toggle unit state'}">
-            <input type="checkbox" class="ad-unit-toggle" data-unit-id="${escapeHtml(u.unitId)}" ${unitEnabled ? 'checked' : ''} ${canToggleThis ? '' : 'disabled'}>
-            <span class="switch-slider"></span>
-          </label>
-          ${isPopunder ? `<span class="muted" style="font-size:11px;">${canToggleThis ? 'Owner Confirm' : 'Owner Only'}</span>` : ''}
-        </div>
-      `;
+      const statusMeta = getUnitPolicyStatusMeta(u.unitId, controls, controlsError, { loadingLabel: 'Loading...' });
+      const canToggleThis = controlsLoaded && (isPopunder ? Boolean(permissions.canTogglePopunder) : Boolean(permissions.canToggleUnits));
+      const permissionBadge = isPopunder
+        ? (state.isOwner ? 'Owner Only (Confirm Required)' : 'Owner Only (Locked for Admin)')
+        : 'Admin & Owner';
+      const switchStateText = !controlsLoaded ? '—' : (statusMeta.unitEnabled ? 'ON' : 'OFF');
 
       return `
-        <tr>
-          <td><strong>Unit ${escapeHtml(u.unitId)}</strong><br><span class="muted" style="font-size:11px;">${escapeHtml(u.name || u.format)}</span></td>
-          <td>${escapeHtml(u.format)}</td>
-          <td>${toggleControl}</td>
-          <td>${statusPill}</td>
-          <td>${apiRow ? apiRow.impressions.toLocaleString() : '—'}</td>
-          <td>${apiRow ? apiRow.clicks.toLocaleString() : '—'}</td>
-          <td>${apiRow ? `$${Number(apiRow.cpm).toFixed(2)}` : '—'}</td>
-          <td>${apiRow ? `$${Number(apiRow.revenue).toFixed(3)}` : '—'}</td>
-        </tr>
+        <article class="ad-unit-card" data-unit-card="${escapeHtml(u.unitId)}">
+          <div class="ad-unit-card-head">
+            <div>
+              <strong>Unit ${escapeHtml(u.unitId)} &mdash; ${escapeHtml(u.name || u.format)}</strong>
+              <div class="ad-unit-card-meta">
+                <span>Format: <code>${escapeHtml(u.format)}</code></span>
+                <span>&bull;</span>
+                <span>${escapeHtml(permissionBadge)}</span>
+              </div>
+            </div>
+            <span class="status-pill ${statusMeta.pillClass}">${escapeHtml(statusMeta.label)}</span>
+          </div>
+          <div class="ad-unit-control-row">
+            <label class="switch-toggle" title="${!controlsLoaded ? 'Saved ad controls unavailable' : (isPopunder && !canToggleThis ? 'Owner approval required for Popunder unit 32172757' : `Toggle Unit ${u.unitId}`)}">
+              <input type="checkbox" class="ad-unit-toggle" data-unit-id="${escapeHtml(u.unitId)}" aria-label="Toggle Unit ${escapeHtml(u.unitId)} (${escapeHtml(u.name || u.format)})" ${statusMeta.unitEnabled ? 'checked' : ''} ${canToggleThis ? '' : 'disabled'}>
+              <span class="switch-slider"></span>
+              <span class="ad-toggle-state-text">${switchStateText}</span>
+            </label>
+            <span class="muted" style="font-size:11px;">${!controlsLoaded ? 'Controls unavailable' : (isPopunder ? (canToggleThis ? 'Confirmation modal required to enable' : 'Requires Owner login') : 'Independent unit toggle')}</span>
+          </div>
+          <div class="ad-unit-stats-row">
+            <div><span>Impressions</span><strong>${apiRow ? apiRow.impressions.toLocaleString() : '—'}</strong></div>
+            <div><span>Clicks</span><strong>${apiRow ? apiRow.clicks.toLocaleString() : '—'}</strong></div>
+            <div><span>CPM</span><strong>${apiRow ? `$${Number(apiRow.cpm).toFixed(2)}` : '—'}</strong></div>
+            <div><span>Revenue</span><strong>${apiRow ? `$${Number(apiRow.revenue).toFixed(3)}` : '—'}</strong></div>
+          </div>
+        </article>
       `;
     }).join('');
 
@@ -92,10 +184,9 @@
     }).join('');
 
     container.innerHTML = `
-      <table style="margin-bottom: 18px;">
-        <thead><tr><th>Adsterra Unit</th><th>Format</th><th>Control</th><th>State</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Est. Revenue</th></tr></thead>
-        <tbody>${unitsRows || '<tr><td colspan="8" class="muted">No Adsterra units found in config.</td></tr>'}</tbody>
-      </table>
+      <div class="ad-units-grid" id="adUnitsGrid">
+        ${unitCardsHtml || '<div class="empty-state">No Adsterra units found in config.</div>'}
+      </div>
       <table>
         <thead><tr><th>DOM Placement Slot</th><th>Page</th><th>Format</th><th>Devices</th><th>Mapped Unit</th><th>Slot Status</th></tr></thead>
         <tbody>${placementRows}</tbody>
@@ -133,7 +224,11 @@
     activeSetupService: null,
     adControls: null,
     adControlsPermissions: null,
+    adControlsError: null,
+    lastAdReport: null,
+    advertisingFilterCustomized: false,
     deployReport: null,
+    deployInFlight: false,
     deployPollTimer: null
   };
   const resources = ['companies', 'interview_questions', 'hiring_news', 'feedback', 'website_settings', 'admin_activity_logs'];
@@ -750,6 +845,28 @@
         api('/api/admin/integrations?service=health')
       ]);
       const d = sysRes.data || {};
+      if (d.adControlsLoaded && d.adControls) {
+        state.adControls = d.adControls;
+        state.adControlsError = null;
+      } else if (!state.adControls) {
+        state.adControlsError = 'Saved ad controls unavailable.';
+      }
+      const controls = state.adControls;
+      const controlsLoaded = Boolean(controls && controls.units);
+      const popOn = controlsLoaded && controls.units['32172757'] === true;
+      const masterOn = controlsLoaded && controls.masterEnabled !== false;
+      const activeEligibleCount = controlsLoaded
+        ? ['32172758', '32172759', '32172760', '32172761', '32172762'].filter((id) => controls.units[id] === true).length
+        : 0;
+      const adPolicyVal = !controlsLoaded
+        ? 'Controls Unavailable'
+        : (masterOn ? `${activeEligibleCount}/5 Units + Popunder ${popOn ? 'ON' : 'OFF'}` : 'Master OFF');
+      const adPolicySub = !controlsLoaded
+        ? 'Popunder 32172757 OFF by default (Owner-controlled)'
+        : (popOn
+          ? (masterOn ? 'Unit 32172757 ON (explicitly enabled by Owner)' : 'Popunder 32172757 saved ON, paused by Master')
+          : 'Unit 32172757 OFF (default; Owner-controlled)');
+
       const h = healthRes?.data?.integrations?.health;
       const hd = h?.data || {};
       if (cards) {
@@ -758,7 +875,7 @@
           ['Avg Response Time', hd.avgLatencyMs != null ? `${hd.avgLatencyMs} ms` : 'Unavailable', 'HTTP Check', `Checked ${new Date(h?.lastSyncedAt || Date.now()).toLocaleTimeString()}`],
           ['Database Reachability', d.databaseAvailability || 'standby', 'Supabase', `Query ${d.responseMs || 0} ms`],
           ['Content Records', `${d.contentRecords ?? 0} Co / ${d.questionRecords ?? 0} Qs`, 'Supabase', 'Live count'],
-          ['Ad Policy Status', '5 Active + Popunder OFF', 'Policy', 'Unit 32172757 disabled']
+          ['Ad Policy Status', adPolicyVal, 'Policy', adPolicySub]
         ]);
       }
       if (epTable) {
@@ -784,12 +901,19 @@
     }
     const isConnected = adsterra?.status === 'Connected' && adsterra?.data;
     const t = adsterra?.data?.totals || {};
+    const controls = state.adControls;
+    const controlsError = state.adControlsError;
+    const rangeLabel = formatAdReportingRange(adsterra);
+    const popSummary = getPopunderPolicySummary(controls, controlsError);
+    const controlsErrHtml = controlsError
+      ? ` <span style="display:block;margin-top:4px;font-size:12px;">Saved ad controls request failed (${escapeHtml(controlsError)}); unit policy statuses below are withheld rather than assumed enabled.</span>`
+      : '';
 
     if (notice) {
       if (isConnected) {
-        notice.innerHTML = '<div class="alert-banner is-success"><strong>Connected to Adsterra Publisher API:</strong> Displaying live authenticated impressions, clicks, CPM, and estimated earnings. Popunder unit <code>32172757</code> remains permanently disabled.</div>';
+        notice.innerHTML = `<div class="alert-banner is-success"><strong>Connected to Adsterra Publisher API (${escapeHtml(rangeLabel)}):</strong> Displaying live authenticated impressions, clicks, CPM, and estimated earnings. ${popSummary}${controlsErrHtml}</div>`;
       } else {
-        notice.innerHTML = `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(adsterra?.status || 'Not configured')}):</strong> ${escapeHtml(adsterra?.error || 'Provide ADSTERRA_API_TOKEN in Cloudflare Pages Secrets to retrieve live revenue and impressions.')} Active client units: 32172758, 32172759, 32172760, 32172761, 32172762 (Popunder 32172757 permanently disabled).</div>`;
+        notice.innerHTML = `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(adsterra?.status || 'Not configured')}):</strong> ${escapeHtml(adsterra?.error || 'Provide ADSTERRA_API_TOKEN in Cloudflare Pages Secrets to retrieve live revenue and impressions.')} ${popSummary}${controlsErrHtml}</div>`;
       }
     }
 
@@ -818,8 +942,8 @@
       const apiMap = new Map((byPlacement || []).map((p) => [String(p.placementId), p]));
       tableEl.innerHTML = `<table><thead><tr><th>Unit ID</th><th>Format</th><th>Policy Status</th><th>Impressions</th><th>Clicks</th><th>CPM</th><th>Revenue</th></tr></thead><tbody>${units.map((u) => {
         const row = apiMap.get(String(u.unitId));
-        const isPop = u.unitId === '32172757';
-        return `<tr><td><strong>${escapeHtml(u.unitId)}</strong> (${escapeHtml(u.name)})</td><td>${escapeHtml(u.format)}</td><td><span class="status-pill ${isPop ? 'status-inactive' : 'status-connected'}">${isPop ? 'Permanently Disabled' : 'Active'}</span></td><td>${row ? row.impressions.toLocaleString() : '—'}</td><td>${row ? row.clicks.toLocaleString() : '—'}</td><td>${row ? `$${Number(row.cpm).toFixed(2)}` : '—'}</td><td>${row ? `$${Number(row.revenue).toFixed(3)}` : '—'}</td></tr>`;
+        const statusMeta = getUnitPolicyStatusMeta(u.unitId, controls, controlsError);
+        return `<tr><td><strong>${escapeHtml(u.unitId)}</strong> (${escapeHtml(u.name)})</td><td>${escapeHtml(u.format)}</td><td><span class="status-pill ${statusMeta.pillClass}">${escapeHtml(statusMeta.label)}</span></td><td>${row ? row.impressions.toLocaleString() : '—'}</td><td>${row ? row.clicks.toLocaleString() : '—'}</td><td>${row ? `$${Number(row.cpm).toFixed(2)}` : '—'}</td><td>${row ? `$${Number(row.revenue).toFixed(3)}` : '—'}</td></tr>`;
       }).join('')}</tbody></table>`;
     }
   }
@@ -961,13 +1085,23 @@
       const granularity = document.getElementById('overviewGranularity')?.value || 'daily';
       const params = analyticsQuery(period, 'overviewFrom', 'overviewTo');
 
-      const [result, intRes] = await Promise.all([
+      let adControlsErr = null;
+      const [result, intRes, ctrlRes] = await Promise.all([
         api(`/api/admin/overview?${params}`),
-        api(`/api/admin/integrations?service=all&${params}`).catch(() => null)
+        api(`/api/admin/integrations?service=all&${params}`).catch(() => null),
+        api('/api/admin/ad-controls').catch((err) => { adControlsErr = err; return null; })
       ]);
 
       state.overviewReport = result;
       if (intRes?.data) state.integrationsReport = intRes.data;
+      if (ctrlRes?.data?.controls) {
+        state.adControls = ctrlRes.data.controls;
+        state.adControlsPermissions = ctrlRes.data.permissions || null;
+        state.adControlsError = null;
+      } else {
+        state.adControls = null;
+        state.adControlsError = adControlsErr?.message || 'Unable to load saved ad controls.';
+      }
 
       const d = result.data || {};
       if (d.currentUser) {
@@ -975,6 +1109,7 @@
         state.isOwner = Boolean(d.currentUser.isOwner);
         updateUserIdentity();
       }
+      renderAdvertisingPlacements();
 
       const ints = state.integrationsReport?.integrations || {};
       const ga4 = ints.ga4;
@@ -1215,13 +1350,21 @@
       });
       if (res?.data?.controls) {
         state.adControls = res.data.controls;
+        state.adControlsError = null;
       }
       renderAdvertisingPlacements();
+      if (state.integrationsReport?.integrations?.adsterra) {
+        renderAdOverviewSection(state.integrationsReport.integrations.adsterra, document.getElementById('overviewGranularity')?.value || 'daily');
+      }
       const refreshRes = await api('/api/admin/ad-controls').catch(() => null);
       if (refreshRes?.data) {
         state.adControls = refreshRes.data.controls;
         state.adControlsPermissions = refreshRes.data.permissions;
+        state.adControlsError = null;
         renderAdvertisingPlacements();
+        if (state.integrationsReport?.integrations?.adsterra) {
+          renderAdOverviewSection(state.integrationsReport.integrations.adsterra, document.getElementById('overviewGranularity')?.value || 'daily');
+        }
         renderAdControlsAudit(refreshRes.data.auditLogs);
       }
       setStatus(statusEl, 'Saved to Supabase & audit logged. Takes effect on fresh page loads (already-loaded ads remain until refresh).', false);
@@ -1234,39 +1377,68 @@
   async function loadAdvertising() {
     const banner = document.getElementById('advertisingApiBanner');
     const controlsNotice = document.getElementById('adControlsNotice');
+    const rangeTag = document.getElementById('advertisingRangeLabel');
     try {
+      if (!state.advertisingFilterCustomized) {
+        syncAdvertisingFilterFromOverview();
+      }
+      const period = document.getElementById('advertisingPeriod')?.value || '7';
+      const params = analyticsQuery(period, 'advertisingFrom', 'advertisingTo');
+      let adControlsErr = null;
       const [res, ctrlRes] = await Promise.all([
-        api('/api/admin/integrations?service=adsterra'),
-        api('/api/admin/ad-controls').catch(() => null)
+        api(`/api/admin/integrations?service=adsterra&${params}`),
+        api('/api/admin/ad-controls').catch((err) => { adControlsErr = err; return null; })
       ]);
       const ad = res?.data?.integrations?.adsterra;
-      if (!state.integrationsReport) state.integrationsReport = { integrations: {} };
-      state.integrationsReport.integrations.adsterra = ad;
       state.lastAdReport = ad;
+      if (!state.advertisingFilterCustomized) {
+        if (!state.integrationsReport) state.integrationsReport = { integrations: {} };
+        state.integrationsReport.integrations.adsterra = ad;
+      }
 
-      if (ctrlRes?.data) {
+      if (ctrlRes?.data?.controls) {
         state.adControls = ctrlRes.data.controls;
-        state.adControlsPermissions = ctrlRes.data.permissions;
+        state.adControlsPermissions = ctrlRes.data.permissions || null;
+        state.adControlsError = null;
         if (controlsNotice && ctrlRes.data.runtimeEnforcement?.note) {
           controlsNotice.innerHTML = `<div class="alert-banner is-info" style="margin-bottom:12px;"><strong>Runtime Persistence:</strong> ${escapeHtml(ctrlRes.data.runtimeEnforcement.note)}</div>`;
         }
         renderAdControlsAudit(ctrlRes.data.auditLogs);
+      } else {
+        state.adControls = null;
+        state.adControlsError = adControlsErr?.message || 'Unable to verify saved ad controls.';
+        if (controlsNotice) {
+          controlsNotice.innerHTML = `<div class="alert-banner is-warning" style="margin-bottom:12px;"><strong>Ad Controls Unavailable:</strong> ${escapeHtml(state.adControlsError)} Interactive controls are locked until saved settings load; Popunder unit <code>32172757</code> remains OFF by default and Owner-controlled.</div>`;
+        }
       }
 
       const ok = ad?.status === 'Connected' && ad?.data;
       const t = ad?.data?.totals || {};
-      const popOn = Boolean(state.adControls?.units?.['32172757']);
+      const rangeText = formatAdReportingRange(ad, params);
+      if (rangeTag) rangeTag.textContent = `Window: ${rangeText}`;
+
+      const controlsLoaded = Boolean(state.adControls && state.adControls.units);
+      const masterOn = controlsLoaded && state.adControls.masterEnabled !== false;
+      const popOn = controlsLoaded && state.adControls.units['32172757'] === true;
+
       if (banner) {
         banner.innerHTML = ok
-          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Authenticated Adsterra Publisher API telemetry loaded. Popunder Unit <code>32172757</code> is ${popOn ? 'ENABLED (Owner override)' : 'disabled'}.</div>`
-          : `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(ad?.status || 'Not configured')}):</strong> ${escapeHtml(ad?.error || 'Set ADSTERRA_API_TOKEN to view live earnings & impressions.')}</div>`;
+          ? `<div class="alert-banner is-success"><strong>Connected:</strong> Authenticated Adsterra Publisher API telemetry loaded for <strong>${escapeHtml(rangeText)}</strong>. ${getPopunderPolicySummary(state.adControls, state.adControlsError)}</div>`
+          : `<div class="alert-banner is-warning"><strong>Adsterra Publisher API (${escapeHtml(ad?.status || 'Not configured')}):</strong> ${escapeHtml(ad?.error || 'Set ADSTERRA_API_TOKEN to view live earnings & impressions.')} Requested window: <strong>${escapeHtml(rangeText)}</strong>.</div>`;
       }
+
+      const popCard = !controlsLoaded
+        ? ['Popunder (32172757)', 'Unavailable', 'Owner Guard', 'OFF by default; controls unavailable']
+        : (popOn
+          ? ['Popunder (32172757)', masterOn ? 'ENABLED' : 'PAUSED (Master OFF)', 'Owner Guard', masterOn ? 'Explicitly enabled by Owner' : 'Saved ON; paused by Master OFF']
+          : ['Popunder (32172757)', 'OFF (Default)', 'Owner Guard', 'Owner-controlled; OFF by default']);
+
       renderStatCards('advertisingSummaryCards', [
-        ['Impressions', ok ? t.impressions : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
-        ['Clicks & CTR', ok ? `${t.clicks} (${t.ctr}%)` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
-        ['CPM', ok ? `$${Number(t.cpm || 0).toFixed(2)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
-        ['Est. Revenue', ok ? `$${Number(t.revenue || 0).toFixed(3)}` : 'Unavailable', ok ? 'Adsterra API' : 'Not configured'],
-        ['Popunder (32172757)', popOn ? 'ENABLED' : 'OFF (Safe)', 'Owner Guard', popOn ? 'Owner confirmed override' : 'Requires Owner confirmation']
+        ['Impressions', ok ? t.impressions : 'Unavailable', ok ? `Adsterra API · ${rangeText}` : 'Not configured'],
+        ['Clicks & CTR', ok ? `${t.clicks} (${t.ctr}%)` : 'Unavailable', ok ? `Adsterra API · ${rangeText}` : 'Not configured'],
+        ['CPM', ok ? `$${Number(t.cpm || 0).toFixed(2)}` : 'Unavailable', ok ? `Adsterra API · ${rangeText}` : 'Not configured'],
+        ['Est. Revenue', ok ? `$${Number(t.revenue || 0).toFixed(3)}` : 'Unavailable', ok ? `Adsterra API · ${rangeText}` : 'Not configured'],
+        popCard
       ]);
       const daily = ad?.data?.daily || [];
       renderMultiChart('adDetRev', 'adDetailRevenueChart', 'line', daily.map((r) => r.date), [{ label: 'Revenue ($)', data: daily.map((r) => r.revenue), borderColor: '#16a34a', tension: 0.2 }]);
@@ -1368,12 +1540,18 @@
 
   async function loadDeploymentCenter() {
     const banner = document.getElementById('deployBanner');
+    const blockEl = document.getElementById('deployBlockReason');
     const preflightEl = document.getElementById('deployPreflightGrid');
     const deployBtn = document.getElementById('deployToProductionBtn');
     const histEl = document.getElementById('deployHistoryTable');
     const failEl = document.getElementById('deployFailedTable');
 
     if (banner) banner.innerHTML = '<div class="alert-banner is-info">Running live pre-deployment verification checks...</div>';
+    if (blockEl) { blockEl.hidden = true; blockEl.innerHTML = ''; }
+    if (deployBtn) {
+      deployBtn.hidden = false;
+      deployBtn.disabled = true;
+    }
     try {
       const res = await api('/api/admin/deploy');
       const d = res?.data || {};
@@ -1381,40 +1559,69 @@
       const pf = d.preflight || {};
       const lp = d.latestProduction;
       const cfOk = Boolean(pf.cloudflareConfigured);
+      const reasons = Array.isArray(pf.blockingReasons) ? pf.blockingReasons : [];
+      const rs = pf.repoSync || {};
+      const prim = rs.primary || {};
+      const back = rs.backup || {};
+      const cfPerms = pf.cloudflarePermissions || {};
+      const tokenInfo = pf.cloudflareToken || {};
 
       if (deployBtn) {
-        deployBtn.hidden = !d.canDeploy;
-        deployBtn.disabled = !pf.readyToDeploy;
+        deployBtn.hidden = false;
+        deployBtn.disabled = Boolean(state.deployInFlight || !d.canDeploy || !pf.readyToDeploy);
+        deployBtn.title = d.canDeploy
+          ? (pf.readyToDeploy ? 'Trigger production deployment on Cloudflare Pages' : (reasons[0] || 'Pre-deployment checks blocked'))
+          : 'Owner access required to trigger production deployments';
       }
 
       if (banner) {
         if (!cfOk) {
           banner.innerHTML = `<div class="alert-banner is-warning"><strong>Cloudflare Pages (${escapeHtml(pf.cloudflareStatus || 'Not configured')}):</strong> ${escapeHtml(pf.cloudflareError || 'Configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.')}</div>`;
         } else if (!pf.repositoriesSynchronized) {
-          banner.innerHTML = `<div class="alert-banner is-error"><strong>Deployment Blocked — Repository Synchronization Check:</strong> ${escapeHtml(pf.repoSync?.error || 'Primary and backup main branches do not match.')}</div>`;
+          banner.innerHTML = `<div class="alert-banner is-error"><strong>Deployment Blocked &mdash; Repository Synchronization Check:</strong> ${escapeHtml(rs.error || 'Primary and backup main branches do not match.')}</div>`;
         } else if (!d.canDeploy) {
           banner.innerHTML = `<div class="alert-banner is-info"><strong>View-Only Access:</strong> Connected to Cloudflare Pages <code>${escapeHtml(d.project?.name || 'prepwise-7ij')}</code> (${escapeHtml(d.project?.productionBranch || 'main')}). Only the verified Owner can trigger production deployments.</div>`;
+        } else if (!pf.readyToDeploy) {
+          banner.innerHTML = `<div class="alert-banner is-warning"><strong>Deployment Blocked:</strong> One or more mandatory preflight checks did not pass. Review the blocked reasons below before deploying.</div>`;
         } else {
-          banner.innerHTML = `<div class="alert-banner is-success"><strong>Ready for Production Release Review:</strong> Project <code>${escapeHtml(d.project?.name || 'prepwise-7ij')}</code> (${escapeHtml(d.project?.productionBranch || 'main')}), primary &amp; backup GitHub <code>main</code> synced at <code>${escapeHtml(pf.repoSync?.primary?.shortSha || '—')}</code>.</div>`;
+          banner.innerHTML = `<div class="alert-banner is-success"><strong>Ready for Production Release Review:</strong> Project <code>${escapeHtml(d.project?.name || 'prepwise-7ij')}</code> (${escapeHtml(d.project?.productionBranch || 'main')}), primary &amp; backup GitHub <code>main</code> synced at <code>${escapeHtml(prim.shortSha || '—')}</code>.</div>`;
         }
       }
 
+      if (blockEl) {
+        if (pf.readyToDeploy) {
+          blockEl.hidden = true;
+          blockEl.innerHTML = '';
+        } else if (reasons.length) {
+          blockEl.hidden = false;
+          blockEl.className = 'deploy-block-reason alert-banner is-warning';
+          blockEl.innerHTML = `<strong>Deploy button disabled because:</strong><ul style="margin:6px 0 0 18px; padding:0;">${reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`;
+        }
+      }
+
+      const currentShort = pf.currentCommitShortSha || lp?.commitHash || 'Unavailable';
+      const expectedShort = pf.expectedCommitShortSha || prim.shortSha || 'Unavailable';
       renderStatCards('deploySummaryCards', [
-        ['Project Name', d.project?.name || pf.projectName || 'prepwise-7ij', cfOk ? 'Cloudflare Pages' : 'Unverified'],
-        ['Production Branch', d.project?.productionBranch || 'Unavailable', pf.branchVerified ? 'Verified: main' : 'Mismatch'],
+        ['Project Name', d.project?.name || pf.projectName || 'prepwise-7ij', cfOk ? 'Cloudflare Pages' : (pf.cloudflareStatus || 'Unverified')],
+        ['Production Branch', d.project?.productionBranch || pf.productionBranch || 'Unavailable', pf.branchVerified ? 'Verified: main' : 'Unverified / Mismatch'],
         ['Latest Prod Deploy', lp ? `${lp.id} (${lp.status})` : 'Unavailable', cfOk ? 'Cloudflare API' : 'Not connected', lp?.createdOn ? new Date(lp.createdOn).toLocaleString() : ''],
-        ['Latest Commit SHA', lp?.commitHash || pf.repoSync?.primary?.shortSha || 'Unavailable', 'GitHub / CF', lp?.commitMessage || pf.repoSync?.primary?.message || ''],
+        ['Current vs Expected SHA', `${currentShort} → ${expectedShort}`, currentShort === expectedShort && currentShort !== 'Unavailable' ? 'In Sync' : 'Pending / Diff', lp?.commitMessage || prim.message || ''],
         ['Failed Deploys (last 10)', cfOk ? (d.failedCount ?? 0) : 'Unavailable', cfOk ? 'Cloudflare API' : 'Not connected']
       ]);
 
       if (preflightEl) {
+        const permDetail = `Pages Read: ${cfPerms.pagesRead?.ok ? 'OK' : (cfPerms.pagesRead?.status || 'Failed')} · Pages Edit: ${cfPerms.pagesEdit?.status || 'unknown'} · Zone Analytics: ${cfPerms.zoneAnalyticsRead?.status || 'unknown'}`;
+        const cfAuthPass = Boolean(cfOk && cfPerms.pagesRead?.ok && (tokenInfo.checked ? tokenInfo.active : true));
+        const eligibilityPass = Boolean(pf.readyToDeploy);
         const checks = [
-          ['Owner Authorization', pf.ownerAuthorized, pf.ownerAuthorized ? 'Verified Owner' : 'Full Admin (View Only)', true],
-          ['Cloudflare API Credentials', pf.cloudflareConfigured, pf.cloudflareConfigured ? 'Authenticated' : (pf.cloudflareError || 'Missing'), false],
-          ['Pages Project Slug', pf.projectVerified, pf.projectName || 'prepwise-7ij', false],
-          ['Production Branch', pf.branchVerified, pf.productionBranch || 'Unknown', false],
-          ['Primary & Backup Sync', pf.repositoriesSynchronized, pf.repositoriesSynchronized ? `Synced (${pf.repoSync?.primary?.shortSha || ''})` : (pf.repoSync?.error || 'Not synced'), false],
-          ['Local Working Tree', null, 'Confirm clean before trigger', true]
+          ['GitHub Primary (RayyanShajahan/prepwise)', Boolean(prim.ok), prim.ok ? `main @ ${prim.shortSha} (${prim.message})` : (prim.error || 'Unreachable')],
+          ['GitHub Backup (Sreesidh-git/prepwise)', Boolean(back.ok), back.ok ? `main @ ${back.shortSha} (${back.message})` : (back.error || 'Unreachable')],
+          ['Main Branch Synchronization', Boolean(pf.repositoriesSynchronized), pf.repositoriesSynchronized ? `Synced (${prim.shortSha || ''} == ${back.shortSha || ''})` : (rs.error || 'Not synchronized')],
+          ['Commit SHA Alignment (Current vs Expected)', Boolean(pf.expectedCommitSha), `Live: ${currentShort} | Expected: ${expectedShort}`],
+          ['Cloudflare Pages Project Detection', Boolean(pf.projectVerified && pf.branchVerified), pf.projectVerified ? `${pf.projectName || 'prepwise-7ij'} (branch: ${pf.productionBranch || 'unknown'})` : (pf.cloudflareError || 'Project or branch unverified')],
+          ['Cloudflare Authorization & Permissions', cfAuthPass, permDetail],
+          ['Owner Auth & Deployment Eligibility', Boolean(pf.ownerAuthorized && eligibilityPass), pf.ownerAuthorized ? (eligibilityPass ? 'Verified Owner · Eligible to deploy' : 'Owner verified · Blocked by preflight') : 'Non-Owner Admin (Deployments blocked)'],
+          ['Clean Working Tree Confirm', null, 'Explicit checkbox confirmation required before trigger']
         ];
         preflightEl.innerHTML = checks.map(([label, pass, detail]) => {
           const pillCls = pass === true ? 'status-connected' : (pass === false ? 'status-error' : 'status-unavailable');
@@ -1426,30 +1633,53 @@
       const deps = d.deployments || [];
       if (histEl) {
         histEl.innerHTML = deps.length
-          ? `<table><thead><tr><th>Deploy</th><th>Env</th><th>Commit</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody>${deps.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td>${escapeHtml(dp.environment)}</td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.commitMessage)}</td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : (dp.status === 'failure' || dp.status === 'failed' ? 'status-error' : 'status-unavailable')}">${escapeHtml(dp.status)}</span></td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>`
-          : '<div class="empty-state">No Cloudflare Pages deployments retrieved.</div>';
+          ? `<table><thead><tr><th>Deploy ID</th><th>Commit SHA</th><th>Branch</th><th>Status</th><th>Created / Completed</th><th>Production URL</th></tr></thead><tbody>${deps.map((dp) => {
+              const created = dp.createdOn ? new Date(dp.createdOn).toLocaleString() : '—';
+              const completed = dp.completedOn ? new Date(dp.completedOn).toLocaleString() : 'In progress';
+              const urlCell = dp.url ? `<a href="${escapeHtml(dp.url)}" target="_blank" rel="noopener">${escapeHtml(dp.url.replace(/^https?:\/\//i, ''))}</a>` : '—';
+              return `<tr><td><code>${escapeHtml(dp.id || '—')}</code><br><span class="muted" style="font-size:11px;">${escapeHtml(dp.environment || '—')}</span></td><td><code>${escapeHtml(dp.commitHash || '—')}</code><br><span class="muted" style="font-size:11px;">${escapeHtml(dp.commitMessage || '—')}</span></td><td><code>${escapeHtml(dp.branch || 'main')}</code></td><td><span class="status-pill ${dp.status === 'success' ? 'status-connected' : (dp.status === 'failure' || dp.status === 'failed' ? 'status-error' : 'status-unavailable')}">${escapeHtml(dp.status || 'unknown')}</span></td><td>${escapeHtml(created)}<br><span class="muted" style="font-size:11px;">Done: ${escapeHtml(completed)}</span></td><td>${urlCell}</td></tr>`;
+            }).join('')}</tbody></table>`
+          : `<div class="empty-state">${cfOk ? 'No Cloudflare Pages deployments returned yet.' : escapeHtml(pf.cloudflareError || 'Cloudflare deployment history unavailable — check CLOUDFLARE_API_TOKEN permissions.')}</div>`;
       }
 
       const failed = d.failedDeployments || [];
       const audit = d.auditLogs || [];
       if (failEl) {
         const failedHtml = failed.length
-          ? `<table style="margin-bottom:14px;"><thead><tr><th>Failed Deploy</th><th>Commit</th><th>Stage</th><th>Date</th></tr></thead><tbody>${failed.map((dp) => `<tr><td><code>${escapeHtml(dp.id)}</code></td><td><code>${escapeHtml(dp.commitHash)}</code></td><td>${escapeHtml(dp.stage || 'deploy')}</td><td>${escapeHtml(new Date(dp.createdOn).toLocaleString())}</td></tr>`).join('')}</tbody></table>`
+          ? `<table style="margin-bottom:14px;"><thead><tr><th>Failed Deploy</th><th>Commit SHA</th><th>Failure Reason</th><th>Timestamp</th></tr></thead><tbody>${failed.map((dp) => `<tr><td><code>${escapeHtml(dp.id || '—')}</code></td><td><code>${escapeHtml(dp.commitHash || '—')}</code></td><td>${escapeHtml(dp.failureReason || dp.stage || 'Build failed')}</td><td>${escapeHtml(dp.completedOn || dp.createdOn ? new Date(dp.completedOn || dp.createdOn).toLocaleString() : '—')}</td></tr>`).join('')}</tbody></table>`
           : '<div class="empty-state" style="margin-bottom:14px;">0 failed deployments in recent history.</div>';
+        const auditErrHtml = d.auditLogsError
+          ? `<div class="alert-banner is-warning" style="margin-bottom:10px;"><strong>Audit Log Warning:</strong> ${escapeHtml(d.auditLogsError)}</div>`
+          : '';
         const auditHtml = audit.length
-          ? `<table><thead><tr><th>Deploy Action</th><th>Commit / Target</th><th>Admin</th><th>Result</th><th>Time</th></tr></thead><tbody>${audit.map((a) => {
+          ? `<table><thead><tr><th>Deploy Action</th><th>Commit / Target</th><th>Details / Failure Reason</th><th>Initiating Admin</th><th>Timestamp</th></tr></thead><tbody>${audit.map((a) => {
               const m = a.metadata || {};
-              return `<tr><td>${escapeHtml(a.action)}</td><td><code>${escapeHtml(String(m.commitSha || '').slice(0, 7) || m.project || '—')}</code></td><td>${escapeHtml(m.administrator?.email || a.admin_user_id || 'Owner')}</td><td><span class="status-pill ${m.success === false ? 'status-error' : 'status-connected'}">${m.success === false ? 'Failed / Denied' : 'Triggered'}</span></td><td>${escapeHtml(new Date(a.created_at).toLocaleString())}</td></tr>`;
+              const detail = m.error || m.reason || (m.success === false ? 'Blocked or failed' : `Triggered (${m.branch || 'main'})`);
+              const adminName = m.administrator?.displayName || m.administrator?.email || a.admin_user_id || 'Owner';
+              return `<tr><td><strong>${escapeHtml(a.action)}</strong><br><span class="status-pill ${m.success === false ? 'status-error' : 'status-connected'}">${m.success === false ? 'Failed / Denied' : 'Triggered'}</span></td><td><code>${escapeHtml(String(m.commitSha || '').slice(0, 7) || m.project || '—')}</code></td><td>${escapeHtml(detail)}</td><td>${escapeHtml(adminName)}</td><td>${escapeHtml(new Date(a.created_at).toLocaleString())}</td></tr>`;
             }).join('')}</tbody></table>`
-          : '<div class="empty-state">No deployment center triggers audited yet.</div>';
-        failEl.innerHTML = failedHtml + auditHtml;
+          : '<div class="empty-state">No deployment center audit events recorded yet.</div>';
+        failEl.innerHTML = failedHtml + auditErrHtml + auditHtml;
       }
     } catch (error) {
-      if (banner) banner.innerHTML = `<div class="alert-banner is-error">${escapeHtml(error.message)}</div>`;
+      if (deployBtn) {
+        deployBtn.hidden = false;
+        deployBtn.disabled = true;
+      }
+      if (banner) banner.innerHTML = `<div class="alert-banner is-error"><strong>Deployment Center Error:</strong> ${escapeHtml(error.message)}</div>`;
+      if (blockEl) {
+        blockEl.hidden = false;
+        blockEl.className = 'deploy-block-reason alert-banner is-error';
+        blockEl.innerHTML = `<strong>Deploy unavailable:</strong> ${escapeHtml(error.message)}`;
+      }
+      if (preflightEl) preflightEl.innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+      if (histEl) histEl.innerHTML = `<div class="empty-state">Unable to load deployment history: ${escapeHtml(error.message)}</div>`;
+      if (failEl) failEl.innerHTML = `<div class="empty-state">Unable to load failed deployments or audit log: ${escapeHtml(error.message)}</div>`;
     }
   }
 
   function openDeployConfirmModal() {
+    if (state.deployInFlight) return;
     const d = state.deployReport;
     const pf = d?.preflight;
     if (!d?.canDeploy || !pf?.readyToDeploy) return;
@@ -1503,18 +1733,25 @@
         `;
 
         if (dep?.status === 'success' || dep?.status === 'failure' || dep?.status === 'failed' || attempts >= 24) {
+          state.deployInFlight = false;
           await loadDeploymentCenter();
           return;
         }
         state.deployPollTimer = setTimeout(step, 5000);
       } catch (err) {
+        state.deployInFlight = false;
         box.innerHTML = `<div class="alert-banner is-error">Progress polling stopped: ${escapeHtml(err.message)}</div>`;
+        await loadDeploymentCenter();
       }
     };
     await step();
   }
 
   async function triggerProductionDeploy() {
+    if (state.deployInFlight) return;
+    state.deployInFlight = true;
+    const deployBtn = document.getElementById('deployToProductionBtn');
+    if (deployBtn) deployBtn.disabled = true;
     const modal = document.getElementById('deployConfirmModal');
     const box = document.getElementById('deployProgressBox');
     const expectedCommitSha = state.deployReport?.preflight?.repoSync?.primary?.sha || '';
@@ -1541,14 +1778,17 @@
       if (dep?.fullId || dep?.id) {
         await pollDeploymentProgress(dep.fullId || dep.id);
       } else {
+        state.deployInFlight = false;
         await loadDeploymentCenter();
       }
     } catch (err) {
+      state.deployInFlight = false;
       if (modal) modal.hidden = true;
       if (box) {
         box.hidden = false;
         box.innerHTML = `<div class="alert-banner is-error"><strong>Deployment failed to start:</strong> ${escapeHtml(err.message)}</div>`;
       }
+      await loadDeploymentCenter();
     } finally {
       if (confirmBtn) {
         confirmBtn.textContent = 'Trigger Production Deployment';
@@ -2683,6 +2923,17 @@
     loadQuiz();
   });
 
+  document.getElementById('advertisingPeriod')?.addEventListener('change', (event) => {
+    state.advertisingFilterCustomized = true;
+    document.getElementById('advertisingFilters')?.classList.toggle('is-custom', event.target.value === 'custom');
+    if (event.target.value !== 'custom') loadAdvertising();
+  });
+  document.getElementById('advertisingFilters')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    state.advertisingFilterCustomized = true;
+    loadAdvertising();
+  });
+
   function activateSection(section) {
     document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.section === section));
     document.querySelectorAll('.panel').forEach((panel) => {
@@ -2822,6 +3073,9 @@
   }));
 
   document.querySelectorAll('[data-jump]').forEach((button) => button.addEventListener('click', () => {
+    if (button.dataset.jump === 'advertising') {
+      state.advertisingFilterCustomized = false;
+    }
     activateSection(button.dataset.jump);
   }));
 
