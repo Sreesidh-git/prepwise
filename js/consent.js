@@ -88,8 +88,37 @@
 
   // --- UI Construction ---
 
+  function safeSessionStorage() {
+    try {
+      return window.sessionStorage;
+    } catch {
+      return null;
+    }
+  }
+
+  function isDismissedThisSession() {
+    const session = safeSessionStorage();
+    if (!session) return false;
+    try {
+      return session.getItem('prepwise_consent_dismissed') === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function dismissBanner() {
+    const session = safeSessionStorage();
+    if (session) {
+      try {
+        session.setItem('prepwise_consent_dismissed', '1');
+      } catch {}
+    }
+    hideBanner();
+  }
+
   function createBanner() {
     if (document.getElementById('prepwise-consent-banner')) return;
+    if (isDismissedThisSession()) return;
 
     const banner = document.createElement('aside');
     banner.id = 'prepwise-consent-banner';
@@ -98,10 +127,11 @@
     banner.setAttribute('aria-label', 'Privacy and Advertising Choices');
     banner.innerHTML = `
       <div class="prepwise-consent-content">
+        <button type="button" class="prepwise-consent-dismiss" id="btnConsentDismiss" aria-label="Dismiss privacy choices">&times;</button>
         <div class="prepwise-consent-text">
           <p class="prepwise-consent-title"><strong>Privacy &amp; Advertising Choices</strong></p>
           <p class="prepwise-consent-desc">
-            We use cookies and partner with Adsterra to keep PrepWise free for students. Choose your preferred advertising experience:
+            We use cookies and partner with Adsterra to keep PrepWise free for students.
           </p>
         </div>
         <div class="prepwise-consent-actions">
@@ -112,10 +142,12 @@
       </div>
     `;
     document.body.appendChild(banner);
+    document.body.classList.add('prepwise-banner-active');
 
     const acceptBtn = banner.querySelector('#btnConsentAll') || banner.querySelector('#btnConsentAccept');
     const essentialBtn = banner.querySelector('#btnConsentEssential') || banner.querySelector('#btnConsentReject');
     const settingsBtn = banner.querySelector('#btnConsentSettings') || banner.querySelector('#btnConsentManage');
+    const dismissBtn = banner.querySelector('#btnConsentDismiss');
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', () => {
@@ -136,11 +168,18 @@
         openModal();
       });
     }
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        dismissBanner();
+      });
+    }
   }
 
   function hideBanner() {
     const banner = document.getElementById('prepwise-consent-banner');
     if (banner) banner.remove();
+    document.body.classList.remove('prepwise-banner-active');
   }
 
   function createModal() {
@@ -322,6 +361,8 @@
     setPreferences: savePreferences,
     openPreferences: openModal,
     closePreferences: closeModal,
+    hideBanner,
+    dismissBanner,
     acceptAll() {
       return savePreferences({ analytics: true, advertising: true, tier: 'all' });
     },
